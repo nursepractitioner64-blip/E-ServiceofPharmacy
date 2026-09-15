@@ -2,127 +2,242 @@
 
   <main class="psc-app">
 
-  <section class="psc-page">
 
-    <!-- CARD -->
-    <div class="psc-card psc-stock-card">
+<section class="psc-page">
 
-      <!-- HEADER -->
-      <div class="psc-stock-header">
+  <div class="psc-card psc-stock-card">
 
-        <div class="psc-stock-title">
-          <h1>Inventory Master List</h1>
-          <p>จัดการข้อมูลเวชภัณฑ์ ยา และอุปกรณ์ทั้งหมด</p>
-        </div>
+    <!-- HEADER -->
+    <div class="psc-stock-header">
 
-        <div class="dsc-dispense-action-bar">
+      <div class="psc-stock-title">
+        <h1>Inventory Master List</h1>
+        <p>จัดการข้อมูลเวชภัณฑ์ ยา และอุปกรณ์ทั้งหมด</p>
+      </div>
 
-         <button type="button" class="btn btn-refresh">
-        <i class="fa-solid fa-file-import"></i>
-        Import Excel
-      </button>
+      <div class="dsc-dispense-action-bar">
 
-      <button type="button" class="btn btn-refresh" id="openAddInventoryModal">
-        <i class="fa-solid fa-plus"></i>
-        เพิ่มรายการ
-      </button>
+        <button
+          type="button"
+          class="btn btn-refresh"
+          id="importInventoryBtn"
+        >
+          <i class="fa-solid fa-file-import"></i>
+          Import Excel
+        </button>
 
-        </div>
+        <button
+          type="button"
+          class="btn btn-refresh"
+          id="openAddInventoryModal"
+        >
+          <i class="fa-solid fa-plus"></i>
+          เพิ่มรายการ
+        </button>
 
       </div>
 
-            <!-- TABLE WRAPPER -->
-      <div class="psc-table-wrap">
+    </div>
 
-        <table class="psc-table">
+    <!-- TABLE -->
+    <div class="psc-table-wrap">
 
-            <thead>
-              <tr>
-                <th>CODE</th>
-                <th>NAME</th>
-                <th>UNIT</th>
-                <th>REQUIRED</th>
-                <th>จัดการ</th>
-              </tr>
-            </thead>
+      <table class="psc-table">
 
-            <tbody id="inventoryMasterTable"></tbody>
+        <thead>
+          <tr>
+            <th>CODE</th>
+            <th>NAME</th>
+            <th>UNIT</th>
+            <th>REQUIRED</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
 
-          </table>
+        <tbody id="inventoryMasterTable">
+          <tr>
+            <td colspan="5" class="text-center py-4">
+              กำลังโหลดข้อมูล...
+            </td>
+          </tr>
+        </tbody>
 
-        </div>     
+      </table>
 
-      </div>
+    </div>
+
+  </div>
+
+</section>
 
 
-  </section>
-
-</main>
+  </main>
 
 </section>
 
 <!-- =====================================================
-MODAL
+     INVENTORY MODAL
 ===================================================== -->
-<div class="inv-modal" id="inventoryModal" aria-hidden="true">
 
-  <div class="inv-modal-overlay" id="closeInventoryModal"></div>
+<div
+  class="inv-modal"
+  id="inventoryModal"
+  aria-hidden="true"
+>
 
-  <div class="inv-modal-box">
+  <!-- OVERLAY -->
 
-    <div class="inv-modal-header">
+  <div
+    class="inv-modal-overlay"
+    id="closeInventoryModal"
+  ></div>
 
-      <div>
-        <h2>เพิ่มรายการ Inventory</h2>
-        <p>บันทึกข้อมูลลง Sheet : INVENTORY_MASTER</p>
-      </div>
+  <!-- MODAL BOX -->
 
-      <button type="button" class="inv-modal-close" id="closeInventoryModalBtn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+  <div
+    class="inv-modal-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="inventoryModalTitle"
+  >
+
+
+<!-- HEADER -->
+<div class="inv-modal-header">
+
+  <div>
+
+    <h2 id="inventoryModalTitle">
+      เพิ่มรายการ Inventory
+    </h2>
+
+    <p>
+      บันทึกข้อมูลลง Sheet : INVENTORY_MASTER
+    </p>
+
+  </div>
+
+  <button
+    type="button"
+    class="inv-modal-close"
+    id="closeInventoryModalBtn"
+    aria-label="ปิด"
+  >
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+
+</div>
+
+
+<!-- FORM -->
+<form id="inventoryForm">
+
+  <div class="inv-form-grid">
+
+    <!-- CODE -->
+    <div class="inv-form-group">
+
+      <label for="inventoryCode">
+        CODE
+      </label>
+
+      <input
+        type="text"
+        id="inventoryCode"
+        name="code"
+        placeholder="DRG0001"
+        autocomplete="off"
+        required
+      >
 
     </div>
 
-    <form id="inventoryForm">
 
-      <div class="inv-form-grid">
+    <!-- UNIT -->
+    <div class="inv-form-group">
 
-        <div class="inv-form-group">
-          <label>CODE</label>
-          <input type="text" name="code" placeholder="DRG0001" required>
-        </div>
+      <label for="inventoryUnit">
+        UNIT
+      </label>
 
-        <div class="inv-form-group">
-          <label>UNIT</label>
-          <input type="text" name="unit" placeholder="amp / box / pcs" required>
-        </div>
+      <input
+        type="text"
+        id="inventoryUnit"
+        name="unit"
+        placeholder="amp / box / pcs"
+        autocomplete="off"
+        required
+      >
 
-      </div>
-
-      <div class="inv-form-group">
-        <label>NAME</label>
-        <input type="text" name="name" required>
-      </div>
-
-      <div class="inv-form-group">
-        <label>REQUIRED</label>
-        <input type="number" name="required" required>
-      </div>
-
-      <div class="inv-modal-footer">
-
-        <button type="button" class="inv-btn inv-btn-light" id="cancelInventoryModal">
-          ยกเลิก
-        </button>
-
-        <button type="submit" class="inv-btn inv-btn-success">
-          <i class="fa-solid fa-floppy-disk"></i>
-          บันทึก
-        </button>
-
-      </div>
-
-    </form>
+    </div>
 
   </div>
+
+
+  <!-- NAME -->
+  <div class="inv-form-group">
+
+    <label for="inventoryName">
+      NAME
+    </label>
+
+    <input
+      type="text"
+      id="inventoryName"
+      name="name"
+      placeholder="ชื่อยา / เวชภัณฑ์ / อุปกรณ์"
+      autocomplete="off"
+      required
+    >
+
+  </div>
+
+
+  <!-- REQUIRED -->
+  <div class="inv-form-group">
+
+    <label for="inventoryRequired">
+      REQUIRED
+    </label>
+
+    <input
+      type="number"
+      id="inventoryRequired"
+      name="required"
+      min="0"
+      step="1"
+      placeholder="0"
+      required
+    >
+
+  </div>
+
+
+  <!-- FOOTER -->
+  <div class="inv-modal-footer">
+
+    <button
+      type="button"
+      class="inv-btn inv-btn-light"
+      id="cancelInventoryModal"
+    >
+      ยกเลิก
+    </button>
+
+    <button
+      type="submit"
+      class="inv-btn inv-btn-success"
+      id="saveInventoryBtn"
+    >
+      <i class="fa-solid fa-floppy-disk"></i>
+      บันทึก
+    </button>
+
+  </div>
+
+</form>
+
+
+  </div>
+
 </div>

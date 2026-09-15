@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/assets/css/system-check-v5.css">
 <div class="ems-check-app">
 
     <div class="card stock-card">
@@ -15,37 +16,48 @@
 
         <div>
           <h1>Smart Controlled Drug System</h1>
-          <p>ระบบตรวจสอบอุปกรณ์ฉุกเฉิน เวชภัณฑ์ และวันหมดอายุ</p>
+          <p>ระบบบริหารจัดการยา Controlled Drug และ Daily Check</p>
         </div>
 
+      </div>
+
+      <div class="stock-header-actions">
+        <button type="button" class="ems-check-btn ems-check-btn-outline" data-route="emergency-checklist">
+          <i class="fa-solid fa-truck-medical"></i>
+          Emergency Check
+        </button>
+        <button type="button" class="ems-check-btn ems-check-btn-outline" data-route="dashboard">
+          <i class="fa-solid fa-house"></i>
+          Dashboard
+        </button>
       </div>
 
     </div>
   <!-- ================= MENU ================= -->
   <section class="ems-check-menu">
 
-    <button class="ems-check-menu-btn" data-page="drugreceive">
+    <button class="ems-check-menu-btn" data-route="receivedrug">
       
       <i class="fa-solid fa-arrows-down-to-line"></i>
       Drug Receive
     </button>
 
-    <button class="ems-check-menu-btn" data-page="drugdispense">
+    <button class="ems-check-menu-btn" data-route="dispense">
       <i class="fa-solid fa-arrows-up-to-line"></i>
       Drug Dispense
     </button>
 
-    <button class="ems-check-menu-btn" data-page="stockout">
+    <button class="ems-check-menu-btn" data-route="stockout">
       <i class="fa-solid fa-chart-pie"></i>
       Drug Balance
     </button>
 
-    <button class="ems-check-menu-btn" data-page="dailycheck">
-      <i class="fa-solid fa-warehouse"></i>
-      Stock Card Drug
+    <button class="ems-check-menu-btn" data-route="dailycheck">
+      <i class="fa-solid fa-clipboard-check"></i>
+      Daily Check
     </button>
 
-    <button class="ems-check-menu-btn" data-page="report">
+    <button class="ems-check-menu-btn" data-route="dashboard">
       <i class="fa-solid fa-chart-column"></i>
       Report
     </button>
@@ -99,3 +111,10 @@
 
 
 </div>
+<section class="container-fluid mt-3" data-system-summary id="systemSummaryV5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">Controlled Drug — สรุปสถานะ</h5>
+    <span class="text-muted small">ข้อมูลจาก Google Sheets</span>
+  </div>
+  <div class="text-muted">กำลังโหลดข้อมูล...</div>
+</section>

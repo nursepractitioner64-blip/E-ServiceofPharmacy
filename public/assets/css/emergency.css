@@ -660,3 +660,11 @@
     }
 
 }
+
+/* Shared system-level actions */
+.stock-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}

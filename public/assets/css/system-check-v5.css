@@ -1,0 +1,3 @@
+[data-system-summary] .card{border-radius:14px;border:1px solid rgba(0,0,0,.08)}
+[data-system-summary] .table td,[data-system-summary] .table th{white-space:nowrap}
+[data-system-summary] .table td:nth-child(2){white-space:normal;min-width:220px}

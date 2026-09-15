@@ -1,5 +1,7 @@
 const { getSheets } = require("../../../config/google");
 
+const { buildSystemDashboard } = require('./dashboard.builder');
+
 function toNumber(value) {
   const n = Number(String(value ?? "").replace(/,/g, ""));
   return Number.isFinite(n) ? n : 0;
@@ -95,4 +97,25 @@ async function getSummary() {
   };
 }
 
-module.exports = { getSummary };
+
+async function getSystemDashboard() {
+  const [emergencyMaster, emergencyMovements, controlledMaster, controlledReceive, controlledMovements] = await Promise.all([
+    readSheet('INVENTORY_MASTER', 'A:D').catch(() => []),
+    readSheet('INVENTORY_MOVEMENT', 'A:O').catch(() => []),
+    readSheet('DRUG_MASTER', 'A:Z').catch(() => []),
+    readSheet('DRUG_RECEIVE', 'A:Z').catch(() => []),
+    readSheet('STOCK_MOVEMENT', 'A:O').catch(() => [])
+  ]);
+
+  const controlledMasterRows = controlledMaster.length > 1
+    ? controlledMaster.slice(1)
+    : controlledReceive.slice(1);
+
+  return {
+    emergency: buildSystemDashboard({ master: emergencyMaster.slice(1), movements: emergencyMovements.slice(1) }),
+    controlled: buildSystemDashboard({ master: controlledMasterRows, movements: controlledMovements.slice(1) }),
+    generatedAt: new Date().toISOString()
+  };
+}
+
+module.exports = { getSummary, getSystemDashboard, buildSystemDashboard };
