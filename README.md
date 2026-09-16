@@ -16,6 +16,44 @@ node server.js
 netstat -ano | findstr :2003
 taskkill /PID <PID> /F
 
+
+cd "F:\STM\E-ServiceofPharmacy"
+
+git status
+
+git add .
+
+git commit -m "Update E-ServiceofPharmacy"
+
+git push
+
+
+
+1. เข้าโฟลเดอร์โปรเจกต์
+cd "F:\STM\ชื่อโปรเจกต์ใหม่"
+2. เริ่ม Git
+git init
+3. เพิ่มไฟล์
+git add -A
+4. Commit
+git commit -m "Initial commit"
+5. สร้าง Repository ใหม่บน GitHub
+
+สร้าง Repo แล้ว ไม่ต้องสร้าง README ก่อน
+
+6. เชื่อม GitHub
+git remote add origin https://github.com/USERNAME/ชื่อ-REPO.git
+7. Push ขึ้น GitHub
+git branch -M main
+git push -u origin main
+
+จบครับ ✅
+หลังจากนี้เวลาแก้โปรเจกต์แล้วใช้แค่:
+
+git add -A
+git commit -m "Update project"
+git push
+
 cd /d F:\Mithmitree_SP4\ระบบงานเภสัชกรรม\PharmacyStockCard_NEW
 
 
