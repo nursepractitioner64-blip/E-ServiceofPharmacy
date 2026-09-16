@@ -1,11 +1,46 @@
-const express = require("express");
-const controller = require("./receivestock.controller");
+console.log("✅ receivestock.routes loaded");
+const router = require("express").Router();
 
-const router = express.Router();
+const controller =
+  require("./receivestock.controller");
 
-router.get("/", controller.getAll);
-router.post("/", controller.create);
-router.get("/refno", controller.getNextRefNo);
-router.get("/master", controller.getInventoryMaster);
+/* =====================================================
+GET ALL
+===================================================== */
+router.use((req, res, next) => {
+  console.log("➡️", req.method, req.originalUrl);
+  next();
+});
+router.get(
+  "/",
+  controller.getAllReceiveStock
+);
+
+/* =====================================================
+CREATE
+===================================================== */
+
+router.post(
+  "/",
+  controller.createReceiveStock
+);
+
+/* =====================================================
+GET REF NO
+===================================================== */
+
+router.get(
+  "/refno",
+  controller.getNextRefNo
+);
+
+/* =====================================================
+GET INVENTORY MASTER
+===================================================== */
+
+router.get(
+  "/master",
+  controller.getInventoryMaster
+);
 
 module.exports = router;

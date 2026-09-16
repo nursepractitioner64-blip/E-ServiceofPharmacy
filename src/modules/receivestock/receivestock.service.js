@@ -1,59 +1,71 @@
 const repository = require("./receivestock.repository");
 
-/* =====================================================
-   RECEIVE STOCK SERVICE
-   ===================================================== */
-
+/* =========================
+GET ALL (กัน null + sort)
+========================= */
 async function getAll() {
   const rows = await repository.getAllReceiveStock();
 
   return (rows || [])
-    .filter(r => String(r.type || "").toUpperCase() === "IN")
-    .sort((a, b) => new Date(b.dateIn || 0) - new Date(a.dateIn || 0));
+    .filter(r => r.type === "IN")
+    .sort((a, b) => new Date(b.dateIn) - new Date(a.dateIn));
 }
 
-async function create(data = {}) {
-  const code = String(data.code || "").trim();
-  const name = String(data.name || "").trim();
-  const qty = Number(data.qty);
-  const lot = String(data.lot || "").trim();
-  const exp = String(data.exp || "").trim();
-  const supplier = String(data.supplier || "").trim();
-  const user = String(data.user || "").trim();
+/* =========================
+CREATE (validate + กันพัง)
+========================= */
+async function create(data) {
 
-  if (!code || !name || !Number.isFinite(qty) || qty <= 0 || !lot || !exp || !supplier || !user) {
-    throw new Error(
-      "ข้อมูลรับสินค้าไม่ครบ: กรุณาตรวจสอบ รหัสยา ชื่อยา จำนวน LOT EXP Supplier และ User"
-    );
+  if (!data.code || !data.name || !data.qty) {
+    throw new Error("ข้อมูลไม่ครบ");
   }
 
   const payload = {
     type: "IN",
-    dateIn: String(data.dateIn || new Date().toISOString().slice(0, 10)).trim(),
-    code,
-    name,
-    qty,
-    unit: String(data.unit || "").trim(),
-    lot,
-    exp,
-    supplier,
-    user,
-    remark: String(data.remark || "").trim(),
-    location: String(data.location || "").trim(),
-    refNo: String(data.receivestockNo || "").trim()
+    dateIn: data.dateIn || new Date().toISOString().slice(0, 10),
+    code: data.code,
+    name: data.name,
+    qty: Number(data.qty) || 0,
+    unit: data.unit || "",
+    lot: data.lot || "",
+    exp: data.exp || "",
+    refNo: data.receivestockNo || await getNextRefNo(),
+    supplier: data.supplier || "",
+    user: data.user || ""
   };
-
-  if (!payload.refNo) {
-    payload.refNo = await repository.getNextRefNoValue();
-  }
 
   return repository.insertReceiveStock(payload);
 }
 
+/* =========================
+NEXT REFNO (กัน empty + format จริง)
+========================= */
 async function getNextRefNo() {
-  return repository.getNextRefNoValue();
+
+  const rows = await repository.getAllReceiveStock();
+
+  const receive = (rows || []).filter(r => r.type === "IN");
+
+  if (receive.length === 0) {
+    return "RCV-0001";
+  }
+
+  const last = receive
+    .map(r => r.refNo)
+    .filter(Boolean)
+    .sort()
+    .pop();
+
+  const num = parseInt(last?.split("-")[1]) || 0;
+
+  const next = num + 1;
+
+  return `RCV-${String(next).padStart(4, "0")}`;
 }
 
+/* =========================
+MASTER
+========================= */
 async function getInventoryMaster() {
   return repository.getInventoryMaster();
 }
