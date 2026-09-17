@@ -15,7 +15,7 @@ const auth = new google.auth.GoogleAuth({
       ? undefined
       : path.join(
           process.cwd(),
-          "credentials.json"
+          "service-account.json"
         ),
 
   scopes: [

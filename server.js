@@ -21,25 +21,27 @@ app.use(
 
 /* =====================================================
  * API ROUTER
- * All module API routes are registered in one place.
 ===================================================== */
 
 const apiRoutes =
   require("./src/routes/index");
-
 
 const repository =
   require("./src/modules/dispense/dispense.repository");
 
 
 /* =====================================================
- * API ROUTES
- * ALL API FIRST — centralized in src/routes/index.js
+ * STICKER PRINT
+ * Static files + module API
 ===================================================== */
 
-/* =====================================================
- * STICKER PRINT
-===================================================== */
+const stickerRoutes =
+  require("./src/modules/sticker-print/sticker.routes");
+
+app.use(
+  "/sticker-print",
+  stickerRoutes
+);
 
 app.use(
   "/modules/sticker-print",
@@ -54,7 +56,7 @@ app.use(
 
 /* =====================================================
  * CENTRAL MODULE API ROUTES
- * ===================================================== */
+===================================================== */
 
 app.use(
   "/api",
@@ -64,8 +66,6 @@ app.use(
 
 /* =====================================================
  * API 404 HANDLER
- *
- * ต้องอยู่หลัง API routes ทั้งหมด
 ===================================================== */
 
 app.use(
@@ -146,7 +146,6 @@ app.use(
       err
     );
 
-
     res
       .status(500)
       .json({
@@ -169,7 +168,6 @@ app.use(
 const PORT =
   process.env.PORT ||
   2003;
-
 
 app.listen(
   PORT,

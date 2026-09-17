@@ -1,147 +1,555 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<title>Daily Check Stock</title>
+<!-- =========================================================
+     DAILY EMERGENCY CHECK
+     public/views/dailycheck.html
+========================================================= -->
 
+<link rel="stylesheet" href="/assets/css/system-check-v5.css">
+
+<div class="ems-check-app">
+
+  <!-- =======================================================
+       HEADER
+  ======================================================== -->
+  <div class="card stock-card">
+
+    <div class="card-header stock-header">
+
+      <div class="stock-header-left">
+
+        <div class="stock-icon">
+          🚑
+        </div>
+
+        <div>
+          <h1>Emergency Checklist</h1>
+          <p>
+            ระบบจัดการ Emergency Stock และตรวจสอบความพร้อมใช้งาน
+          </p>
+        </div>
+
+      </div>
+
+      <div class="stock-header-right">
+
+        <button
+          type="button"
+          id="scanQrBtn"
+          class="ems-check-btn ems-check-btn-outline"
+        >
+          <i class="fa-solid fa-qrcode"></i>
+          Scan QR
+        </button>
+
+        <button
+          type="button"
+          id="saveChecklistBtn"
+          class="ems-check-btn ems-check-btn-outline"
+        >
+          <i class="fa-solid fa-check"></i>
+          บันทึก
+        </button>
+
+      </div>
+
+      <div class="stock-header-actions">
+
+        <button
+          type="button"
+          class="ems-check-btn ems-check-btn-outline"
+          data-route="controlled-drug"
+        >
+          <i class="fa-solid fa-pills"></i>
+          Controlled Drug
+        </button>
+
+        <button
+          type="button"
+          class="ems-check-btn ems-check-btn-outline"
+          data-route="dashboard"
+        >
+          <i class="fa-solid fa-house"></i>
+          Dashboard
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MENU
+    ====================================================== -->
+    <section class="ems-check-menu">
+
+      <button
+        type="button"
+        class="ems-check-menu-btn"
+        data-route="inventory-master"
+      >
+        <i class="fa-solid fa-layer-group"></i>
+        Inventory Master
+      </button>
+
+      <button
+        type="button"
+        class="ems-check-menu-btn"
+        data-route="receive-stock"
+      >
+        <i class="fa-solid fa-arrows-down-to-line"></i>
+        Inventory Stock
+      </button>
+
+      <button
+        type="button"
+        class="ems-check-menu-btn"
+        data-route="inventorydispense"
+      >
+        <i class="fa-solid fa-arrows-up-to-line"></i>
+        Inventory Dispense
+      </button>
+
+      <button
+        type="button"
+        class="ems-check-menu-btn active"
+        data-route="dailycheck"
+      >
+        <i class="fa-solid fa-clipboard-check"></i>
+        Daily Check
+      </button>
+
+      <button
+        type="button"
+        class="ems-check-menu-btn"
+        data-route="dashboard"
+      >
+        <i class="fa-solid fa-chart-column"></i>
+        Report
+      </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         DAILY CHECK
+    ====================================================== -->
+    <section class="ems-check-daily">
+
+      <div class="ems-daily-card">
+
+        <!-- =================================================
+             DAILY HEADER
+        ================================================== -->
+        <div class="ems-daily-header">
+
+          <div class="ems-daily-title">
+
+            <div class="ems-daily-icon">
+              📅
+            </div>
+
+            <div>
+
+              <h2>
+                Daily Emergency Check
+              </h2>
+
+              <span>
+                ตารางตรวจสอบอุปกรณ์ Emergency ประจำวัน
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- ===============================================
+               FILTER
+          ================================================ -->
+          <div class="ems-daily-filter">
+
+            <label for="monthSelect">
+              เดือน
+            </label>
+
+            <select id="monthSelect">
+
+              <option value="1">มกราคม</option>
+              <option value="2">กุมภาพันธ์</option>
+              <option value="3">มีนาคม</option>
+              <option value="4">เมษายน</option>
+              <option value="5">พฤษภาคม</option>
+              <option value="6">มิถุนายน</option>
+              <option value="7">กรกฎาคม</option>
+              <option value="8">สิงหาคม</option>
+              <option value="9">กันยายน</option>
+              <option value="10">ตุลาคม</option>
+              <option value="11">พฤศจิกายน</option>
+              <option value="12">ธันวาคม</option>
+
+            </select>
+
+
+            <label for="yearSelect">
+              ปี
+            </label>
+
+            <select id="yearSelect">
+
+              <option value="2025">
+                2025
+              </option>
+
+              <option value="2026">
+                2026
+              </option>
+
+              <option value="2027">
+                2027
+              </option>
+
+              <option value="2028">
+                2028
+              </option>
+
+              <option value="2029">
+                2029
+              </option>
+
+              <option value="2030">
+                2030
+              </option>
+
+              <option value="2031">
+                2031
+              </option>
+
+              <option value="2032">
+                2032
+              </option>
+
+              <option value="2033">
+                2033
+              </option>
+
+              <option value="2034">
+                2034
+              </option>
+
+              <option value="2035">
+                2035
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+        <div class="ems-daily-table-wrapper">
+
+          <table id="dailyTable">
+
+            <thead>
+
+              <tr>
+
+                <th>CODE</th>
+                <th>NAME</th>
+                <th>UNIT</th>
+                <th>REQ</th>
+
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+                <th>10</th>
+                <th>11</th>
+                <th>12</th>
+                <th>13</th>
+                <th>14</th>
+                <th>15</th>
+                <th>16</th>
+                <th>17</th>
+                <th>18</th>
+                <th>19</th>
+                <th>20</th>
+                <th>21</th>
+                <th>22</th>
+                <th>23</th>
+                <th>24</th>
+                <th>25</th>
+                <th>26</th>
+                <th>27</th>
+                <th>28</th>
+                <th>29</th>
+                <th>30</th>
+                <th>31</th>
+
+                <th>สถานะ</th>
+                <th>ตรวจ</th>
+
+              </tr>
+
+            </thead>
+
+
+            <!-- =============================================
+                 DATA
+            ============================================== -->
+            <tbody id="tbody">
+
+              <tr>
+
+                <td
+                  colspan="37"
+                  class="text-center text-muted"
+                >
+                  กำลังโหลดข้อมูล...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =====================================================
+       SYSTEM SUMMARY
+  ====================================================== -->
+  <section
+    class="container-fluid mt-3"
+    data-system-summary
+    id="systemSummaryV5"
+  >
+
+    <div
+      class="d-flex align-items-center justify-content-between mb-3"
+    >
+
+      <h5 class="mb-0">
+        Emergency Check — สรุปสถานะ
+      </h5>
+
+      <span class="text-muted small">
+        ข้อมูลจาก Google Sheets
+      </span>
+
+    </div>
+
+    <div class="text-muted">
+      ระบบ Daily Emergency Check
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- =========================================================
+     LOCAL STYLE
+     ป้องกันตาราง Daily Check พังจาก CSS ของหน้าอื่น
+========================================================= -->
 <style>
-body {
-  font-family: Arial;
-  background: #f5f6fa;
-  margin: 0;
-  padding: 20px;
+
+.ems-check-daily {
+  width: 100%;
 }
 
-h3 {
-  margin-bottom: 10px;
-}
-
-.table-container {
-  overflow: auto;
-  max-height: 90vh;
+.ems-daily-card {
+  width: 100%;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
-table {
-  border-collapse: collapse;
+.ems-daily-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ems-daily-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ems-daily-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef6ff;
+  font-size: 24px;
+}
+
+.ems-daily-title h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.ems-daily-title span {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.ems-daily-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.ems-daily-filter label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ems-daily-filter select {
+  min-width: 110px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.ems-daily-table-wrapper {
+  width: 100%;
+  overflow: auto;
+  max-height: calc(100vh - 300px);
+}
+
+#dailyTable {
+  border-collapse: separate;
+  border-spacing: 0;
   width: max-content;
   min-width: 100%;
   font-size: 12px;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 6px;
+#dailyTable th,
+#dailyTable td {
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 7px 8px;
   text-align: center;
   white-space: nowrap;
+  height: 32px;
 }
 
-th {
-  background: #2c3e50;
-  color: white;
+#dailyTable th {
   position: sticky;
   top: 0;
+  z-index: 10;
+  background: #263746;
+  color: #fff;
+  font-weight: 700;
 }
 
-.loading {
-  padding: 10px;
-  color: #666;
+#dailyTable th:nth-child(1),
+#dailyTable td:nth-child(1) {
+  min-width: 90px;
 }
 
-.bg-success{
-  background:#28a745;
-  color:#fff;
-  font-weight:bold;
+#dailyTable th:nth-child(2),
+#dailyTable td:nth-child(2) {
+  min-width: 180px;
+  text-align: left;
 }
 
-.bg-danger{
-  background:#dc3545;
-  color:#fff;
-  font-weight:bold;
+#dailyTable th:nth-child(3),
+#dailyTable td:nth-child(3) {
+  min-width: 70px;
 }
 
-.bg-warning{
-  background:#ffc107;
-  font-weight:bold;
+#dailyTable th:nth-child(4),
+#dailyTable td:nth-child(4) {
+  min-width: 55px;
 }
 
-.bg-success {
+#dailyTable th:nth-child(n+5):nth-child(-n+35),
+#dailyTable td:nth-child(n+5):nth-child(-n+35) {
+  min-width: 38px;
+}
+
+#dailyTable th:nth-child(36),
+#dailyTable td:nth-child(36) {
+  min-width: 90px;
+}
+
+#dailyTable th:nth-child(37),
+#dailyTable td:nth-child(37) {
+  min-width: 70px;
+}
+
+#dailyTable tbody tr:hover td {
+  background: #f8fafc;
+}
+
+/* วันที่ตรวจผ่าน */
+#dailyTable td.bg-success {
   background-color: #28a745 !important;
   color: #fff !important;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-.bg-danger {
+/* จำนวนไม่ครบ */
+#dailyTable td.bg-danger {
   background-color: #dc3545 !important;
   color: #fff !important;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-.bg-warning {
+/* จำนวนเกิน */
+#dailyTable td.bg-warning {
   background-color: #ffc107 !important;
   color: #000 !important;
-  font-weight: bold;
+  font-weight: 700;
 }
+
+@media (max-width: 768px) {
+
+  .ems-daily-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ems-daily-filter {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .ems-daily-table-wrapper {
+    max-height: 70vh;
+  }
+
+}
+
 </style>
-</head>
-
-<body>
-
-<h3>Emergency Stock</h3>
-<div style="margin-bottom:15px;display:flex;gap:10px;align-items:center;">
-
-  <label>เดือน</label>
-
-  <select id="monthSelect">
-
-    <option value="1">มกราคม</option>
-    <option value="2">กุมภาพันธ์</option>
-    <option value="3">มีนาคม</option>
-    <option value="4">เมษายน</option>
-    <option value="5">พฤษภาคม</option>
-    <option value="6" selected>มิถุนายน</option>
-    <option value="7">กรกฎาคม</option>
-    <option value="8">สิงหาคม</option>
-    <option value="9">กันยายน</option>
-    <option value="10">ตุลาคม</option>
-    <option value="11">พฤศจิกายน</option>
-    <option value="12">ธันวาคม</option>
-
-  </select>
-
-  <label>ปี</label>
-
-  <select id="yearSelect">
-
-    <option value="2025">2025</option>
-    <option value="2026" selected>2026</option>
-    <option value="2027">2027</option>
-
-  </select>
-
-</div>
-<div class="table-container">
- 
-
-  <table>
-    <thead>
-      <tr>
-        <th>CODE</th>
-        <th>NAME</th>
-        <th>UNIT</th>
-        <th>REQUIRED</th>
-        <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
-        <th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
-        <th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th>
-        <th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th>
-        <th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th><th>สถานะ</th><th>ตรวจ</th>
-      </tr>
-    </thead>
-
-    <tbody id="tbody"></tbody>
-  </table>
-</div>
-
-</body>
-</html>

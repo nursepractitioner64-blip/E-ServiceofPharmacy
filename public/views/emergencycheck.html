@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="/assets/css/system-check-v5.css">
 <div class="ems-check-app">
 
     <div class="card stock-card">
@@ -16,7 +15,7 @@
 
         <div>
           <h1>Emergency Checklist</h1>
-          <p>ระบบจัดการ Emergency Stock และตรวจสอบความพร้อมใช้งาน</p>
+          <p>ระบบตรวจสอบอุปกรณ์ฉุกเฉิน เวชภัณฑ์ และวันหมดอายุ</p>
         </div>
 
       </div>
@@ -41,42 +40,31 @@
 
       </div>
 
-      <div class="stock-header-actions">
-        <button type="button" class="ems-check-btn ems-check-btn-outline" data-route="controlled-drug">
-          <i class="fa-solid fa-pills"></i>
-          Controlled Drug
-        </button>
-        <button type="button" class="ems-check-btn ems-check-btn-outline" data-route="dashboard">
-          <i class="fa-solid fa-house"></i>
-          Dashboard
-        </button>
-      </div>
-
     </div>
   <!-- ================= MENU ================= -->
   <section class="ems-check-menu">
 
-    <button class="ems-check-menu-btn" data-route="inventory-master">
+    <button class="ems-check-menu-btn" data-page="inventory">
       <i class="fa-solid fa-layer-group"></i>
       Inventory Master
     </button>
 
-    <button class="ems-check-menu-btn" data-route="receive-stock">
+    <button class="ems-check-menu-btn" data-page="receive">
       <i class="fa-solid fa-arrows-down-to-line"></i>
       Inventory Stock 
     </button>
 
-    <button class="ems-check-menu-btn" data-route="inventorydispense">
+    <button class="ems-check-menu-btn" data-page="stockout">
       <i class="fa-solid fa-arrows-up-to-line"></i>
       Inventory Dispense
     </button>
 
-    <button class="ems-check-menu-btn" data-route="dailycheck">
+    <button class="ems-check-menu-btn" data-page="dailycheck">
       <i class="fa-solid fa-clipboard-check"></i>
       Daily Check
     </button>
 
-    <button class="ems-check-menu-btn" data-route="dashboard">
+    <button class="ems-check-menu-btn" data-page="report">
       <i class="fa-solid fa-chart-column"></i>
       Report
     </button>
@@ -228,11 +216,3 @@
 
 </div>
 
-
-<section class="container-fluid mt-3" data-system-summary id="systemSummaryV5">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="mb-0">Emergency Check — สรุปสถานะ</h5>
-    <span class="text-muted small">ข้อมูลจาก Google Sheets</span>
-  </div>
-  <div class="text-muted">กำลังโหลดข้อมูล...</div>
-</section>
