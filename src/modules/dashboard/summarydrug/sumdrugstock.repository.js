@@ -101,10 +101,10 @@ async function getSummary() {
 async function getSystemDashboard() {
   const [emergencyMaster, emergencyMovements, controlledMaster, controlledReceive, controlledMovements] = await Promise.all([
     readSheet('INVENTORY_MASTER', 'A:D').catch(() => []),
-    readSheet('INVENTORY_MOVEMENT', 'A:O').catch(() => []),
+    readSheet('INVENTORY_MOVEMENT', 'A:R').catch(() => []),
     readSheet('DRUG_MASTER', 'A:Z').catch(() => []),
     readSheet('DRUG_RECEIVE', 'A:Z').catch(() => []),
-    readSheet('STOCK_MOVEMENT', 'A:O').catch(() => [])
+    readSheet('STOCK_MOVEMENT', 'A:R').catch(() => [])
   ]);
 
   const controlledMasterRows = controlledMaster.length > 1

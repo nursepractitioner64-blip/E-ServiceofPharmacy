@@ -1,15 +1,57 @@
-/* =====================================================
-   PHARMACY SPA MAIN ROUTER
-   Single navigation owner for the whole application.
-===================================================== */
+/* =========================================================
+   SMART PHARMACY MANAGEMENT SYSTEM
+   APP.JS
+   ========================================================= */
+
+console.log("🚀 Pharmacy SPA Starting...");
+
+
+/* =========================================================
+   ROUTES
+========================================================= */
 
 const routes = {
-  // System entry points
+
+  /* ===================================================
+     SYSTEM ENTRY
+  =================================================== */
+
   dashboard: {
     view: "/views/dashboard.html",
     script: "/modules/dashboard/dashboard.view.js",
     system: "pharmacy"
   },
+
+
+  /* ===================================================
+     VACCINE MANAGEMENT
+     
+     โหลดเฉพาะ HTML
+     ยังไม่มี JavaScript Module
+  =================================================== */
+
+  "vaccine-management": {
+    view: "/views/vaccinemanagement.html",
+    script: null,
+    system: "pharmacy"
+  },
+
+"vaccine-master": {
+  view: "/views/vaccinemaster.html",
+  script: "/modules/vaccinemaster/vaccinemaster.client.js",
+  system: "pharmacy"
+},
+
+"vaccine-record": {
+  view: "/views/vaccinationrecord.html",
+  script: null,
+  system: "pharmacy"
+},
+
+
+  /* ===================================================
+     EMERGENCY
+  =================================================== */
 
   "emergency-checklist": {
     view: "/views/emergencycheck.html",
@@ -17,18 +59,28 @@ const routes = {
     system: "emergency"
   },
 
+
+  /* ===================================================
+     CONTROLLED DRUG
+  =================================================== */
+
   "controlled-drug": {
     view: "/views/controlleddrug.html",
     script: "/modules/controlleddrug/controlleddrug.client.js",
     system: "controlled"
   },
 
-  // Pharmacy / Emergency inventory
+
+  /* ===================================================
+     EMERGENCY / INVENTORY
+  =================================================== */
+
   "inventory-master": {
     view: "/views/inventory-master.html",
     script: "/modules/inventorymaster/inventorymaster.client.js",
     system: "emergency"
   },
+
 
   "receive-stock": {
     view: "/views/receive-stock.html",
@@ -36,18 +88,24 @@ const routes = {
     system: "emergency"
   },
 
-  inventorydispense: {
+
+  "inventorydispense": {
     view: "/views/inventorydispense.html",
     script: "/modules/inventorydispense/inventorydispense.client.js",
     system: "emergency"
   },
 
-  // Controlled drug / pharmacy
+
+  /* ===================================================
+     CONTROLLED DRUG
+  =================================================== */
+
   receivedrug: {
     view: "/views/receivedrug.html",
     script: "/modules/receivedrug/receivedrug.client.js",
     system: "controlled"
   },
+
 
   dispense: {
     view: "/views/dispense.html",
@@ -55,314 +113,1249 @@ const routes = {
     system: "controlled"
   },
 
+
   stockout: {
     view: "/views/stock-balance.html",
     script: "/modules/drugbalance/stockbalance.client.js",
     system: "controlled"
   },
 
+
+  /* ===================================================
+     DAILY CHECK
+  =================================================== */
+
   dailycheck: {
     view: "/views/dailycheck.html",
     script: "/modules/dailycheck/dailycheck.client.js",
     system: "controlled"
   }
+
 };
 
+
+/* =========================================================
+   ROUTE ALIASES
+========================================================= */
+
 const aliases = {
-  inventory: "inventory-master",
-  receive: "receive-stock",
-  inventorystock: "receive-stock",
-  "inventory-stock": "receive-stock",
-  "inventory-dispense": "inventorydispense",
-  "inventorydispense": "inventorydispense",
-  stockout: "stockout",
-  dailycheck: "dailycheck",
-  "emergency": "emergency-checklist",
-  "controlled": "controlled-drug",
-  "controlleddrug": "controlled-drug"
+
+  /* ===================================================
+     Inventory
+  =================================================== */
+
+  inventory:
+    "inventory-master",
+
+  "inventory-master":
+    "inventory-master",
+
+
+  /* ===================================================
+     Receive
+  =================================================== */
+
+  receive:
+    "receive-stock",
+
+  inventorystock:
+    "receive-stock",
+
+  "inventory-stock":
+    "receive-stock",
+
+  "receive-stock":
+    "receive-stock",
+
+
+  /* ===================================================
+     Inventory Dispense
+  =================================================== */
+
+  "inventory-dispense":
+    "inventorydispense",
+
+  inventorydispense:
+    "inventorydispense",
+
+  "inventory-dispense-stock":
+    "inventorydispense",
+
+
+  /* ===================================================
+     IMPORTANT
+
+     stockout = Inventory Dispense
+     ใน Emergency Inventory
+  =================================================== */
+
+  stockout:
+    "inventorydispense",
+
+
+  /* ===================================================
+     Daily Check
+  =================================================== */
+
+  dailycheck:
+    "dailycheck",
+
+
+  /* ===================================================
+     Emergency
+  =================================================== */
+
+  emergency:
+    "emergency-checklist",
+
+  "emergency-checklist":
+    "emergency-checklist",
+
+
+  /* ===================================================
+     Controlled Drug
+  =================================================== */
+
+  controlled:
+    "controlled-drug",
+
+  controlleddrug:
+    "controlled-drug",
+
+  "controlled-drug":
+    "controlled-drug"
+
 };
+
+
+/* =========================================================
+   CURRENT MODULE
+========================================================= */
 
 let currentModule = null;
 let currentRoute = null;
-let navigationToken = 0;
-let navigationPromise = null;
 
-function normalizeRoute(page) {
-  if (typeof page !== "string") {
-    if (page?.dataset?.route) page = page.dataset.route;
-    else if (page?.currentTarget?.dataset?.route) {
-      page = page.currentTarget.dataset.route;
-    } else if (page?.dataset?.page) {
-      page = page.dataset.page;
-    } else if (page?.currentTarget?.dataset?.page) {
-      page = page.currentTarget.dataset.page;
-    } else if (page?.page) {
-      page = page.page;
-    } else {
-      return null;
-    }
-  }
 
-  const value = String(page).trim();
-  return aliases[value] || value;
-}
+/* =========================================================
+   NORMALIZE ROUTE
+========================================================= */
 
-async function navigate(page, options = {}) {
-  const routeName = normalizeRoute(page);
-
-  if (!routeName) {
-    console.error("❌ Invalid navigate target:", page);
-    return false;
-  }
-
-  const route = routes[routeName];
+function normalizeRoute(route) {
 
   if (!route) {
-    console.error("❌ Route not found:", routeName);
-    console.log("Available routes:", Object.keys(routes));
-    return false;
+    return "dashboard";
   }
 
-  // Do not reload the same route unless explicitly requested.
-  if (
-    !options.force &&
-    currentRoute === routeName &&
-    document.getElementById("app")?.dataset.route === routeName
-  ) {
-    updateNavigationState(routeName);
-    return true;
+
+  const key =
+    String(route)
+      .trim()
+      .toLowerCase();
+
+
+  /* ===================================================
+     Direct route
+  =================================================== */
+
+  if (routes[key]) {
+    return key;
   }
 
-  console.log("🧭 NAVIGATE:", routeName);
 
-  // If a previous navigation is still loading, let it finish instead
-  // of creating competing DOM/module lifecycles.
-  if (navigationPromise) {
-    await navigationPromise;
+  /* ===================================================
+     Alias
+  =================================================== */
+
+  if (aliases[key]) {
+    return aliases[key];
   }
 
-  const token = ++navigationToken;
 
-  navigationPromise = loadView(routeName, route, token);
+  return null;
 
-  try {
-    return await navigationPromise;
-  } finally {
-    navigationPromise = null;
-  }
 }
+
+
+/* =========================================================
+   DESTROY CURRENT MODULE
+========================================================= */
 
 async function destroyCurrentModule() {
-  if (
-    currentModule &&
-    typeof currentModule.destroy === "function"
-  ) {
-    try {
-      await currentModule.destroy();
-    } catch (error) {
-      console.warn("⚠️ Module destroy error:", error);
-    }
+
+  if (!currentModule) {
+    return;
   }
 
-  currentModule = null;
-}
-
-async function loadView(routeName, route, token) {
-  const app = document.getElementById("app");
-
-  if (!app) {
-    console.error("❌ #app not found");
-    return false;
-  }
 
   try {
-    await destroyCurrentModule();
 
-    console.log("📄 LOAD VIEW:", route.view);
+    if (
+      typeof currentModule.destroy ===
+      "function"
+    ) {
 
-    const response = await fetch(
-      `${route.view}?t=${Date.now()}`,
-      { cache: "no-store" }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `View HTTP ${response.status}: ${route.view}`
+      console.log(
+        "🧹 DESTROY MODULE"
       );
+
+
+      await currentModule.destroy();
+
     }
 
-    const html = await response.text();
+  } catch (err) {
 
-    // A newer navigation may have been requested while the fetch ran.
-    if (token !== navigationToken) {
-      return false;
-    }
-
-    app.innerHTML = html;
-    app.dataset.route = routeName;
-    app.dataset.system = route.system || "";
-
-    await nextFrame();
-    await nextFrame();
-
-    console.log("📦 LOAD MODULE:", route.script);
-
-    const module = await import(
-      `${route.script}?t=${Date.now()}`
+    console.error(
+      "❌ MODULE DESTROY ERROR:",
+      err
     );
 
-    if (token !== navigationToken) {
-      if (typeof module.destroy === "function") {
-        await module.destroy();
+  }
+
+
+  currentModule = null;
+
+}
+
+
+/* =========================================================
+   LOAD VIEW
+========================================================= */
+
+async function loadView(viewUrl) {
+
+  console.log(
+    "📄 LOAD VIEW:",
+    viewUrl
+  );
+
+
+  const app =
+    document.getElementById("app");
+
+
+  if (!app) {
+
+    throw new Error(
+      "#app ไม่พบใน index.html"
+    );
+
+  }
+
+
+  const response =
+    await fetch(
+      viewUrl,
+      {
+        cache: "no-store"
       }
-      return false;
-    }
+    );
 
-    currentModule = module;
 
-    if (typeof module.init === "function") {
-      console.log("🚀 INIT RUN:", routeName);
-      await module.init();
-    }
+  if (!response.ok) {
 
-    currentRoute = routeName;
-    updateNavigationState(routeName);
+    throw new Error(
+      `ไม่สามารถโหลด View ได้ (${response.status}) : ${viewUrl}`
+    );
 
-    console.log("✅ ROUTE READY:", routeName);
-    return true;
-
-  } catch (error) {
-    console.error("❌ loadView error:", error);
-
-    app.innerHTML = `
-      <div class="spa-error">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <h3>ไม่สามารถโหลดหน้าได้</h3>
-        <p>${escapeHtml(error.message)}</p>
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-route="dashboard"
-        >
-          กลับ Dashboard
-        </button>
-      </div>
-    `;
-
-    app.dataset.route = "";
-    currentRoute = null;
-    return false;
   }
+
+
+  const html =
+    await response.text();
+
+
+  app.innerHTML =
+    html;
+
+
+  return html;
+
 }
 
-function nextFrame() {
-  return new Promise(resolve => {
-    requestAnimationFrame(() => resolve());
-  });
+
+/* =========================================================
+   LOAD MODULE
+========================================================= */
+
+async function loadModule(scriptUrl) {
+
+  console.log(
+    "📦 LOAD MODULE:",
+    scriptUrl
+  );
+
+
+  /*
+     ป้องกันการเรียก import(null)
+  */
+
+  if (!scriptUrl) {
+
+    console.log(
+      "ℹ️ ไม่มี Module สำหรับ Route นี้"
+    );
+
+    return null;
+
+  }
+
+
+  /*
+     =====================================================
+     Cache Busting
+     
+     ป้องกัน Browser ใช้ JS เก่า
+  =====================================================
+  */
+
+  const separator =
+    scriptUrl.includes("?")
+      ? "&"
+      : "?";
+
+
+  const moduleUrl =
+    `${scriptUrl}${separator}t=${Date.now()}`;
+
+
+  const module =
+    await import(
+      moduleUrl
+    );
+
+
+  console.log(
+    "📦 MODULE LOADED:",
+    module
+  );
+
+
+  return module;
+
 }
 
-function updateNavigationState(routeName) {
+
+/* =========================================================
+   INIT MODULE
+========================================================= */
+
+async function initModule(module) {
+
+  if (
+    !module ||
+    typeof module.init !==
+    "function"
+  ) {
+
+    console.warn(
+      "⚠️ MODULE ไม่มี init()"
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    "🚀 INIT RUN"
+  );
+
+
+  await module.init();
+
+}
+
+
+/* =========================================================
+   UPDATE ACTIVE SIDEBAR
+========================================================= */
+
+function updateSidebarActive(route) {
+
   document
-    .querySelectorAll("[data-route]")
+    .querySelectorAll(
+      "[data-route]"
+    )
     .forEach(el => {
-      const target = normalizeRoute(el.dataset.route);
-      el.classList.toggle("active", target === routeName);
-      el.setAttribute(
-        "aria-current",
-        target === routeName ? "page" : "false"
+
+      const target =
+        normalizeRoute(
+          el.dataset.route
+        );
+
+
+      el.classList.toggle(
+        "active",
+        target === route
       );
+
     });
+
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+
+/* =========================================================
+   UPDATE INTERNAL MENU
+========================================================= */
+
+function updateInternalMenu(route) {
+
+  document
+    .querySelectorAll(
+      "[data-page]"
+    )
+    .forEach(el => {
+
+      const page =
+        el.dataset.page;
+
+
+      let target =
+        normalizeRoute(page);
+
+
+      /* =================================================
+         Emergency menu
+      ================================================= */
+
+      if (
+        page === "inventory"
+      ) {
+
+        target =
+          "inventory-master";
+
+      }
+
+
+      if (
+        page === "receive"
+      ) {
+
+        target =
+          "receive-stock";
+
+      }
+
+
+      if (
+        page === "stockout"
+      ) {
+
+        target =
+          "inventorydispense";
+
+      }
+
+
+      if (
+        page === "check"
+      ) {
+
+        target =
+          "emergency-checklist";
+
+      }
+
+
+      if (
+        page === "report"
+      ) {
+
+        target =
+          "dashboard";
+
+      }
+
+
+      el.classList.toggle(
+        "active",
+        target === route
+      );
+
+    });
+
+
+  /* =================================================
+     รองรับ data-route
+     ภายใน View
+  ================================================= */
+
+  document
+    .querySelectorAll(
+      ".ems-check-menu-btn[data-route]"
+    )
+    .forEach(el => {
+
+      const target =
+        normalizeRoute(
+          el.dataset.route
+        );
+
+
+      el.classList.toggle(
+        "active",
+        target === route
+      );
+
+    });
+
 }
 
-// =====================================================
-// GLOBAL API
-// =====================================================
 
-window.routes = routes;
-window.navigate = navigate;
-window.loadView = async (viewPath, scriptPath) => {
-  const routeName = Object.keys(routes).find(
-    key =>
-      routes[key].view === viewPath &&
-      routes[key].script === scriptPath
+/* =========================================================
+   BIND GLOBAL ROUTE BUTTON
+========================================================= */
+
+function bindRouteButtons() {
+
+  /*
+     ใช้ Event Delegation
+
+     สำคัญมากสำหรับ SPA
+
+     เพราะ View ถูกเปลี่ยนด้วย innerHTML
+  */
+
+  document.addEventListener(
+    "click",
+    async event => {
+
+      const button =
+        event.target.closest(
+          "[data-route]"
+        );
+
+
+      if (!button) {
+        return;
+      }
+
+
+      /*
+         ถ้าเป็น link
+      */
+
+      if (
+        button.tagName ===
+        "A"
+      ) {
+
+        event.preventDefault();
+
+      }
+
+
+      const route =
+        button.dataset.route;
+
+
+      if (!route) {
+        return;
+      }
+
+
+      console.log(
+        "🖱️ DATA ROUTE:",
+        route
+      );
+
+
+      await navigate(
+        route
+      );
+
+    }
   );
 
-  if (routeName) {
-    return navigate(routeName, { force: true });
-  }
+}
 
-  // Compatibility for legacy callers that pass raw paths.
-  return loadView(
-    "__legacy__",
-    {
-      view: viewPath,
-      script: scriptPath,
-      system: ""
-    },
-    ++navigationToken
-  );
+
+/* =========================================================
+   BIND INTERNAL EMERGENCY MENU
+========================================================= */
+
+function bindPageButtons() {
+
+  document.addEventListener(
+    "click",
+    async event => {
+
+      const button =
+        event.target.closest(
+          ".ems-check-menu-btn[data-page]"
+        );
+
+
+      if (!button) {
+        return;
+      }
+
+
+      event.preventDefault();
+
+
+      const page =
+        button.dataset.page;
+
+
+      console.log(
+        "📂 OPEN PAGE:",
+        page
+      );
+
+
+      let route =
+        null;
+
+
+      /* =================================================
+         EMERGENCY MENU MAP
+      ================================================= */
+const map = {
+
+  inventory:
+    "inventory-master",
+
+  receive:
+    "receive-stock",
+
+  stockout:
+    "inventorydispense",
+
+  check:
+    "emergency-checklist",
+
+  report:
+    "dashboard",
+
+  dailycheck:
+    "dailycheck",
+
+  inventorydispense:
+    "inventorydispense",
+
+  "inventory-dispense":
+    "inventorydispense",
+
+  "vaccine-master":
+    "vaccine-master",
+  "vaccine-master":
+    "vaccine-master",
+  "vaccine-record":
+    "vaccine-record"
+
 };
 
-// =====================================================
-// ONE AND ONLY ONE CLICK DELEGATION
-// Supports current data-route markup and legacy data-page.
-// =====================================================
 
-document.addEventListener("click", event => {
-  const element = event.target.closest("[data-route], [data-page]");
+      route =
+        map[page] ||
+        normalizeRoute(page);
 
-  if (!element) return;
 
-  // Ignore modified clicks so normal browser behavior remains possible
-  // for links/buttons intentionally opened by the user.
-  if (
-    event.button !== 0 ||
-    event.ctrlKey ||
-    event.metaKey ||
-    event.shiftKey ||
-    event.altKey
-  ) {
-    return;
-  }
+      if (!route) {
 
-  const route = normalizeRoute(
-    element.dataset.route || element.dataset.page
+        console.error(
+          "❌ ROUTE NOT FOUND:",
+          page
+        );
+
+        return;
+
+      }
+
+
+      console.log(
+        `🧭 ROUTE: ${page} → ${route}`
+      );
+
+
+      /* =================================================
+         Active button
+      ================================================= */
+
+      document
+        .querySelectorAll(
+          ".ems-check-menu-btn"
+        )
+        .forEach(btn => {
+
+          btn.classList.remove(
+            "active"
+          );
+
+        });
+
+
+      button.classList.add(
+        "active"
+      );
+
+
+      console.log(
+        "🚀 NAVIGATE:",
+        route
+      );
+
+
+      await navigate(
+        route
+      );
+
+    }
   );
 
-  if (!route || !routes[route] && !aliases[route]) {
+}
+
+
+/* =========================================================
+   NAVIGATE
+========================================================= */
+
+async function navigate(route) {
+
+  console.log(
+    "🧭 NAVIGATE:",
+    route
+  );
+
+
+  const normalized =
+    normalizeRoute(route);
+
+
+  if (!normalized) {
+
+    console.error(
+      "❌ ROUTE NOT FOUND:",
+      route
+    );
+
+
+    /*
+       แจ้งเฉพาะ Console
+       ไม่ทำให้ระบบล่ม
+    */
+
+    return;
+
+  }
+
+
+  const config =
+    routes[normalized];
+
+
+  if (!config) {
+
+    console.error(
+      "❌ ROUTE CONFIG NOT FOUND:",
+      normalized
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    "✅ ROUTE FOUND:",
+    normalized,
+    config
+  );
+
+
+  /* =====================================================
+     1. DESTROY MODULE เดิม
+  ===================================================== */
+
+  await destroyCurrentModule();
+
+
+  /* =====================================================
+     2. LOAD VIEW
+  ===================================================== */
+
+  try {
+
+    await loadView(
+      config.view
+    );
+
+  } catch (err) {
+
+    console.error(
+      "❌ VIEW LOAD ERROR:",
+      err
+    );
+
+
+    const app =
+      document.getElementById(
+        "app"
+      );
+
+
+    if (app) {
+
+      app.innerHTML = `
+
+        <div
+          style="
+            padding:40px;
+            text-align:center;
+            font-family:Prompt,sans-serif;
+          "
+        >
+
+          <h2>
+            ไม่สามารถเปิดหน้านี้ได้
+          </h2>
+
+          <p>
+            ${config.view}
+          </p>
+
+        </div>
+
+      `;
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* =====================================================
+     3. UPDATE ACTIVE MENU
+  ===================================================== */
+
+  updateSidebarActive(
+    normalized
+  );
+
+
+  updateInternalMenu(
+    normalized
+  );
+
+
+  /* =====================================================
+     4. LOAD MODULE
+     
+     ถ้า route มี script → โหลด module
+     ถ้า script เป็น null → ข้าม
+  ===================================================== */
+
+  if (config.script) {
+
+    try {
+
+      const module =
+        await loadModule(
+          config.script
+        );
+
+
+      currentModule =
+        module;
+
+
+      /* =================================================
+         5. INIT MODULE
+      ================================================= */
+
+      await initModule(
+        module
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ MODULE ERROR:",
+        err
+      );
+
+
+      const app =
+        document.getElementById(
+          "app"
+        );
+
+
+      if (app) {
+
+        app.insertAdjacentHTML(
+          "beforeend",
+          `
+
+            <div
+              style="
+                margin:20px;
+                padding:16px;
+                border-radius:12px;
+                background:#fee2e2;
+                color:#991b1b;
+                font-family:Prompt,sans-serif;
+              "
+            >
+
+              <strong>
+                ไม่สามารถโหลด Module ได้
+              </strong>
+
+              <br>
+
+              ${config.script}
+
+            </div>
+
+          `
+        );
+
+      }
+
+
+      return;
+
+    }
+
+  } else {
+
+    console.log(
+      "ℹ️ ROUTE นี้ไม่มี Module:",
+      normalized
+    );
+
+
+    currentModule =
+      null;
+
+  }
+
+
+  /* =====================================================
+     6. CURRENT ROUTE
+  ===================================================== */
+
+  currentRoute =
+    normalized;
+
+
+  /* =====================================================
+     7. HISTORY
+  ===================================================== */
+
+  try {
+
+    history.pushState(
+      {
+        route:
+          normalized
+      },
+      "",
+      `#${normalized}`
+    );
+
+  } catch (err) {
+
+    console.warn(
+      "⚠️ History error:",
+      err
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   WINDOW NAVIGATION
+========================================================= */
+
+window.navigate =
+  navigate;
+
+
+/* =========================================================
+   BACKWARD COMPATIBILITY
+========================================================= */
+
+window.loadView =
+  navigate;
+
+
+/* =========================================================
+   BROWSER BACK / FORWARD
+========================================================= */
+
+window.addEventListener(
+  "popstate",
+  async event => {
+
+    const route =
+      event.state?.route ||
+      location.hash
+        .replace(
+          /^#/,
+          ""
+        );
+
+
+    const target =
+      normalizeRoute(
+        route
+      ) ||
+      "dashboard";
+
+
+    /*
+       ป้องกัน pushState ซ้ำ
+    */
+
+    await navigateWithoutHistory(
+      target
+    );
+
+  }
+);
+
+
+/* =========================================================
+   NAVIGATE WITHOUT HISTORY
+========================================================= */
+
+async function navigateWithoutHistory(
+  route
+) {
+
+  const normalized =
+    normalizeRoute(route);
+
+
+  if (!normalized) {
     return;
   }
 
-  event.preventDefault();
-  event.stopPropagation();
 
-  navigate(route);
-});
+  const config =
+    routes[normalized];
 
-// =====================================================
-// INIT
-// =====================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.__PHARMACY_SPA_READY) return;
+  if (!config) {
+    return;
+  }
 
-  window.__PHARMACY_SPA_READY = true;
 
-  console.log("🚀 Pharmacy SPA Ready");
+  /* =====================================================
+     1. DESTROY MODULE เดิม
+  ===================================================== */
 
-  navigate("dashboard");
-});
+  await destroyCurrentModule();
 
-// V8 unified dashboard alias
-window.PHARMACY_UNIFIED_DASHBOARD = "dashboard-unified";
 
-window.openUnifiedDashboard = () => window.navigate?.("dashboard");
+  /* =====================================================
+     2. LOAD VIEW
+  ===================================================== */
+
+  try {
+
+    await loadView(
+      config.view
+    );
+
+  } catch (err) {
+
+    console.error(
+      "❌ VIEW LOAD ERROR:",
+      err
+    );
+
+    return;
+
+  }
+
+
+  /* =====================================================
+     3. UPDATE MENU
+  ===================================================== */
+
+  updateSidebarActive(
+    normalized
+  );
+
+
+  updateInternalMenu(
+    normalized
+  );
+
+
+  /* =====================================================
+     4. LOAD MODULE
+     
+     ถ้ามี script → โหลด
+     ถ้าไม่มี script → ข้าม
+  ===================================================== */
+
+  if (config.script) {
+
+    try {
+
+      const module =
+        await loadModule(
+          config.script
+        );
+
+
+      currentModule =
+        module;
+
+
+      await initModule(
+        module
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ MODULE ERROR:",
+        err
+      );
+
+    }
+
+  } else {
+
+    console.log(
+      "ℹ️ ROUTE นี้ไม่มี Module:",
+      normalized
+    );
+
+
+    currentModule =
+      null;
+
+  }
+
+
+  /* =====================================================
+     5. CURRENT ROUTE
+  ===================================================== */
+
+  currentRoute =
+    normalized;
+
+}
+
+
+/* =========================================================
+   INITIAL ROUTE
+========================================================= */
+
+async function boot() {
+
+  console.log(
+    "🚀 Pharmacy SPA Ready"
+  );
+
+
+  /* =====================================================
+     Bind ครั้งเดียว
+  ===================================================== */
+
+  bindRouteButtons();
+
+  bindPageButtons();
+
+
+  /* =====================================================
+     อ่าน hash
+  ===================================================== */
+
+  let initialRoute =
+    location.hash
+      .replace(
+        /^#/,
+        ""
+      )
+      .trim();
+
+
+  /* =====================================================
+     ถ้าไม่มี route
+     ใช้ dashboard
+  ===================================================== */
+
+  initialRoute =
+    normalizeRoute(
+      initialRoute
+    ) ||
+    "dashboard";
+
+
+  console.log(
+    "🏁 INITIAL ROUTE:",
+    initialRoute
+  );
+
+
+  /* =====================================================
+     โหลดหน้าแรก
+  ===================================================== */
+
+  await navigateWithoutHistory(
+    initialRoute
+  );
+
+
+  /* =====================================================
+     ถ้าไม่มี hash
+     สร้าง hash โดยไม่ reload
+  ===================================================== */
+
+  if (
+    !location.hash
+  ) {
+
+    history.replaceState(
+      {
+        route:
+          initialRoute
+      },
+      "",
+      `#${initialRoute}`
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DOM READY
+========================================================= */
+
+if (
+  document.readyState ===
+  "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    boot,
+    {
+      once: true
+    }
+  );
+
+} else {
+
+  boot();
+
+}
+

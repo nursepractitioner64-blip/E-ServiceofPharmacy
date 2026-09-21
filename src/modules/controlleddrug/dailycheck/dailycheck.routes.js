@@ -487,35 +487,35 @@ router.get("/", async (req, res) => {
       stockMap[key].qty += qty;
 
 
+
       // =================================================
-      // RECORDER MAP
-      //
-      // F = USER
-      //
-      // ผู้ตรวจล่าสุดของวัน
-      // =================================================
+// RECORDER MAP
+//
+// F = USER
+//
+// ใช้ผู้ตรวจ + เวลา "ครั้งแรก" ของวัน
+// =================================================
 
-      if (user) {
+if (user) {
 
-        const previousTime =
-          recorderTimeMap[day] || 0;
+  const previousTime =
+    recorderTimeMap[day] || 0;
 
+  // ใช้รายการแรกของวัน
+  if (
+    !previousTime ||
+    currentTime < previousTime
+  ) {
 
-        if (
-          currentTime >=
-          previousTime
-        ) {
+    recorderMap[day] =
+      user;
 
-          recorderMap[day] =
-            user;
+    recorderTimeMap[day] =
+      currentTime;
 
+  }
 
-          recorderTimeMap[day] =
-            currentTime;
-
-        }
-
-      }
+}
 
     });
 
@@ -641,24 +641,23 @@ router.get("/", async (req, res) => {
     // RESPONSE
     // =================================================
 
-    return res.json({
+return res.json({
 
-      ok:
-        true,
+  ok: true,
 
-      month:
-        month,
+  month: month,
 
-      year:
-        year,
+  year: year,
 
-      data:
-        output,
+  data: output,
 
-      recorders:
-        recorderMap,
+  // ผู้ตรวจ/ผู้บันทึกคนแรกของวัน
+  recorders: recorderMap,
 
-    });
+  // เวลาแรกของวัน
+  recorderTimes: recorderTimeMap,
+
+});
 
 
   } catch (err) {

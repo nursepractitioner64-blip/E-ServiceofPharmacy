@@ -1,0 +1,2631 @@
+/* =====================================================
+   VACCINE MASTER MODAL VISIBILITY FIX
+===================================================== */
+
+/*
+ * hidden ต้องซ่อนจริงเสมอ
+ * ป้องกัน CSS .show / display:flex
+ * ทำให้ Modal โผล่เอง
+ */
+
+#vaccinemasterModal[hidden],
+#vaccineStockDetailModal[hidden] {
+  display: none !important;
+}
+
+
+/*
+ * Modal จะเห็นได้เมื่อมี class show
+ */
+
+#vaccinemasterModal.show,
+#vaccineStockDetailModal.show {
+  display: flex;
+}
+
+
+/*
+ * ป้องกัน body ถูกล็อกโดยไม่จำเป็น
+ */
+
+body.vaccinemaster-modal-open {
+  overflow: hidden;
+}
+
+body.vaccinemaster-detail-modal-open {
+  overflow: hidden;
+}
+
+/* =====================================================
+   VACCINE MASTER MODULE
+===================================================== */
+
+.vaccinemaster-page {
+
+  width: 100%;
+
+  min-height: 100%;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  box-sizing: border-box;
+
+}
+
+.vaccinemaster-page *,
+.vaccinemaster-modal,
+.vaccinemaster-modal * {
+
+  box-sizing: border-box;
+
+}
+
+
+/* =====================================================
+   TABLE SECTION
+===================================================== */
+
+.vaccinemaster-table-section {
+
+  margin-top: 20px;
+
+  padding:
+    0 22px 22px;
+
+}
+
+
+/* =====================================================
+   TABLE HEADER
+===================================================== */
+
+.vaccinemaster-table-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 14px;
+
+}
+
+
+.vaccinemaster-table-title h2 {
+
+  margin: 0;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #212529;
+
+}
+
+
+.vaccinemaster-table-title p {
+
+  margin:
+    4px 0 0;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size: 12px;
+
+  color: #6c757d;
+
+}
+
+
+/* =====================================================
+   TABLE TOOLS
+===================================================== */
+
+.vaccinemaster-table-tools {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+}
+
+
+.vaccinemaster-search {
+
+  width: 270px;
+
+  height: 38px;
+
+  padding:
+    7px 12px;
+
+  border:
+    1px solid #d9dee6;
+
+  border-radius: 8px;
+
+  background:
+    #ffffff;
+
+  outline: none;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size: 13px;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
+
+}
+
+
+.vaccinemaster-search:focus {
+
+  border-color:
+    #20a39e;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(32, 163, 158, .10);
+
+}
+
+
+/* =====================================================
+   REFRESH BUTTON
+===================================================== */
+
+.vaccinemaster-table-refresh {
+
+  height: 38px;
+
+  padding:
+    0 14px;
+
+  border:
+    1px solid #d9dee6;
+
+  border-radius: 8px;
+
+  background:
+    #ffffff;
+
+  color:
+    #495057;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    all .15s ease;
+
+}
+
+
+.vaccinemaster-table-refresh:hover {
+
+  background:
+    #f5f8fb;
+
+  border-color:
+    #adb5bd;
+
+}
+
+
+/* =====================================================
+   TABLE WRAPPER
+===================================================== */
+
+.vaccinemaster-table-wrapper {
+
+  width: 100%;
+
+  overflow-x: auto;
+
+  border:
+    1px solid #e3e7eb;
+
+  border-radius: 10px;
+
+  background:
+    #ffffff;
+
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.vaccinemaster-table {
+
+  width: 100%;
+
+  min-width: 700px;
+
+  border-collapse:
+    collapse;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size: 13px;
+
+}
+
+
+.vaccinemaster-table thead th {
+
+  padding:
+    11px 13px;
+
+  background:
+    #f7f9fb;
+
+  border-bottom:
+    1px solid #e3e7eb;
+
+  color:
+    #495057;
+
+  font-weight:
+    600;
+
+  text-align:
+    left;
+
+  white-space:
+    nowrap;
+
+}
+
+
+.vaccinemaster-table tbody td {
+
+  padding:
+    11px 13px;
+
+  border-bottom:
+    1px solid #edf0f2;
+
+  color:
+    #343a40;
+
+  vertical-align:
+    middle;
+
+}
+
+
+.vaccinemaster-table tbody tr:last-child td {
+
+  border-bottom:
+    none;
+
+}
+
+
+.vaccinemaster-table tbody tr {
+
+  transition:
+    background .15s ease;
+
+}
+
+
+.vaccinemaster-table tbody tr:hover {
+
+  background:
+    #fafcfd;
+
+}
+
+
+/* =====================================================
+   COLUMN
+===================================================== */
+
+.vaccinemaster-col-no {
+
+  width:
+    60px;
+
+  text-align:
+    center !important;
+
+}
+
+
+.vaccinemaster-col-code {
+
+  width:
+    150px;
+
+}
+
+
+.vaccinemaster-col-name {
+
+  min-width:
+    240px;
+
+}
+
+
+.vaccinemaster-col-stock {
+
+  width:
+    150px;
+
+  text-align:
+    center !important;
+
+}
+
+
+.vaccinemaster-col-action {
+
+  width:
+    150px;
+
+  text-align:
+    center !important;
+
+}
+
+
+/* =====================================================
+   CODE
+===================================================== */
+
+.vaccinemaster-code {
+
+  display:
+    inline-block;
+
+  padding:
+    3px 7px;
+
+  border-radius:
+    5px;
+
+  background:
+    #eef8f7;
+
+  color:
+    #137c77;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size:
+    12px;
+
+  font-weight:
+    600;
+
+}
+
+
+/* =====================================================
+   NAME
+===================================================== */
+
+.vaccinemaster-name {
+
+  font-weight:
+    500;
+
+  color:
+    #343a40;
+
+}
+
+
+.vaccinemaster-thname {
+
+  margin-top:
+    3px;
+
+  color:
+    #6c757d;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.5;
+
+}
+
+
+/* =====================================================
+   STOCK
+===================================================== */
+
+.vaccinemaster-stock {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  min-width:
+    42px;
+
+  padding:
+    4px 9px;
+
+  border-radius:
+    6px;
+
+  background:
+    #eef8f7;
+
+  color:
+    #137c77;
+
+  font-weight:
+    600;
+
+}
+
+
+/* =====================================================
+   TABLE STATE
+===================================================== */
+
+.vaccinemaster-table-loading,
+.vaccinemaster-table-empty,
+.vaccinemaster-table-error {
+
+  height:
+    100px;
+
+  text-align:
+    center !important;
+
+  vertical-align:
+    middle !important;
+
+  color:
+    #6c757d !important;
+
+}
+
+
+.vaccinemaster-table-error {
+
+  color:
+    #dc3545 !important;
+
+}
+
+
+/* =====================================================
+   VACCINE MASTER ACTIONS
+===================================================== */
+
+.vaccinemaster-actions {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+
+  white-space:
+    nowrap;
+
+}
+
+
+/* =====================================================
+   ACTION ICON BUTTON
+===================================================== */
+
+.vaccinemaster-icon-btn {
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  padding:
+    0;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  flex:
+    0 0 34px;
+
+  border:
+    1px solid #dfe5ec;
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+
+  color:
+    #495057;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    16px;
+
+  line-height:
+    1;
+
+  cursor:
+    pointer;
+
+  outline:
+    none;
+
+  transition:
+    transform .15s ease,
+    background .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease;
+
+}
+
+
+/* =====================================================
+   ACTION HOVER
+===================================================== */
+
+.vaccinemaster-icon-btn:hover {
+
+  transform:
+    translateY(-1px);
+
+  background:
+    #f7f9fc;
+
+  border-color:
+    #cbd5e1;
+
+  box-shadow:
+    0 3px 8px
+    rgba(0, 0, 0, .08);
+
+}
+
+
+.vaccinemaster-icon-btn:active {
+
+  transform:
+    translateY(0);
+
+  box-shadow:
+    none;
+
+}
+
+
+.vaccinemaster-icon-btn:focus-visible {
+
+  outline:
+    2px solid #20a39e;
+
+  outline-offset:
+    2px;
+
+}
+
+
+/* =====================================================
+   DETAIL BUTTON
+===================================================== */
+
+.vaccinemaster-detail-btn {
+
+  color:
+    #0d6efd;
+
+}
+
+
+.vaccinemaster-detail-btn:hover {
+
+  background:
+    #eef8ff;
+
+  border-color:
+    #b8dcf5;
+
+}
+
+
+/* =====================================================
+   EDIT BUTTON
+===================================================== */
+
+.vaccinemaster-edit-btn {
+
+  color:
+    #d99a00;
+
+}
+
+
+.vaccinemaster-edit-btn:hover {
+
+  background:
+    #fff8e8;
+
+  border-color:
+    #f0d58a;
+
+}
+
+
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
+.vaccinemaster-delete-btn {
+
+  color:
+    #dc3545;
+
+}
+
+
+.vaccinemaster-delete-btn:hover {
+
+  background:
+    #fff1f1;
+
+  border-color:
+    #efb4b4;
+
+}
+
+
+/* =====================================================
+   TABLE FOOTER
+===================================================== */
+
+.vaccinemaster-table-footer {
+
+  display:
+    flex;
+
+  justify-content:
+    flex-end;
+
+  padding:
+    9px 2px 0;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    12px;
+
+  color:
+    #6c757d;
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.vaccinemaster-modal {
+
+  position:
+    fixed !important;
+
+  inset:
+    0 !important;
+
+  width:
+    100vw !important;
+
+  height:
+    100vh !important;
+
+  z-index:
+    99999 !important;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+}
+
+
+/* =====================================================
+   IMPORTANT
+   hidden attribute ต้องไม่ให้ Modal แสดง
+===================================================== */
+
+.vaccinemaster-modal[hidden] {
+
+  display:
+    none !important;
+
+}
+
+
+/* =====================================================
+   MODAL OVERLAY
+===================================================== */
+
+.vaccinemaster-modal-overlay {
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  background:
+    rgba(0, 0, 0, .45);
+
+  cursor:
+    pointer;
+
+}
+
+
+/* =====================================================
+   MODAL BOX
+===================================================== */
+
+.vaccinemaster-modal-box {
+
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  width:
+    min(620px, 94vw);
+
+  max-height:
+    90vh;
+
+  overflow-y:
+    auto;
+
+  background:
+    #ffffff;
+
+  border-radius:
+    14px;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0, 0, 0, .25);
+
+  animation:
+    vaccinemasterModalIn
+    .18s
+    ease-out;
+
+}
+
+
+@keyframes vaccinemasterModalIn {
+
+  from {
+
+    opacity:
+      0;
+
+    transform:
+      translateY(10px)
+      scale(.98);
+
+  }
+
+  to {
+
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+  }
+
+}
+
+
+/* =====================================================
+   MODAL HEADER
+===================================================== */
+
+.vaccinemaster-modal-header {
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    15px;
+
+  padding:
+    20px 22px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+}
+
+
+.vaccinemaster-modal-header h2 {
+
+  margin:
+    0;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    19px;
+
+  font-weight:
+    600;
+
+  color:
+    #212529;
+
+}
+
+
+.vaccinemaster-modal-header p {
+
+  margin:
+    4px 0 0;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    12px;
+
+  color:
+    #6c757d;
+
+}
+
+
+/* =====================================================
+   MODAL CLOSE
+===================================================== */
+
+.vaccinemaster-modal-close {
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  padding:
+    0;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  flex:
+    0 0 34px;
+
+  border:
+    1px solid #e0e4e8;
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+
+  color:
+    #495057;
+
+  font-size:
+    14px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all .15s ease;
+
+}
+
+
+.vaccinemaster-modal-close:hover {
+
+  background:
+    #fff1f1;
+
+  border-color:
+    #efb4b4;
+
+  color:
+    #dc3545;
+
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+#vaccinemasterForm {
+
+  padding:
+    20px 22px 22px;
+
+}
+
+
+.vaccinemaster-form-group {
+
+  margin-bottom:
+    16px;
+
+}
+
+
+.vaccinemaster-form-group label {
+
+  display:
+    block;
+
+  margin-bottom:
+    6px;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    13px;
+
+  font-weight:
+    500;
+
+  color:
+    #343a40;
+
+}
+
+
+.vaccinemaster-form-group input {
+
+  display:
+    block;
+
+  width:
+    100%;
+
+  height:
+    40px;
+
+  padding:
+    8px 11px;
+
+  border:
+    1px solid #d9dee6;
+
+  border-radius:
+    8px;
+
+  outline:
+    none;
+
+  background:
+    #ffffff;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    13px;
+
+  box-sizing:
+    border-box;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
+
+}
+
+
+.vaccinemaster-form-group input:focus {
+
+  border-color:
+    #20a39e;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(32, 163, 158, .10);
+
+}
+
+
+/* =====================================================
+   MODAL FOOTER
+===================================================== */
+
+.vaccinemaster-modal-footer {
+
+  display:
+    flex;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    8px;
+
+  margin-top:
+    20px;
+
+  padding-top:
+    16px;
+
+  border-top:
+    1px solid #edf0f3;
+
+}
+
+
+.vaccinemaster-btn {
+
+  height:
+    38px;
+
+  padding:
+    0 15px;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    8px;
+
+  font-family:
+    "Prompt",
+    sans-serif;
+
+  font-size:
+    13px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all .15s ease;
+
+}
+
+
+.vaccinemaster-btn-light {
+
+  border-color:
+    #d9dee6;
+
+  background:
+    #ffffff;
+
+  color:
+    #495057;
+
+}
+
+
+.vaccinemaster-btn-light:hover {
+
+  background:
+    #f5f7f9;
+
+}
+
+
+.vaccinemaster-btn-success {
+
+  border-color:
+    #198754;
+
+  background:
+    #198754;
+
+  color:
+    #ffffff;
+
+}
+
+
+.vaccinemaster-btn-success:hover {
+
+  background:
+    #157347;
+
+}
+
+
+/* =====================================================
+   LOADING BUTTON
+===================================================== */
+
+.vaccinemaster-btn:disabled {
+
+  opacity:
+    .65;
+
+  cursor:
+    not-allowed;
+
+}
+
+
+/* =====================================================
+   BODY LOCK
+===================================================== */
+
+body.vaccinemaster-modal-open {
+
+  overflow:
+    hidden !important;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .vaccinemaster-table-header {
+
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+  }
+
+
+  .vaccinemaster-table-tools {
+
+    width:
+      100%;
+
+  }
+
+
+  .vaccinemaster-search {
+
+    flex:
+      1;
+
+    width:
+      auto;
+
+  }
+
+
+  .vaccinemaster-table-section {
+
+    padding:
+      0 12px 15px;
+
+  }
+
+
+  .vaccinemaster-modal-box {
+
+    width:
+      94vw;
+
+    max-height:
+      92vh;
+
+  }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 576px) {
+
+  .vaccinemaster-actions {
+
+    gap:
+      4px;
+
+  }
+
+
+  .vaccinemaster-icon-btn {
+
+    width:
+      32px;
+
+    height:
+      32px;
+
+    flex:
+      0 0 32px;
+
+    font-size:
+      15px;
+
+    border-radius:
+      7px;
+
+  }
+
+
+  .vaccinemaster-modal-header {
+
+    padding:
+      16px;
+
+  }
+
+
+  #vaccinemasterForm {
+
+    padding:
+      16px;
+
+  }
+
+
+  .vaccinemaster-modal-footer {
+
+    flex-direction:
+      row;
+
+  }
+
+
+  .vaccinemaster-btn {
+
+    flex:
+      1;
+
+  }
+
+}
+
+
+/* =====================================================
+   VACCINE STOCK DETAIL MODAL
+===================================================== */
+
+.vaccine-stock-detail-modal {
+
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+
+  height: 100vh;
+
+  z-index: 100000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+
+.vaccine-stock-detail-modal[hidden] {
+
+  display: none !important;
+
+}
+
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
+.vaccine-stock-detail-overlay {
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    rgba(15, 23, 42, .48);
+
+}
+
+
+/* =====================================================
+   MODAL BOX
+===================================================== */
+
+.vaccine-stock-detail-box {
+
+  position: relative;
+
+  z-index: 2;
+
+  width: min(620px, 94vw);
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 24px 70px
+    rgba(0, 0, 0, .25);
+
+  animation:
+    vaccineStockDetailModalIn
+    .18s
+    ease-out;
+
+}
+
+
+@keyframes vaccineStockDetailModalIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(.98);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+  }
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.vaccine-stock-detail-header {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 20px 22px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+}
+
+
+.vaccine-stock-detail-header h2 {
+
+  margin: 0;
+
+  font-family: "Prompt", sans-serif;
+
+  font-size: 19px;
+
+  font-weight: 600;
+
+  color: #212529;
+
+}
+
+
+.vaccine-stock-detail-header p {
+
+  margin: 4px 0 0;
+
+  font-family: "Prompt", sans-serif;
+
+  font-size: 12px;
+
+  color: #6c757d;
+
+}
+
+
+/* =====================================================
+   CLOSE
+===================================================== */
+
+.vaccine-stock-detail-close {
+
+  width: 34px;
+
+  height: 34px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0;
+
+  border:
+    1px solid #dfe4ea;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #6c757d;
+
+  cursor: pointer;
+
+  transition: all .15s ease;
+
+}
+
+
+.vaccine-stock-detail-close:hover {
+
+  background: #fff1f1;
+
+  border-color: #efb4b4;
+
+  color: #dc3545;
+
+}
+
+
+/* =====================================================
+   VACCINE INFO
+===================================================== */
+
+.vaccine-stock-detail-info {
+
+  padding:
+    18px 22px 10px;
+
+}
+
+
+.vaccine-stock-detail-code {
+
+  display: inline-block;
+
+  padding:
+    4px 9px;
+
+  border-radius: 6px;
+
+  background: #eef8f7;
+
+  color: #137c77;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+}
+
+
+.vaccine-stock-detail-name {
+
+  margin-top: 8px;
+
+  font-family: "Prompt", sans-serif;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  line-height: 1.6;
+
+  color: #343a40;
+
+}
+
+
+/* =====================================================
+   LOT LIST
+===================================================== */
+
+.vaccine-stock-detail-lots {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding:
+    10px 22px;
+
+}
+
+
+.vaccine-stock-lot-row {
+
+  display: grid;
+
+  grid-template-columns:
+    90px
+    1fr
+    100px;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding:
+    11px 13px;
+
+  border:
+    1px solid #e3e7eb;
+
+  border-radius: 9px;
+
+  background: #fafbfc;
+
+  font-family: "Prompt", sans-serif;
+
+}
+
+
+.vaccine-stock-lot {
+
+  font-weight: 600;
+
+  color: #343a40;
+
+}
+
+
+.vaccine-stock-exp {
+
+  color: #6c757d;
+
+  font-size: 13px;
+
+}
+
+
+.vaccine-stock-qty {
+
+  text-align: right;
+
+  font-weight: 600;
+
+  color: #137c77;
+
+}
+
+
+/* =====================================================
+   TOTAL
+===================================================== */
+
+.vaccine-stock-detail-total {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin:
+    8px 22px 0;
+
+  padding:
+    13px 15px;
+
+  border-radius: 9px;
+
+  background: #eef8f7;
+
+  color: #137c77;
+
+  font-family: "Prompt", sans-serif;
+
+}
+
+
+.vaccine-stock-detail-total span {
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+}
+
+
+.vaccine-stock-detail-total strong {
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   EXPIRY WARNING
+===================================================== */
+
+.vaccine-stock-detail-warning {
+
+  margin:
+    12px 22px 0;
+
+  padding:
+    12px 14px;
+
+  border:
+    1px solid #f3d58a;
+
+  border-radius: 9px;
+
+  background:
+    #fff9e8;
+
+}
+
+
+.vaccine-stock-detail-warning[hidden] {
+
+  display: none !important;
+
+}
+
+
+.vaccine-stock-detail-warning-title {
+
+  margin-bottom: 4px;
+
+  font-family: "Prompt", sans-serif;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #946200;
+
+}
+
+
+.vaccine-stock-detail-warning-text {
+
+  font-family: "Prompt", sans-serif;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+
+  color: #795300;
+
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.vaccine-stock-detail-footer {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  padding:
+    16px 22px 20px;
+
+}
+
+/* =========================================================
+   VACCINE STOCK RECEIVE MODAL — PROFESSIONAL FORM UI
+   Scope: Vaccine Master Receive Stock Modal only
+========================================================= */
+
+#vaccinemasterStockModal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, .56);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-family: "Prompt", sans-serif;
+}
+
+#vaccinemasterStockModal[hidden] {
+  display: none !important;
+}
+
+#vaccinemasterStockModal.show {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.vaccinemaster-stock-modal,
+.vaccinemaster-stock-modal * {
+  box-sizing: border-box;
+}
+
+.vaccinemaster-stock-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(20, 184, 166, .10), transparent 34%),
+    rgba(15, 23, 42, .10);
+  pointer-events: none;
+}
+
+/* =========================
+   CARD
+========================= */
+.vaccinemaster-stock-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(920px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, .90);
+  border-radius: 20px;
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, .25),
+    0 8px 24px rgba(15, 23, 42, .10);
+  animation: vaccinemasterStockModalIn .20s ease-out;
+}
+
+@keyframes vaccinemasterStockModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================
+   HEADER
+========================= */
+.vaccinemaster-stock-modal-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 26px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fbfefe 100%);
+  border-bottom: 1px solid #e8eef2;
+}
+
+.vaccinemaster-stock-modal-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vaccinemaster-stock-modal-icon {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c9f3ee;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ecfdfb, #f4fffe);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+  font-size: 25px;
+}
+
+.vaccinemaster-stock-modal-title-wrap {
+  min-width: 0;
+}
+
+.vaccinemaster-stock-modal-kicker {
+  margin-bottom: 2px;
+  color: #0f766e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1.2;
+}
+
+.vaccinemaster-stock-modal-heading h2 {
+  margin: 0;
+  color: #17212b;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.vaccinemaster-stock-modal-heading p {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.vaccinemaster-stock-modal-close {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 300;
+  line-height: 1;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.vaccinemaster-stock-modal-close:hover {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.vaccinemaster-stock-modal-close:focus-visible {
+  outline: 3px solid rgba(20, 184, 166, .18);
+  outline-offset: 2px;
+}
+
+/* =========================
+   FORM / BODY
+========================= */
+.vaccinemaster-stock-form {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vaccinemaster-stock-modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 26px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.vaccinemaster-stock-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vaccinemaster-stock-modal-body::-webkit-scrollbar-thumb {
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+/* =========================
+   SECTION
+========================= */
+.vaccinemaster-stock-section {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid #e5ebf0;
+  border-radius: 15px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .025);
+}
+
+.vaccinemaster-stock-section:last-of-type {
+  margin-bottom: 14px;
+}
+
+.vaccinemaster-stock-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.vaccinemaster-stock-section-number {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #bcebe5;
+  border-radius: 10px;
+  background: #effcf9;
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.vaccinemaster-stock-section-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.vaccinemaster-stock-section-header p {
+  margin: 3px 0 0;
+  color: #94a3b8;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================
+   GRID
+========================= */
+.vaccinemaster-stock-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px 16px;
+}
+
+.vaccinemaster-stock-vaccine-grid {
+  display: grid;
+  grid-template-columns: minmax(250px, .78fr) minmax(0, 1.22fr);
+  gap: 15px 16px;
+}
+
+.vaccinemaster-stock-stock-grid {
+  display: grid;
+  grid-template-columns: 1fr .72fr 1fr 1.12fr;
+  gap: 15px;
+}
+
+.vaccinemaster-stock-field {
+  min-width: 0;
+}
+
+.vaccinemaster-stock-field-full {
+  grid-column: 1 / -1;
+}
+
+.vaccinemaster-stock-field label {
+  min-height: 19px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 7px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.vaccinemaster-stock-field label b {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.vaccinemaster-stock-label-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 17px;
+  padding: 0 6px;
+  border: 1px solid #bae6fd;
+  border-radius: 5px;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+/* =========================
+   INPUTS
+========================= */
+.vaccinemaster-stock-field input,
+.vaccinemaster-stock-field select,
+.vaccinemaster-stock-field textarea {
+  width: 100%;
+  border: 1px solid #d5dde5;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.vaccinemaster-stock-field input,
+.vaccinemaster-stock-field select {
+  height: 42px;
+  padding: 9px 12px;
+}
+
+.vaccinemaster-stock-field textarea {
+  min-height: 88px;
+  resize: vertical;
+  padding: 10px 12px;
+}
+
+.vaccinemaster-stock-field input::placeholder,
+.vaccinemaster-stock-field textarea::placeholder {
+  color: #a8b2bd;
+}
+
+.vaccinemaster-stock-field input:hover,
+.vaccinemaster-stock-field select:hover,
+.vaccinemaster-stock-field textarea:hover {
+  border-color: #b8c4cf;
+}
+
+.vaccinemaster-stock-field input:focus,
+.vaccinemaster-stock-field select:focus,
+.vaccinemaster-stock-field textarea:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, .12);
+}
+
+.vaccinemaster-stock-field input[readonly] {
+  background: #f8fafc;
+  color: #475569;
+  cursor: default;
+}
+
+.vaccinemaster-stock-field input[type="date"] {
+  color-scheme: light;
+}
+
+.vaccinemaster-stock-help {
+  display: block;
+  margin-top: 5px;
+  color: #94a3b8;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* =========================
+   SYSTEM REF FIELD
+========================= */
+.vaccinemaster-system-field {
+  display: flex;
+  align-items: stretch;
+}
+
+.vaccinemaster-system-prefix {
+  min-width: 49px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d5dde5;
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.vaccinemaster-system-field input {
+  min-width: 0;
+  border-radius: 0 10px 10px 0;
+}
+
+/* =========================
+   SELECT
+========================= */
+.vaccinemaster-stock-select-wrap {
+  position: relative;
+}
+
+.vaccinemaster-stock-select-wrap::after {
+  content: "⌄";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-55%);
+  color: #64748b;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.vaccinemaster-stock-select-wrap select {
+  appearance: none;
+  padding-right: 35px;
+}
+
+/* =========================
+   QUANTITY
+========================= */
+.vaccinemaster-stock-input-with-suffix {
+  position: relative;
+}
+
+.vaccinemaster-stock-input-with-suffix input {
+  padding-right: 62px;
+}
+
+.vaccinemaster-stock-input-with-suffix span {
+  position: absolute;
+  top: 50%;
+  right: 11px;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+/* =========================
+   HINTS / NOTICES
+========================= */
+.vaccinemaster-stock-selection-hint,
+.vaccinemaster-stock-exp-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.vaccinemaster-stock-selection-hint {
+  border: 1px solid #d9f4f0;
+  background: #f5fdfc;
+}
+
+.vaccinemaster-stock-exp-note {
+  border: 1px solid #f7e7b0;
+  background: #fffaf0;
+}
+
+.vaccinemaster-stock-selection-hint-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dff7f3;
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.vaccinemaster-stock-selection-hint strong,
+.vaccinemaster-stock-exp-note strong {
+  display: block;
+  margin-bottom: 1px;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.vaccinemaster-stock-selection-hint span:not(.vaccinemaster-stock-selection-hint-icon),
+.vaccinemaster-stock-exp-note span:not(.vaccinemaster-stock-selection-hint-icon) {
+  display: block;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* =========================
+   SYSTEM NOTE
+========================= */
+.vaccinemaster-stock-system-note {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 2px 0 15px;
+  padding: 11px 13px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 11px;
+  background: #f8fafc;
+}
+
+.vaccinemaster-stock-system-note-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #eef2f7;
+  font-size: 14px;
+}
+
+.vaccinemaster-stock-system-note strong {
+  display: block;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.vaccinemaster-stock-system-note p {
+  margin: 2px 0 0;
+  color: #94a3b8;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: .02em;
+}
+
+.vaccinemaster-stock-system-status {
+  margin-left: auto;
+  padding: 4px 7px;
+  border: 1px solid #dbe4ec;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #94a3b8;
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.vaccinemaster-stock-modal-footer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 26px 16px;
+  border-top: 1px solid #e8eef2;
+  background: #fbfcfd;
+}
+
+.vaccinemaster-stock-footer-hint {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.vaccinemaster-stock-footer-hint span {
+  color: #14b8a6;
+  font-size: 8px;
+}
+
+.vaccinemaster-stock-footer-hint b {
+  color: #dc2626;
+}
+
+.vaccinemaster-stock-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vaccinemaster-stock-btn {
+  min-width: 110px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.vaccinemaster-stock-btn:focus-visible {
+  outline: 3px solid rgba(20, 184, 166, .16);
+  outline-offset: 2px;
+}
+
+.vaccinemaster-stock-btn-cancel {
+  border-color: #d9e1e8;
+  background: #ffffff;
+  color: #475569;
+}
+
+.vaccinemaster-stock-btn-cancel:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.vaccinemaster-stock-btn-save {
+  min-width: 158px;
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(15, 118, 110, .16);
+}
+
+.vaccinemaster-stock-btn-save:hover {
+  border-color: #0d6b64;
+  background: #0d6b64;
+  box-shadow: 0 6px 14px rgba(15, 118, 110, .20);
+  transform: translateY(-1px);
+}
+
+.vaccinemaster-stock-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: none;
+}
+
+.vaccinemaster-stock-btn:disabled {
+  opacity: .60;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none;
+}
+
+/* =========================
+   VALIDATION SUPPORT
+   Works with native invalid state without changing JS.
+========================= */
+.vaccinemaster-stock-field input:required:invalid:not(:focus):not(:placeholder-shown),
+.vaccinemaster-stock-field select:required:invalid:not(:focus),
+.vaccinemaster-stock-field textarea:required:invalid:not(:focus) {
+  border-color: #f1a8a8;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 820px) {
+  #vaccinemasterStockModal {
+    padding: 12px;
+  }
+
+  .vaccinemaster-stock-modal-card {
+    max-height: calc(100vh - 24px);
+    border-radius: 16px;
+  }
+
+  .vaccinemaster-stock-modal-header {
+    padding: 16px 18px;
+  }
+
+  .vaccinemaster-stock-modal-icon {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+    border-radius: 12px;
+    font-size: 22px;
+  }
+
+  .vaccinemaster-stock-modal-heading h2 {
+    font-size: 19px;
+  }
+
+  .vaccinemaster-stock-modal-body {
+    padding: 16px 18px 6px;
+  }
+
+  .vaccinemaster-stock-section {
+    padding: 15px;
+  }
+
+  .vaccinemaster-stock-stock-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vaccinemaster-stock-modal-footer {
+    padding: 12px 18px 14px;
+  }
+}
+
+@media (max-width: 620px) {
+  #vaccinemasterStockModal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .vaccinemaster-stock-modal-card {
+    width: 100%;
+    max-height: 96vh;
+    border-radius: 18px 18px 0 0;
+    border-bottom: 0;
+  }
+
+  .vaccinemaster-stock-grid,
+  .vaccinemaster-stock-vaccine-grid,
+  .vaccinemaster-stock-stock-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vaccinemaster-stock-field-full {
+    grid-column: auto;
+  }
+
+  .vaccinemaster-stock-modal-header {
+    gap: 12px;
+  }
+
+  .vaccinemaster-stock-modal-close {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .vaccinemaster-stock-modal-body {
+    padding: 14px 12px 4px;
+  }
+
+  .vaccinemaster-stock-section {
+    margin-bottom: 12px;
+    padding: 13px;
+    border-radius: 13px;
+  }
+
+  .vaccinemaster-stock-section-header {
+    margin-bottom: 14px;
+  }
+
+  .vaccinemaster-stock-section-header p {
+    font-size: 10px;
+  }
+
+  .vaccinemaster-stock-modal-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 9px;
+    padding: 10px 12px 12px;
+  }
+
+  .vaccinemaster-stock-footer-hint {
+    text-align: center;
+  }
+
+  .vaccinemaster-stock-footer-actions {
+    width: 100%;
+  }
+
+  .vaccinemaster-stock-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .vaccinemaster-stock-system-status {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vaccinemaster-stock-modal-card,
+  .vaccinemaster-stock-btn,
+  .vaccinemaster-stock-modal-close {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

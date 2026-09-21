@@ -20,101 +20,103 @@
 
       </div>
 
-      <div class="stock-header-right">
+<div class="stock-header-right">
 
-        <button
-        id="scanQrBtn"
-        class="ems-check-btn ems-check-btn-outline"
-      >
-        <i class="fa-solid fa-qrcode"></i>
-        Scan QR
-      </button>
+  <!-- USER -->
+  <div class="ems-user-menu">
 
-      <button
-        id="saveChecklistBtn"
-        class="ems-check-btn ems-check-btn-outline"
-      >
-        <i class="fa-solid fa-check"></i>
-        บันทึก
-      </button>
+    <button
+      type="button"
+      class="ems-user-trigger"
+      id="emsUserTrigger"
+    >
+
+      <span class="ems-user-avatar">
+        <i class="fa-solid fa-user"></i>
+      </span>
+
+      <span class="ems-user-info">
+        <strong>สมชาย</strong>
+        <small>ผู้ใช้งาน</small>
+      </span>
+
+      <i class="fa-solid fa-chevron-down ems-user-arrow"></i>
+
+    </button>
+
+    <div
+      class="ems-user-dropdown"
+      id="emsUserDropdown"
+    >
+
+      <div class="ems-user-dropdown-header">
+
+        <span class="ems-user-avatar large">
+          <i class="fa-solid fa-user"></i>
+        </span>
+
+        <div>
+          <strong>สมชาย</strong>
+          <small>ผู้ใช้งาน</small>
+        </div>
 
       </div>
+
+      <div class="ems-user-divider"></div>
+
+      <button type="button">
+        <i class="fa-solid fa-user"></i>
+        โปรไฟล์
+      </button>
+
+      <button type="button">
+        <i class="fa-solid fa-key"></i>
+        เปลี่ยนรหัสผ่าน
+      </button>
+
+      <div class="ems-user-divider"></div>
+
+      <button
+        type="button"
+        class="ems-user-logout"
+      >
+        <i class="fa-solid fa-right-from-bracket"></i>
+        ออกจากระบบ
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
     </div>
   <!-- ================= MENU ================= -->
-  <section class="ems-check-menu">
+<section class="ems-check-menu">
 
-    <button class="ems-check-menu-btn" data-page="inventory">
-      <i class="fa-solid fa-layer-group"></i>
-      Inventory Master
-    </button>
+  <button class="ems-check-menu-btn" data-page="inventory">
+    <span class="ems-menu-icon">📦</span>
+    <span class="ems-menu-text">Inventory Master</span>
+  </button>
 
-    <button class="ems-check-menu-btn" data-page="receive">
-      <i class="fa-solid fa-arrows-down-to-line"></i>
-      Inventory Stock 
-    </button>
+  <button class="ems-check-menu-btn" data-page="receive">
+    <span class="ems-menu-icon">📥</span>
+    <span class="ems-menu-text">Inventory Stock</span>
+  </button>
 
-    <button class="ems-check-menu-btn" data-page="stockout">
-      <i class="fa-solid fa-arrows-up-to-line"></i>
-      Inventory Dispense
-    </button>
+  <button class="ems-check-menu-btn" data-page="stockout">
+    <span class="ems-menu-icon">📤</span>
+    <span class="ems-menu-text">Inventory Dispense</span>
+  </button>
 
-    <button class="ems-check-menu-btn" data-page="dailycheck">
-      <i class="fa-solid fa-clipboard-check"></i>
-      Daily Check
-    </button>
 
-    <button class="ems-check-menu-btn" data-page="report">
-      <i class="fa-solid fa-chart-column"></i>
-      Report
-    </button>
+  <button class="ems-check-menu-btn" data-page="report">
+    <span class="ems-menu-icon">📋</span>
+    <span class="ems-menu-text">Report</span>
+  </button>
 
-  </section>
+</section>
 
-  <!-- ================= SUMMARY ================= -->
-  <section class="ems-check-summary">
-
-    <div class="ems-check-card">
-      <div class="ems-check-icon blue">
-        <i class="fa-solid fa-boxes-stacked"></i>
-      </div>
-      <div>
-        <h2 id="totalItems">124</h2>
-        <p>ทั้งหมด</p>
-      </div>
-    </div>
-
-    <div class="ems-check-card">
-      <div class="ems-check-icon green">
-        <i class="fa-solid fa-check"></i>
-      </div>
-      <div>
-        <h2 id="readyItems">118</h2>
-        <p>พร้อมใช้งาน</p>
-      </div>
-    </div>
-
-    <div class="ems-check-card">
-      <div class="ems-check-icon orange">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
-      <div>
-        <h2 id="missingItems">4</h2>
-        <p>ไม่ครบ</p>
-      </div>
-    </div>
-
-    <div class="ems-check-card">
-      <div class="ems-check-icon red">
-        <i class="fa-solid fa-clock"></i>
-      </div>
-      <div>
-        <h2 id="expireItems">2</h2>
-        <p>ใกล้หมดอายุ</p>
-      </div>
-    </div>
-
-  </section>
   <!-- ================= DAILY CHECK ================= -->
 
 <section class="ems-check-daily">
@@ -163,10 +165,10 @@
 
           <tr>
 
-            <th>CODE</th>
-            <th>NAME</th>
-            <th>UNIT</th>
-            <th>REQ</th>
+            <th style="width: 100px;">CODE</th>
+            <th style="width: 250px;">NAME</th>
+            <th style="width: 50px;">UNIT</th>
+            <th style="width: 50px;">REQ</th>
 
             <th>1</th>
             <th>2</th>

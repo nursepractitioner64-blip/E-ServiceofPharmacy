@@ -10,13 +10,15 @@ export async function init() {
   bindEvents();
 
   loadChecklist();
-  const dailyModule = await import(
-  "/modules/dailycheck/dailycheck.client.js?t=" + Date.now()
-);
 
-await dailyModule.init();
+  const dailyModule = await import(
+    "/modules/dailycheck/dailycheck.client.js?t=" + Date.now()
+  );
+
+  await dailyModule.init();
 
 }
+
 
 /*********************************************************
 BIND EVENTS
@@ -26,20 +28,22 @@ function bindEvents() {
 
   /* ================= SCAN QR ================= */
 
-  const scanBtn = document.querySelector("#scanQrBtn");
+  const scanBtn =
+    document.querySelector("#scanQrBtn");
 
   scanBtn?.addEventListener("click", () => {
 
     console.log("📷 OPEN QR SCANNER");
 
     alert("เปิดระบบสแกน QR");
-    
 
   });
 
+
   /* ================= SAVE ================= */
 
-  const saveBtn = document.querySelector("#saveChecklistBtn");
+  const saveBtn =
+    document.querySelector("#saveChecklistBtn");
 
   saveBtn?.addEventListener("click", async () => {
 
@@ -80,46 +84,90 @@ function bindEvents() {
 
   });
 
+
   /* ================= MENU ================= */
 
- document.querySelectorAll(".ems-check-menu-btn")
-  .forEach(btn => {
+  document
+    .querySelectorAll(".ems-check-menu-btn")
+    .forEach(btn => {
 
-    btn.addEventListener("click", async () => {
+      btn.addEventListener("click", async () => {
 
-      const page = btn.dataset.page;
+        const page =
+          btn.dataset.page;
 
-      console.log("📂 OPEN PAGE:", page);
+        console.log(
+          "📂 OPEN PAGE:",
+          page
+        );
 
-      /* ACTIVE MENU */
 
-      document.querySelectorAll(".ems-check-menu-btn")
-        .forEach(b => b.classList.remove("active"));
+        /* ACTIVE MENU */
 
-      btn.classList.add("active");
+        document
+          .querySelectorAll(".ems-check-menu-btn")
+          .forEach(b =>
+            b.classList.remove("active")
+          );
 
-      /* LOAD VIEW */
+        btn.classList.add("active");
 
-      if (window.loadView) {
 
-       const map = {
-  inventory: "inventory-master",
-  receive: "receive-stock",
-  stockout: "dispense",
-  check: "emergency-checklist",
-  report: "dashboard",
-  dailycheck: "dailycheck" // ✅ เพิ่มตรงนี้
-};
+        /* LOAD VIEW */
 
-await window.navigate(map[page]);
+        if (window.loadView) {
 
-      }
+          const map = {
+
+            inventory:
+              "inventory-master",
+
+            receive:
+              "receive-stock",
+
+            stockout:
+              "dispense",
+
+            check:
+              "emergency-checklist",
+
+            report:
+              "dashboard",
+
+            dailycheck:
+              "dailycheck"
+
+          };
+
+
+          const route =
+            map[page];
+
+
+          if (!route) {
+
+            console.warn(
+              "⚠️ UNKNOWN MENU PAGE:",
+              page
+            );
+
+            return;
+
+          }
+
+
+          await window.navigate(
+            route
+          );
+
+        }
+
+      });
 
     });
 
-  });
-
 }
+
 
 /*********************************************************
 LOAD CHECKLIST
@@ -129,27 +177,41 @@ async function loadChecklist() {
 
   try {
 
-    console.log("📦 LOAD EMERGENCY CHECKLIST");
+    console.log(
+      "📦 LOAD EMERGENCY CHECKLIST"
+    );
+
 
     // TODO:
     // const res = await api.getChecklist();
 
     await fakeDelay(500);
 
+
     updateSummary({
+
       total: 124,
+
       ready: 118,
+
       missing: 4,
+
       expire: 2
+
     });
+
 
   } catch (err) {
 
-    console.error(err);
+    console.error(
+      "❌ LOAD EMERGENCY CHECKLIST ERROR:",
+      err
+    );
 
   }
 
 }
+
 
 /*********************************************************
 UPDATE SUMMARY
@@ -157,19 +219,111 @@ UPDATE SUMMARY
 
 function updateSummary(data) {
 
-  document.querySelector("#totalItems").textContent =
-    data.total || 0;
+  /*
+   * สำคัญ
+   *
+   * หน้า Emergency Checklist บางเวอร์ชัน
+   * อาจไม่มี Summary Card แล้ว
+   *
+   * ดังนั้นห้ามใช้
+   *
+   * document.querySelector(...).textContent
+   *
+   * โดยไม่ตรวจสอบ null
+   */
 
-  document.querySelector("#readyItems").textContent =
-    data.ready || 0;
 
-  document.querySelector("#missingItems").textContent =
-    data.missing || 0;
+  const totalEl =
+    document.querySelector("#totalItems");
 
-  document.querySelector("#expireItems").textContent =
-    data.expire || 0;
+
+  const readyEl =
+    document.querySelector("#readyItems");
+
+
+  const missingEl =
+    document.querySelector("#missingItems");
+
+
+  const expireEl =
+    document.querySelector("#expireItems");
+
+
+  if (!totalEl) {
+
+    console.warn(
+      "⚠️ ไม่พบ #totalItems"
+    );
+
+  } else {
+
+    totalEl.textContent =
+      data.total ?? 0;
+
+  }
+
+
+  if (!readyEl) {
+
+    console.warn(
+      "⚠️ ไม่พบ #readyItems"
+    );
+
+  } else {
+
+    readyEl.textContent =
+      data.ready ?? 0;
+
+  }
+
+
+  if (!missingEl) {
+
+    console.warn(
+      "⚠️ ไม่พบ #missingItems"
+    );
+
+  } else {
+
+    missingEl.textContent =
+      data.missing ?? 0;
+
+  }
+
+
+  if (!expireEl) {
+
+    console.warn(
+      "⚠️ ไม่พบ #expireItems"
+    );
+
+  } else {
+
+    expireEl.textContent =
+      data.expire ?? 0;
+
+  }
+
+
+  console.log(
+    "📊 EMERGENCY SUMMARY:",
+    {
+      total:
+        data.total ?? 0,
+
+      ready:
+        data.ready ?? 0,
+
+      missing:
+        data.missing ?? 0,
+
+      expire:
+        data.expire ?? 0
+    }
+  );
 
 }
+
 
 /*********************************************************
 UTIL
@@ -179,7 +333,10 @@ function fakeDelay(ms) {
 
   return new Promise(resolve => {
 
-    setTimeout(resolve, ms);
+    setTimeout(
+      resolve,
+      ms
+    );
 
   });
 

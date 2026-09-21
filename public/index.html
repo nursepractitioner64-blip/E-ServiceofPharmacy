@@ -3,119 +3,544 @@
 
 <head>
 
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
-  />
+  >
 
   <title>Smart Pharmacy Management System</title>
 
-  <!-- CSS -->
-<link rel="stylesheet" href="/assets/css/dashboard.css">
-<link rel="stylesheet" href="/assets/css/pharmacy.css">
-<link rel="stylesheet" href="/assets/css/dispense.css">
-<link rel="stylesheet" href="/assets/css/emergency.css">
-<link rel="stylesheet" href="/assets/css/inventory.css">
-<link rel="stylesheet" href="/assets/css/receivestock.css">
-<link rel="stylesheet" href="/assets/css/stock-balance.css">
-<link rel="stylesheet" href="/assets/css/summarydb.css">
 
+  <!-- =====================================================
+       GOOGLE FONT
+       PROMPT
+  ====================================================== -->
 
-  <!-- FONT AWESOME -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+
+  <!-- =====================================================
+       FONT AWESOME
+       โหลดครั้งเดียวทั้งระบบ
+  ====================================================== -->
+
+  <link
+    rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    rel="stylesheet"
-  />
+  >
 
-  <!-- GOOGLE FONT -->
+
+  <!-- =====================================================
+       CSS
+  ====================================================== -->
+
+  <link rel="stylesheet" href="/assets/css/dashboard.css">
+  <link rel="stylesheet" href="/assets/css/pharmacy.css">
+  <link rel="stylesheet" href="/assets/css/dispense.css">
+  <link rel="stylesheet" href="/assets/css/emergency.css">
+  <link rel="stylesheet" href="/assets/css/inventory.css">
+  <link rel="stylesheet" href="/assets/css/receivestock.css">
+  <link rel="stylesheet" href="/assets/css/stock-balance.css">
+  <link rel="stylesheet" href="/assets/css/summarydb.css">
+  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css"
+>
+
+
+  <!-- =====================================================
+       TOM SELECT
+  ====================================================== -->
+
   <link
-    href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"
     rel="stylesheet"
-  />
+    href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
+  >
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+
+  <!-- =====================================================
+       GLOBAL FONT CONTROL
+       
+       TEXT       = PROMPT
+       ICON       = FONT AWESOME
+  ====================================================== -->
+
+  <style>
+
+    /* =====================================================
+       PROMPT
+       ใช้กับข้อความทั้งหมดของระบบ
+    ===================================================== */
+
+    html,
+    body {
+
+      font-family:
+        "Prompt",
+        sans-serif;
+
+    }
+
+
+    body *,
+    body *::before,
+    body *::after {
+
+      font-family:
+        "Prompt",
+        sans-serif;
+
+    }
+
+
+    /* =====================================================
+       FONT AWESOME
+       สำคัญมาก
+       
+       ไม่ให้ CSS ด้านบนไปทับ Font Awesome
+    ===================================================== */
+
+    .fa,
+    .fas,
+    .far,
+    .fal,
+    .fab,
+    .fad,
+    .fa-solid,
+    .fa-regular,
+    .fa-light,
+    .fa-thin,
+    .fa-duotone,
+    .fa-brands {
+
+      font-family:
+        "Font Awesome 6 Free" !important;
+
+      font-style: normal;
+
+      line-height: 1;
+
+    }
+
+
+    /* =====================================================
+       SOLID
+    ===================================================== */
+
+    .fa-solid,
+    .fas {
+
+      font-family:
+        "Font Awesome 6 Free" !important;
+
+      font-weight: 900 !important;
+
+    }
+
+
+    /* =====================================================
+       REGULAR
+    ===================================================== */
+
+    .fa-regular,
+    .far {
+
+      font-family:
+        "Font Awesome 6 Free" !important;
+
+      font-weight: 400 !important;
+
+    }
+
+
+    /* =====================================================
+       BRANDS
+    ===================================================== */
+
+    .fa-brands,
+    .fab {
+
+      font-family:
+        "Font Awesome 6 Brands" !important;
+
+      font-weight: 400 !important;
+
+    }
+
+
+    /* =====================================================
+       FONT AWESOME ALIGNMENT
+    ===================================================== */
+
+    i[class^="fa-"],
+    i[class*=" fa-"] {
+
+      display: inline-block;
+
+      line-height: 1;
+
+      text-rendering: auto;
+
+      -webkit-font-smoothing: antialiased;
+
+    }
+
+
+    /* =====================================================
+       TOM SELECT
+       ข้อความยังใช้ PROMPT
+    ===================================================== */
+
+    .ts-control,
+    .ts-control *,
+    .ts-dropdown,
+    .ts-dropdown * {
+
+      font-family:
+        "Prompt",
+        sans-serif !important;
+
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ===================================================== */
+
+    button {
+
+      font-family:
+        "Prompt",
+        sans-serif;
+
+    }
+
+
+    /* =====================================================
+       INPUT
+    ===================================================== */
+
+    input,
+    textarea,
+    select,
+    option {
+
+      font-family:
+        "Prompt",
+        sans-serif;
+
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    table,
+    th,
+    td {
+
+      font-family:
+        "Prompt",
+        sans-serif;
+
+    }
+
+
+    /* =====================================================
+       FONT AWESOME INSIDE BUTTON
+    ===================================================== */
+
+    button i.fa-solid,
+    button i.fa-regular,
+    button i.fa-brands,
+    a i.fa-solid,
+    a i.fa-regular,
+    a i.fa-brands {
+
+      font-family:
+        "Font Awesome 6 Free" !important;
+
+    }
+
+
+    /* =====================================================
+       BRANDS INSIDE BUTTON / LINK
+    ===================================================== */
+
+    button i.fa-brands,
+    a i.fa-brands {
+
+      font-family:
+        "Font Awesome 6 Brands" !important;
+
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
+
 <div class="layout">
 
-  <!-- SIDEBAR -->
+
+  <!-- =====================================================
+       SIDEBAR
+  ====================================================== -->
+
   <aside class="sidebar">
+
+
+    <!-- =================================================
+         BRAND
+    ================================================== -->
 
     <div class="brand">
 
       <div class="brand-logo">
+
+        <!-- ยังคง emoji เดิม -->
+
         💊
+
       </div>
 
+
       <div>
-        <h2>Smart Stock</h2>
-        <p>Management System</p>
+
+        <h2>
+          Smart Stock
+        </h2>
+
+        <p>
+          Management System
+        </p>
+
       </div>
 
     </div>
 
+
+    <!-- =================================================
+         MENU
+    ================================================== -->
+
     <ul class="menu">
 
-  <li>
-    <a href="#" data-route="dashboard">
-      📊 Dashboard
-    </a>
-  </li>
 
-  <!-- Controlled Drug -->
-  <li>
-  <a href="#" data-route="controlled-drug">
-      💊 Smart Controlled Drug
-  </a>
-</li>
+      <!-- =================================================
+           DASHBOARD
+      ================================================== -->
 
-  <!-- Emergency Checklist -->
-  <li>
-  <a href="#" data-route="emergency-checklist">
-      🚑 Emergency Checklist
-  </a>
-</li>
+      <li>
 
-  <li>
-    <a href="#">
-      📄 Report
-    </a>
-  </li>
+        <a
+          href="#"
+          data-route="dashboard"
+        >
 
-  <li>
-    <a href="#">
-      🛠️ Settings
-    </a>
-  </li>
+          <!-- Emoji เดิม -->
 
-</ul>
+          📊
+
+          <span>
+            Dashboard
+          </span>
+
+        </a>
+
+      </li>
+
+
+      <!-- =================================================
+           CONTROLLED DRUG
+      
+
+      <li>
+
+        <a
+          href="#"
+          data-route="controlled-drug"
+        >
+
+         
+
+          💊
+
+          <span>
+            Smart Controlled Drug
+          </span>
+
+        </a>
+
+      </li>
+      ================================================== -->
+
+
+      <!-- =================================================
+           EMERGENCY CHECKLIST
+      ================================================== -->
+
+      <li>
+
+        <a
+          href="#"
+          data-route="emergency-checklist"
+        >
+
+          <!-- Emoji เดิม -->
+
+          🚑
+
+          <span>
+            Emergency Checklist
+          </span>
+
+        </a>
+
+      </li>
+
+      <!-- =================================================
+          VACCINE MANAGEMENT
+      ================================================== -->
+
+      <li>
+
+        <a
+          href="#"
+          data-route="vaccine-management"
+        >
+
+          💉
+
+          <span>
+            Vaccine Management
+          </span>
+
+        </a>
+
+      </li>
+
+
+      <!-- =================================================
+           REPORT
+      ================================================== -->
+
+      <li>
+
+        <a href="#">
+
+          <!-- Emoji เดิม -->
+
+          📄
+
+          <span>
+            Report
+          </span>
+
+        </a>
+
+      </li>
+
+
+      <!-- =================================================
+           SETTINGS
+      ================================================== -->
+
+      <li>
+
+        <a href="#">
+
+          <!-- Emoji เดิม -->
+
+          🛠️
+
+          <span>
+            Settings
+          </span>
+
+        </a>
+
+      </li>
+
+
+    </ul>
 
   </aside>
 
-  
 
-<!-- MAIN -->
-<main class="main">
-<div id="app"></div>
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
 
-</main>
+  <main class="main">
+
+    <div id="app"></div>
+
+  </main>
+
 
 </div>
 
+
+<!-- =====================================================
+     MODAL ROOT
+====================================================== -->
+
 <div id="modal-root"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-<script src="/assets/js/modal.js"></script>
-<script type="module" src="/assets/js/app.js"></script>
+
+<!-- =====================================================
+     SWEET ALERT
+====================================================== -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+
+<!-- =====================================================
+     TOM SELECT
+====================================================== -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js">
+</script>
+
+
+<!-- =====================================================
+     MODAL
+====================================================== -->
+
+<script
+  src="/assets/js/modal.js">
+</script>
+
+
+<!-- =====================================================
+     APPLICATION
+====================================================== -->
+
+<script
+  type="module"
+  src="/assets/js/app.js">
+</script>
+
 
 </body>
-
-
 
 </html>

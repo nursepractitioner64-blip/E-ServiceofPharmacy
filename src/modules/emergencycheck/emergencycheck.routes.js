@@ -19,7 +19,7 @@ async function readRange(range){
   return r.data.values||[];
 }
 async function getData(){
-  const [m, mv]=await Promise.all([readRange("INVENTORY_MASTER!A:Z"),readRange("INVENTORY_MOVEMENT!A:Z")]);
+  const [m, mv]=await Promise.all([readRange("INVENTORY_MASTER!A:Z"),readRange("INVENTORY_MOVEMENT!A:R")]);
   return {master:parseRows(m),movements:parseRows(mv)};
 }
 async function ensureCheckSheet(){

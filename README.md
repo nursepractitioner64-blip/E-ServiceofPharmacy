@@ -15,7 +15,9 @@ node test.js
 node server.js                      
 netstat -ano | findstr :2003
 taskkill /PID <PID> /F
-
+Get-NetTCPConnection -LocalPort 2003 -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty OwningProcess -Unique |
+    ForEach-Object { Stop-Process -Id $_ -Force }
 
 cd "F:\STM\E-ServiceofPharmacy"
 

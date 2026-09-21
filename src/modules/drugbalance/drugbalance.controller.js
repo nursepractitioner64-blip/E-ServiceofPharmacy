@@ -82,8 +82,11 @@ const filteredRows = selectedCode
       const target = r[10] || "";
       const user = r[11] || "";
       const time = r[12] || "";
-      const remark = r[13] || "";
-      const location = r[14] || "";
+      const branchId = r[13] || "";
+const location = r[14] || "";
+const qrcode = r[15] || "";
+const containerId = r[16] || "";
+const containerQr = r[17] || "";
 
       // ===========================
       // BALANCE PER CODE
@@ -117,8 +120,11 @@ const filteredRows = selectedCode
         target,
         user,
         time,
-        remark,
-        location
+        branchId,
+location,
+qrcode,
+containerId,
+containerQr
       };
 
     });

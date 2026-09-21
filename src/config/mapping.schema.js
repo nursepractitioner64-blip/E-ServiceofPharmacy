@@ -12,22 +12,25 @@ const SCHEMA = {
   },
 
   MOVEMENT: {
-    MOVEMENT_ID: ["MOVEMENT_ID"],
-    TYPE: ["TYPE"],
-    REF_NO: ["REF_NO"],
-    DATE: ["DATE", "DATESERV", "TIME"],
-    CODE: ["CODE"],
-    NAME: ["NAME"],
-    QTY: ["QTY"],
-    UNIT: ["UNIT"],
-    LOT: ["LOT"],
-    EXP: ["EXP"],
-    TARGET: ["TARGET"],
-    USER: ["USER"],
-    TIME: ["TIME"],
-    REMARK: ["REMARK"],
-    LOCATION: ["LOCATION", "Location"]
-  }
+  MOVEMENT_ID: ["MOVEMENT_ID"],
+  TYPE: ["TYPE"],
+  REF_NO: ["REF_NO"],
+  DATE: ["DATE", "DATESERV", "TIME"],
+  CODE: ["CODE"],
+  NAME: ["NAME"],
+  QTY: ["QTY"],
+  UNIT: ["UNIT"],
+  LOT: ["LOT"],
+  EXP: ["EXP"],
+  TARGET: ["TARGET"],
+  USER: ["USER"],
+  TIME: ["TIME"],
+  BRANCH_ID: ["BRANCH_ID"],
+  LOCATION: ["LOCATION", "Location"],
+  QRCODE: ["QRCODE"],
+  CONTAINER_ID: ["CONTAINER_ID"],
+  CONTAINER_QR: ["CONTAINER_QR"]
+}
 };
 
 module.exports = { SCHEMA };

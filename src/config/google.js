@@ -6,10 +6,17 @@ dotenv.config({
   path: path.join(__dirname, "../../.env")
 });
 
+
+/* =====================================================
+   SPREADSHEET ID
+===================================================== */
+
 function getSpreadsheetId() {
-  const id = String(
-    process.env.GOOGLE_SHEET_ID || ""
-  ).trim();
+
+  const id =
+    String(
+      process.env.GOOGLE_SHEET_ID || ""
+    ).trim();
 
   if (!id) {
     throw new Error(
@@ -20,34 +27,51 @@ function getSpreadsheetId() {
   return id;
 }
 
+
+/* =====================================================
+   GOOGLE SHEETS AUTH
+===================================================== */
+
 async function getSheets() {
 
   const authConfig = {
+
     scopes: [
       "https://www.googleapis.com/auth/spreadsheets"
     ]
+
   };
 
-  /*
-   * Render / Production
-   * รองรับ GOOGLE_SERVICE_ACCOUNT เป็น JSON
-   */
-  if (process.env.GOOGLE_SERVICE_ACCOUNT) {
 
-    let raw = process.env.GOOGLE_SERVICE_ACCOUNT;
+  /* ===================================================
+     RENDER / PRODUCTION
+     GOOGLE_SERVICE_ACCOUNT = JSON
+  =================================================== */
 
-    // รองรับ JSON ที่เก็บ \n
-    raw = raw.replace(/\\n/g, "\\n");
+  if (
+    process.env.GOOGLE_SERVICE_ACCOUNT
+  ) {
+
+    let raw =
+      process.env.GOOGLE_SERVICE_ACCOUNT;
+
+    /*
+     * รองรับ JSON ที่เก็บ \n
+     */
+    raw =
+      raw.replace(/\\n/g, "\n");
 
     authConfig.credentials =
       JSON.parse(raw);
 
   }
 
-  /*
-   * Render / Production
-   * แยก EMAIL + PRIVATE KEY
-   */
+
+  /* ===================================================
+     RENDER / PRODUCTION
+     EMAIL + PRIVATE KEY
+  =================================================== */
+
   else if (
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
     process.env.GOOGLE_PRIVATE_KEY
@@ -64,13 +88,16 @@ async function getSheets() {
         String(
           process.env.GOOGLE_PRIVATE_KEY
         ).replace(/\\n/g, "\n")
+
     };
 
   }
 
-  /*
-   * Local
-   */
+
+  /* ===================================================
+     LOCAL
+  =================================================== */
+
   else {
 
     authConfig.keyFile =
@@ -81,6 +108,7 @@ async function getSheets() {
 
   }
 
+
   console.log(
     "🔐 GOOGLE AUTH:",
     authConfig.credentials
@@ -88,16 +116,25 @@ async function getSheets() {
       : `KEYFILE: ${authConfig.keyFile}`
   );
 
+
   const auth =
-    new google.auth.GoogleAuth(authConfig);
+    new google.auth.GoogleAuth(
+      authConfig
+    );
+
 
   const client =
     await auth.getClient();
 
+
   return google.sheets({
+
     version: "v4",
+
     auth: client
+
   });
+
 }
 
 
@@ -105,16 +142,28 @@ async function getSheets() {
    HEADER CACHE
 ===================================================== */
 
-const headerCache = new Map();
+const headerCache =
+  new Map();
 
-async function getHeaders(sheetName) {
 
-  if (headerCache.has(sheetName)) {
-    return headerCache.get(sheetName);
+async function getHeaders(
+  sheetName
+) {
+
+  if (
+    headerCache.has(sheetName)
+  ) {
+
+    return headerCache.get(
+      sheetName
+    );
+
   }
+
 
   const sheets =
     await getSheets();
+
 
   const res =
     await sheets.spreadsheets.values.get({
@@ -124,28 +173,39 @@ async function getHeaders(sheetName) {
 
       range:
         `${sheetName}!A1:Z1`
+
     });
+
 
   const headers =
     (res.data.values || [])[0] || [];
+
 
   console.log(
     `📋 ${sheetName} HEADERS =`,
     headers
   );
 
-  if (!headers.length) {
+
+  if (
+    !headers.length
+  ) {
+
     throw new Error(
       `ไม่พบ Header ใน Sheet ${sheetName}`
     );
+
   }
+
 
   headerCache.set(
     sheetName,
     headers
   );
 
+
   return headers;
+
 }
 
 
@@ -153,10 +213,13 @@ async function getHeaders(sheetName) {
    READ ROWS
 ===================================================== */
 
-async function readRows(sheetName) {
+async function readRows(
+  sheetName
+) {
 
   const sheets =
     await getSheets();
+
 
   const res =
     await sheets.spreadsheets.values.get({
@@ -166,17 +229,26 @@ async function readRows(sheetName) {
 
       range:
         `${sheetName}!A:Z`
+
     });
+
 
   const values =
     res.data.values || [];
 
-  if (!values.length) {
+
+  if (
+    !values.length
+  ) {
+
     return [];
+
   }
+
 
   const headers =
     values[0];
+
 
   return values
     .slice(1)
@@ -184,16 +256,19 @@ async function readRows(sheetName) {
 
       const obj = {};
 
-      headers.forEach((h, i) => {
+      headers.forEach(
+        (h, i) => {
 
-        obj[h] =
-          row[i] ?? "";
+          obj[h] =
+            row[i] ?? "";
 
-      });
+        }
+      );
 
       return obj;
 
     });
+
 }
 
 
@@ -209,18 +284,24 @@ async function appendRow(
   const sheets =
     await getSheets();
 
+
   const headers =
-    await getHeaders(sheetName);
+    await getHeaders(
+      sheetName
+    );
+
 
   const row =
     headers.map(
       h => data[h] ?? ""
     );
 
+
   console.log(
     `💾 APPEND ${sheetName}:`,
     row
   );
+
 
   const result =
     await sheets.spreadsheets.values.append({
@@ -238,23 +319,40 @@ async function appendRow(
         "INSERT_ROWS",
 
       requestBody: {
-        values: [row]
+
+        values: [
+          row
+        ]
+
       }
 
     });
+
 
   console.log(
     "✅ GOOGLE SHEETS APPEND:",
     result.data.updates?.updatedRange
   );
 
+
   return true;
+
 }
 
 
+/* =====================================================
+   EXPORT
+===================================================== */
+
 module.exports = {
+
   getSheets,
+
   readRows,
+
   appendRow,
+
   getSpreadsheetId
+
 };
+

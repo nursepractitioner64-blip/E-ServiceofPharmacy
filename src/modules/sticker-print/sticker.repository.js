@@ -8,7 +8,7 @@ exports.getMovement = async () => {
   const response =
     await sheets.spreadsheets.values.get({
       spreadsheetId: getSpreadsheetId(),
-      range: "INVENTORY_MOVEMENT!A1:P"
+      range: "INVENTORY_MOVEMENT!A1:R"
     });
 
   const rows =

@@ -174,8 +174,11 @@ async function getStockMovements() {
     target: r[10] || "",
     user: r[11] || "",
     time: r[12] || "",
-    remark: r[13] || "",
-    location: r[14] || ""
+    branchId: r[13] || "",
+location: r[14] || "",
+qrcode: r[15] || "",
+containerId: r[16] || "",
+containerQr: r[17] || ""
   }));
 }
 
