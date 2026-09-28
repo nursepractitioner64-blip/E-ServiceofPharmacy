@@ -30,11 +30,11 @@ const routes = {
      ยังไม่มี JavaScript Module
   =================================================== */
 
-  "vaccine-management": {
-    view: "/views/vaccinemanagement.html",
-    script: null,
-    system: "pharmacy"
-  },
+"vaccine-management": {
+  view: "/views/vaccinemanagement.html",
+  script: null,
+  system: "pharmacy"
+},
 
 "vaccine-master": {
   view: "/views/vaccinemaster.html",
@@ -42,11 +42,27 @@ const routes = {
   system: "pharmacy"
 },
 
+"vaccine-master-item": {
+  view: "/views/vaccinemasteritem.html",
+  script: null,
+  system: "pharmacy"
+},
+
+"vaccine-master-stock": {
+  view: "/views/vaccinemasterstock.html",
+  script: "/modules/vaccinemasterstock/vaccinemasterstock.view.js",
+  style: "/modules/vaccinemasterstock/vaccinemasterstock.css",
+  system: "pharmacy"
+},
+
+
 "vaccine-record": {
   view: "/views/vaccinationrecord.html",
   script: null,
   system: "pharmacy"
 },
+
+
 
 
   /* ===================================================
@@ -208,9 +224,6 @@ const aliases = {
   emergency:
     "emergency-checklist",
 
-  "emergency-checklist":
-    "emergency-checklist",
-
 
   /* ===================================================
      Controlled Drug
@@ -222,18 +235,17 @@ const aliases = {
   controlleddrug:
     "controlled-drug",
 
-  "controlled-drug":
-    "controlled-drug"
-
 };
 
 
-/* =========================================================
-   CURRENT MODULE
-========================================================= */
-
 let currentModule = null;
 let currentRoute = null;
+
+/* =========================================================
+   CURRENT ROUTE STYLE
+========================================================= */
+
+let currentRouteStyle = null;
 
 
 /* =========================================================
@@ -314,6 +326,157 @@ async function destroyCurrentModule() {
 
 
   currentModule = null;
+
+}
+
+/* =========================================================
+   LOAD ROUTE STYLE
+========================================================= */
+
+async function loadRouteStyle(styleUrl) {
+
+  /* ไม่มี CSS */
+  if (!styleUrl) {
+
+    console.log(
+      "ℹ️ ROUTE นี้ไม่มี CSS"
+    );
+
+    return;
+
+  }
+
+  console.log(
+    "🎨 LOAD STYLE:",
+    styleUrl
+  );
+
+
+  /* =====================================================
+     REMOVE STYLE เดิม
+  ===================================================== */
+
+  removeRouteStyle();
+
+
+  /* =====================================================
+     Cache Busting
+  ===================================================== */
+
+  const separator =
+    styleUrl.includes("?")
+      ? "&"
+      : "?";
+
+
+  const finalUrl =
+    `${styleUrl}${separator}t=${Date.now()}`;
+
+
+  const link =
+    document.createElement("link");
+
+
+  link.rel =
+    "stylesheet";
+
+
+  link.href =
+    finalUrl;
+
+
+  link.dataset.routeStyle =
+    "true";
+
+
+  document.head.appendChild(
+    link
+  );
+
+
+  currentRouteStyle =
+    link;
+
+
+  /* =====================================================
+     รอให้ CSS โหลดเสร็จ
+  ===================================================== */
+
+  await new Promise(
+    (resolve, reject) => {
+
+      link.onload = () => {
+
+        console.log(
+          "✅ STYLE LOADED:",
+          styleUrl
+        );
+
+        resolve();
+
+      };
+
+
+      link.onerror = () => {
+
+        console.error(
+          "❌ STYLE LOAD ERROR:",
+          styleUrl
+        );
+
+        link.remove();
+
+        currentRouteStyle =
+          null;
+
+        reject(
+          new Error(
+            `ไม่สามารถโหลด CSS ได้: ${styleUrl}`
+          )
+        );
+
+      };
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   REMOVE ROUTE STYLE
+========================================================= */
+
+function removeRouteStyle() {
+
+  if (currentRouteStyle) {
+
+    console.log(
+      "🧹 REMOVE STYLE:",
+      currentRouteStyle.href
+    );
+
+
+    currentRouteStyle.remove();
+
+
+    currentRouteStyle =
+      null;
+
+  }
+
+
+  /*
+     เผื่อกรณี module เดิมสร้าง style เอง
+  */
+
+  document
+    .querySelectorAll(
+      'link[data-route-style="true"]'
+    )
+    .forEach(
+      link => link.remove()
+    );
 
 }
 
@@ -605,18 +768,11 @@ function updateInternalMenu(route) {
 
 
 /* =========================================================
-   BIND GLOBAL ROUTE BUTTON
+   CENTRAL SPA NAVIGATION
+   Single delegated handler for all route/page buttons.
 ========================================================= */
 
-function bindRouteButtons() {
-
-  /*
-     ใช้ Event Delegation
-
-     สำคัญมากสำหรับ SPA
-
-     เพราะ View ถูกเปลี่ยนด้วย innerHTML
-  */
+function bindNavigation() {
 
   document.addEventListener(
     "click",
@@ -624,190 +780,59 @@ function bindRouteButtons() {
 
       const button =
         event.target.closest(
-          "[data-route]"
+          "[data-route], [data-page]"
         );
-
 
       if (!button) {
         return;
       }
 
-
-      /*
-         ถ้าเป็น link
-      */
-
-      if (
-        button.tagName ===
-        "A"
-      ) {
-
+      if (button.tagName === "A") {
         event.preventDefault();
-
       }
 
+      let route =
+        button.dataset.route || "";
 
-      const route =
-        button.dataset.route;
+      if (!route) {
+        const page =
+          button.dataset.page || "";
 
+        const pageMap = {
+          inventory: "inventory-master",
+          receive: "receive-stock",
+          stockout: "inventorydispense",
+          check: "emergency-checklist",
+          report: "dashboard",
+          dailycheck: "dailycheck",
+          inventorydispense: "inventorydispense",
+          "inventory-dispense": "inventorydispense",
+          "vaccine-master": "vaccine-master",
+          "vaccine-master-stock": "vaccine-master-stock",
+          "vaccine-record": "vaccine-record"
+        };
+
+        route =
+          pageMap[page] ||
+          normalizeRoute(page);
+      }
 
       if (!route) {
         return;
       }
-
-
-      console.log(
-        "🖱️ DATA ROUTE:",
-        route
-      );
-
-
-      await navigate(
-        route
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   BIND INTERNAL EMERGENCY MENU
-========================================================= */
-
-function bindPageButtons() {
-
-  document.addEventListener(
-    "click",
-    async event => {
-
-      const button =
-        event.target.closest(
-          ".ems-check-menu-btn[data-page]"
-        );
-
-
-      if (!button) {
-        return;
-      }
-
 
       event.preventDefault();
 
-
-      const page =
-        button.dataset.page;
-
-
       console.log(
-        "📂 OPEN PAGE:",
-        page
-      );
-
-
-      let route =
-        null;
-
-
-      /* =================================================
-         EMERGENCY MENU MAP
-      ================================================= */
-const map = {
-
-  inventory:
-    "inventory-master",
-
-  receive:
-    "receive-stock",
-
-  stockout:
-    "inventorydispense",
-
-  check:
-    "emergency-checklist",
-
-  report:
-    "dashboard",
-
-  dailycheck:
-    "dailycheck",
-
-  inventorydispense:
-    "inventorydispense",
-
-  "inventory-dispense":
-    "inventorydispense",
-
-  "vaccine-master":
-    "vaccine-master",
-  "vaccine-master":
-    "vaccine-master",
-  "vaccine-record":
-    "vaccine-record"
-
-};
-
-
-      route =
-        map[page] ||
-        normalizeRoute(page);
-
-
-      if (!route) {
-
-        console.error(
-          "❌ ROUTE NOT FOUND:",
-          page
-        );
-
-        return;
-
-      }
-
-
-      console.log(
-        `🧭 ROUTE: ${page} → ${route}`
-      );
-
-
-      /* =================================================
-         Active button
-      ================================================= */
-
-      document
-        .querySelectorAll(
-          ".ems-check-menu-btn"
-        )
-        .forEach(btn => {
-
-          btn.classList.remove(
-            "active"
-          );
-
-        });
-
-
-      button.classList.add(
-        "active"
-      );
-
-
-      console.log(
-        "🚀 NAVIGATE:",
+        "🧭 CENTRAL NAVIGATION:",
         route
       );
 
-
-      await navigate(
-        route
-      );
-
+      await navigate(route);
     }
   );
 
 }
-
 
 /* =========================================================
    NAVIGATE
@@ -877,13 +902,18 @@ async function navigate(route) {
      2. LOAD VIEW
   ===================================================== */
 
-  try {
+try {
 
-    await loadView(
-      config.view
-    );
+  await loadView(
+    config.view
+  );
 
-  } catch (err) {
+
+  await loadRouteStyle(
+    config.style
+  );
+
+} catch (err) {
 
     console.error(
       "❌ VIEW LOAD ERROR:",
@@ -1259,6 +1289,8 @@ async function navigateWithoutHistory(
 
 async function boot() {
 
+  bindNavigation();
+
   console.log(
     "🚀 Pharmacy SPA Ready"
   );
@@ -1267,13 +1299,7 @@ async function boot() {
   /* =====================================================
      Bind ครั้งเดียว
   ===================================================== */
-
-  bindRouteButtons();
-
-  bindPageButtons();
-
-
-  /* =====================================================
+/* =====================================================
      อ่าน hash
   ===================================================== */
 

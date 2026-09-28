@@ -22,6 +22,15 @@
 
 <div class="stock-header-right">
 
+  <button
+    type="button"
+    class="ems-check-btn ems-check-btn-outline"
+    data-route="controlled-drug"
+  >
+    <i class="fa-solid fa-pills"></i>
+    Controlled Drug
+  </button>
+
   <!-- USER -->
   <div class="ems-user-menu">
 
@@ -94,23 +103,28 @@
   <!-- ================= MENU ================= -->
 <section class="ems-check-menu">
 
-  <button class="ems-check-menu-btn" data-page="inventory">
+  <button class="ems-check-menu-btn" data-route="inventory-master">
     <span class="ems-menu-icon">📦</span>
     <span class="ems-menu-text">Inventory Master</span>
   </button>
 
-  <button class="ems-check-menu-btn" data-page="receive">
+  <button class="ems-check-menu-btn" data-route="receive-stock">
     <span class="ems-menu-icon">📥</span>
     <span class="ems-menu-text">Inventory Stock</span>
   </button>
 
-  <button class="ems-check-menu-btn" data-page="stockout">
+  <button class="ems-check-menu-btn" data-route="inventorydispense">
     <span class="ems-menu-icon">📤</span>
     <span class="ems-menu-text">Inventory Dispense</span>
   </button>
 
 
-  <button class="ems-check-menu-btn" data-page="report">
+  <button class="ems-check-menu-btn" data-route="dailycheck">
+    <span class="ems-menu-icon">📅</span>
+    <span class="ems-menu-text">Daily Check</span>
+  </button>
+
+  <button class="ems-check-menu-btn" data-route="dashboard">
     <span class="ems-menu-icon">📋</span>
     <span class="ems-menu-text">Report</span>
   </button>

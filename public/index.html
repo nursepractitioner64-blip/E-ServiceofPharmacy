@@ -55,8 +55,11 @@
   <link rel="stylesheet" href="/assets/css/receivestock.css">
   <link rel="stylesheet" href="/assets/css/stock-balance.css">
   <link rel="stylesheet" href="/assets/css/summarydb.css">
-  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css"
->
+  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css">
+  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.css">
+  <link rel="stylesheet"href="/modules/vaccinemasterstock/vaccinemasterstock.css">
+
+
 
 
   <!-- =====================================================
@@ -69,225 +72,258 @@
   >
 
 
-  <!-- =====================================================
-       GLOBAL FONT CONTROL
-       
-       TEXT       = PROMPT
-       ICON       = FONT AWESOME
-  ====================================================== -->
+<!-- =====================================================
+     GLOBAL FONT CONTROL
+
+     TEXT = PROMPT
+     ICON = FONT AWESOME
+====================================================== -->
+
+<style>
 
-  <style>
+/* =====================================================
+   GLOBAL FONT
+   TEXT ทั้งระบบ = PROMPT
+===================================================== */
+
+:root {
+  --app-font-family: "Prompt", sans-serif;
+}
+
+html,
+body {
+  font-family: "Prompt", sans-serif !important;
+}
+
+body,
+body * {
+  font-family: "Prompt", sans-serif !important;
+}
+
+
+/* =====================================================
+   FORM ELEMENTS
+===================================================== */
+
+button,
+input,
+textarea,
+select,
+option {
+  font-family: "Prompt", sans-serif !important;
+}
 
-    /* =====================================================
-       PROMPT
-       ใช้กับข้อความทั้งหมดของระบบ
-    ===================================================== */
 
-    html,
-    body {
+/* =====================================================
+   TABLE
+===================================================== */
 
-      font-family:
-        "Prompt",
-        sans-serif;
+table,
+thead,
+tbody,
+tfoot,
+tr,
+th,
+td {
+  font-family: "Prompt", sans-serif !important;
+}
 
-    }
 
+/* =====================================================
+   LINKS
+===================================================== */
 
-    body *,
-    body *::before,
-    body *::after {
+a,
+a * {
+  font-family: "Prompt", sans-serif !important;
+}
 
-      font-family:
-        "Prompt",
-        sans-serif;
 
-    }
+/* =====================================================
+   MODAL
+===================================================== */
 
+.modal,
+.modal *,
+#modal-root,
+#modal-root * {
+  font-family: "Prompt", sans-serif !important;
+}
 
-    /* =====================================================
-       FONT AWESOME
-       สำคัญมาก
-       
-       ไม่ให้ CSS ด้านบนไปทับ Font Awesome
-    ===================================================== */
 
-    .fa,
-    .fas,
-    .far,
-    .fal,
-    .fab,
-    .fad,
-    .fa-solid,
-    .fa-regular,
-    .fa-light,
-    .fa-thin,
-    .fa-duotone,
-    .fa-brands {
+/* =====================================================
+   TOM SELECT
+===================================================== */
 
-      font-family:
-        "Font Awesome 6 Free" !important;
+.ts-control,
+.ts-control *,
+.ts-dropdown,
+.ts-dropdown * {
+  font-family: "Prompt", sans-serif !important;
+}
 
-      font-style: normal;
 
-      line-height: 1;
+/* =====================================================
+   SWEET ALERT
+===================================================== */
 
-    }
+.swal2-container,
+.swal2-container *,
+.swal2-popup,
+.swal2-popup * {
+  font-family: "Prompt", sans-serif !important;
+}
 
 
-    /* =====================================================
-       SOLID
-    ===================================================== */
+/* =====================================================
+   FONT AWESOME
+   ICON = FONT AWESOME
+===================================================== */
 
-    .fa-solid,
-    .fas {
+.fa,
+.fas,
+.far,
+.fal,
+.fab,
+.fad,
+.fa-solid,
+.fa-regular,
+.fa-light,
+.fa-thin,
+.fa-duotone,
+.fa-brands {
 
-      font-family:
-        "Font Awesome 6 Free" !important;
+  font-style: normal;
+  line-height: 1;
 
-      font-weight: 900 !important;
+}
 
-    }
 
+/* =====================================================
+   FONT AWESOME SOLID
+===================================================== */
 
-    /* =====================================================
-       REGULAR
-    ===================================================== */
+.fa-solid,
+.fas {
 
-    .fa-regular,
-    .far {
+  font-family:
+    "Font Awesome 6 Free" !important;
 
-      font-family:
-        "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
 
-      font-weight: 400 !important;
+}
 
-    }
 
+/* =====================================================
+   FONT AWESOME REGULAR
+===================================================== */
 
-    /* =====================================================
-       BRANDS
-    ===================================================== */
+.fa-regular,
+.far {
 
-    .fa-brands,
-    .fab {
+  font-family:
+    "Font Awesome 6 Free" !important;
 
-      font-family:
-        "Font Awesome 6 Brands" !important;
+  font-weight: 400 !important;
 
-      font-weight: 400 !important;
+}
 
-    }
 
+/* =====================================================
+   FONT AWESOME BRANDS
+===================================================== */
 
-    /* =====================================================
-       FONT AWESOME ALIGNMENT
-    ===================================================== */
+.fa-brands,
+.fab {
 
-    i[class^="fa-"],
-    i[class*=" fa-"] {
+  font-family:
+    "Font Awesome 6 Brands" !important;
 
-      display: inline-block;
+  font-weight: 400 !important;
 
-      line-height: 1;
+}
 
-      text-rendering: auto;
 
-      -webkit-font-smoothing: antialiased;
+/* =====================================================
+   FONT AWESOME ICON ELEMENT
+===================================================== */
 
-    }
+i[class^="fa-"],
+i[class*=" fa-"] {
 
+  display: inline-block;
 
-    /* =====================================================
-       TOM SELECT
-       ข้อความยังใช้ PROMPT
-    ===================================================== */
+  line-height: 1;
 
-    .ts-control,
-    .ts-control *,
-    .ts-dropdown,
-    .ts-dropdown * {
+  text-rendering: auto;
 
-      font-family:
-        "Prompt",
-        sans-serif !important;
+  -webkit-font-smoothing: antialiased;
 
-    }
+}
 
 
-    /* =====================================================
-       BUTTON
-    ===================================================== */
+/* =====================================================
+   FONT AWESOME INSIDE BUTTON
+===================================================== */
 
-    button {
+button .fa,
+button .fas,
+button .far,
+button .fab,
+button .fa-solid,
+button .fa-regular,
+button .fa-brands {
 
-      font-family:
-        "Prompt",
-        sans-serif;
+  font-family:
+    "Font Awesome 6 Free" !important;
 
-    }
+}
 
 
-    /* =====================================================
-       INPUT
-    ===================================================== */
+/* =====================================================
+   FONT AWESOME BRANDS INSIDE BUTTON
+===================================================== */
 
-    input,
-    textarea,
-    select,
-    option {
+button .fa-brands,
+button .fab,
+a .fa-brands,
+a .fab {
 
-      font-family:
-        "Prompt",
-        sans-serif;
+  font-family:
+    "Font Awesome 6 Brands" !important;
 
-    }
+}
 
 
-    /* =====================================================
-       TABLE
-    ===================================================== */
+/* =====================================================
+   ICON + TEXT
 
-    table,
-    th,
-    td {
+   ตัวอย่าง:
 
-      font-family:
-        "Prompt",
-        sans-serif;
+   <i class="fa-solid fa-plus"></i>
+   เพิ่มข้อมูล
 
-    }
+   ICON = Font Awesome
+   TEXT = Prompt
+===================================================== */
 
+i[class^="fa-"],
+i[class*=" fa-"] {
 
-    /* =====================================================
-       FONT AWESOME INSIDE BUTTON
-    ===================================================== */
+  font-family:
+    "Font Awesome 6 Free" !important;
 
-    button i.fa-solid,
-    button i.fa-regular,
-    button i.fa-brands,
-    a i.fa-solid,
-    a i.fa-regular,
-    a i.fa-brands {
+}
 
-      font-family:
-        "Font Awesome 6 Free" !important;
+i.fa-brands,
+i.fab {
 
-    }
+  font-family:
+    "Font Awesome 6 Brands" !important;
 
+}
 
-    /* =====================================================
-       BRANDS INSIDE BUTTON / LINK
-    ===================================================== */
-
-    button i.fa-brands,
-    a i.fa-brands {
-
-      font-family:
-        "Font Awesome 6 Brands" !important;
-
-    }
-
-  </style>
+</style>
 
 </head>
 
@@ -415,7 +451,7 @@
       </li>
 
       <!-- =================================================
-          VACCINE MANAGEMENT
+          Immunization Services
       ================================================== -->
 
       <li>
@@ -428,7 +464,7 @@
           💉
 
           <span>
-            Vaccine Management
+            IMMUNIZATION SERVICES
           </span>
 
         </a>

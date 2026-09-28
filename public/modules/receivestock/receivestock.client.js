@@ -53,44 +53,189 @@ async function loadDrugDropdown() {
 /* =========================
    TABLE
    ========================= */
+/* =========================
+   TABLE
+   ========================= */
 async function loadReceiveStock() {
   const tbody = document.getElementById("receiveStockTable");
-  if (!tbody) return;
 
-  tbody.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
+  if (!tbody) {
+    console.warn("❌ receiveStockTable not found");
+    return;
+  }
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="8">Loading...</td>
+    </tr>
+  `;
 
   try {
-    const res = await fetch("/api/receivestock");
+    const res = await fetch("/api/receivestock", {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
 
     if (!res.ok) {
-      throw new Error(`โหลด receive ไม่สำเร็จ HTTP ${res.status}`);
+      throw new Error(
+        `โหลด receive ไม่สำเร็จ HTTP ${res.status}`
+      );
     }
 
     const json = await res.json();
-    const rows = Array.isArray(json) ? json : (json.data || []);
+
+    const rows = Array.isArray(json)
+      ? json
+      : (Array.isArray(json.data) ? json.data : []);
+
+    console.log("📦 RECEIVE API DATA:", rows);
 
     if (!rows.length) {
-      tbody.innerHTML = `<tr><td colspan="8">ไม่พบข้อมูล</td></tr>`;
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8">
+            ไม่พบข้อมูล
+          </td>
+        </tr>
+      `;
       return;
     }
 
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.dateIn ?? r.DATE ?? "-"}</td>
-        <td>${r.code ?? r.CODE ?? "-"}</td>
-        <td>${r.name ?? r.NAME ?? "-"}</td>
-        <td>${r.qty ?? r.QTY ?? 0}</td>
-        <td>${r.unit ?? r.UNIT ?? "-"}</td>
-        <td>${r.lot ?? r.LOT ?? "-"}</td>
-        <td>${r.exp ?? r.EXP ?? "-"}</td>
-        <td>${r.qrcode ?? r.QRCODE ? `<img src="${r.qrcode ?? r.QRCODE}" width="60">` : "-"}</td>
-      </tr>
-    `).join("");
+    tbody.innerHTML = rows.map(r => {
 
-    console.log("📦 RECEIVE STOCK:", rows.length);
+      /* =========================
+         NORMALIZE DATA
+         ========================= */
+
+      const dateIn =
+        r.dateIn ??
+        r.DATE_IN ??
+        r.DATE ??
+        "-";
+
+      const code =
+        r.code ??
+        r.CODE ??
+        "-";
+
+      const name =
+        r.name ??
+        r.NAME ??
+        "-";
+
+      const qty =
+        r.qty ??
+        r.QTY ??
+        0;
+
+      const unit =
+        r.unit ??
+        r.UNIT ??
+        "-";
+
+      const lot =
+        r.lot ??
+        r.LOT ??
+        "-";
+
+      const exp =
+        r.exp ??
+        r.EXP ??
+        "-";
+
+      const qr =
+        r.qrcode ??
+        r.QRCODE ??
+        "";
+
+      /* =========================
+         QR HTML
+         ========================= */
+
+      const qrHtml = qr
+        ? `
+          <img
+            src="${qr}"
+            width="60"
+            height="60"
+            alt="QR Code"
+            loading="lazy"
+            style="
+              display:block;
+              width:60px;
+              height:60px;
+              object-fit:contain;
+              margin:auto;
+            "
+          >
+        `
+        : "-";
+
+      /* =========================
+         ROW
+         ========================= */
+
+      return `
+        <tr>
+
+          <td>
+            ${dateIn}
+          </td>
+
+          <td>
+            ${code}
+          </td>
+
+          <td>
+            ${name}
+          </td>
+
+          <td>
+            ${qty}
+          </td>
+
+          <td>
+            ${unit}
+          </td>
+
+          <td>
+            ${lot}
+          </td>
+
+          <td>
+            ${exp}
+          </td>
+
+          <td class="rsm-qrcode-cell">
+            ${qrHtml}
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+    console.log(
+      "✅ RECEIVE STOCK TABLE LOADED:",
+      rows.length
+    );
+
   } catch (err) {
-    console.error("❌ table:", err);
-    tbody.innerHTML = `<tr><td colspan="8">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+
+    console.error(
+      "❌ RECEIVE STOCK TABLE ERROR:",
+      err
+    );
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8">
+          โหลดข้อมูลไม่สำเร็จ
+        </td>
+      </tr>
+    `;
   }
 }
 
@@ -119,100 +264,401 @@ async function loadRefNo() {
 }
 
 /* =========================
-   SELECT
+   DRUG SELECT
    ========================= */
 function bindDrugSelect() {
-  const select = document.getElementById("drugSelectReceive");
-  if (!select || select.dataset.bound === "1") return;
+
+  const select =
+    document.getElementById(
+      "drugSelectReceive"
+    );
+
+  if (!select) {
+
+    console.warn(
+      "❌ RSM #drugSelectReceive not found"
+    );
+
+    return;
+  }
+
+  if (
+    select.dataset.bound === "1"
+  ) {
+    return;
+  }
 
   select.dataset.bound = "1";
 
-  select.addEventListener("change", () => {
-    const opt = select.selectedOptions[0];
+  select.addEventListener(
+    "change",
+    event => {
 
-    const code = document.getElementById("code");
-    const name = document.getElementById("name");
-    const unit = document.getElementById("unit");
+      const selected =
+        event.target.selectedOptions?.[0];
 
-    if (code) code.value = opt?.value || "";
-    if (name) name.value = opt?.dataset.name || "";
-    if (unit) unit.value = opt?.dataset.unit || "";
+      const code =
+        document.getElementById("code");
 
-    console.log("💊 SELECT DRUG:", {
-      code: code?.value,
-      name: name?.value,
-      unit: unit?.value
-    });
-  });
+      const name =
+        document.getElementById("name");
+
+      const unit =
+        document.getElementById("unit");
+
+      if (!selected || !selected.value) {
+
+        if (code) code.value = "";
+        if (name) name.value = "";
+        if (unit) unit.value = "";
+
+        return;
+      }
+
+      const selectedCode =
+        selected.value || "";
+
+      const selectedName =
+        selected.dataset.name || "";
+
+      const selectedUnit =
+        selected.dataset.unit || "";
+
+      if (code) {
+        code.value = selectedCode;
+      }
+
+      if (name) {
+        name.value = selectedName;
+      }
+
+      if (unit) {
+        unit.value = selectedUnit;
+      }
+
+      console.log(
+        "💊 RSM DRUG SELECT:",
+        {
+          code: selectedCode,
+          name: selectedName,
+          unit: selectedUnit
+        }
+      );
+    }
+  );
+
+  console.log(
+    "✅ RSM DRUG SELECT BOUND"
+  );
 }
 
 /* =========================
    RESET
    ========================= */
+/* =========================
+   RESET FORM
+   ========================= */
 function resetForm() {
-  const form = document.getElementById("receivestockForm");
-  form?.reset();
 
-  ["code", "name", "unit"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = "";
-  });
+  const form =
+    document.getElementById(
+      "receivestockForm"
+    );
+
+  if (!form) {
+    return;
+  }
+
+  form.reset();
+
+  const code =
+    document.getElementById("code");
+
+  const name =
+    document.getElementById("name");
+
+  const unit =
+    document.getElementById("unit");
+
+  if (code) {
+    code.value = "";
+  }
+
+  if (name) {
+    name.value = "";
+  }
+
+  if (unit) {
+    unit.value = "";
+  }
+
+  const select =
+    document.getElementById(
+      "drugSelectReceive"
+    );
+
+  if (select) {
+    select.value = "";
+  }
+
+  console.log(
+    "♻️ RSM FORM RESET"
+  );
 }
 
 /* =========================
    MODAL
    ========================= */
 function modalClose() {
-  document
-    .getElementById("ReceiveStockModal")
-    ?.classList.remove("active");
-}
 
-function bindModal() {
-  const modal = document.getElementById("ReceiveStockModal");
-  const openBtn = document.getElementById("openReceiveStockModal");
+  const modal =
+    document.getElementById(
+      "ReceiveStockModal"
+    );
 
-  if (!modal || !openBtn) {
-    console.warn("❌ modal/openBtn not found");
+  if (!modal) {
     return;
   }
 
-  if (openBtn.dataset.bound !== "1") {
-    openBtn.dataset.bound = "1";
+  /* Return focus before hiding the modal from assistive technology. */
+  const activeElement =
+    document.activeElement;
 
-    openBtn.onclick = async () => {
-      console.log("➕ OPEN RECEIVE MODAL");
-
-      resetForm();
-      modal.classList.add("active");
-
-      const dateInput = document.querySelector('input[name="dateIn"]');
-      if (dateInput) {
-        dateInput.value = new Date().toISOString().slice(0, 10);
-      }
-
-      await loadRefNo();
-    };
+  if (
+    activeElement &&
+    modal.contains(activeElement) &&
+    typeof activeElement.blur === "function"
+  ) {
+    activeElement.blur();
   }
 
-  modal
-    .querySelectorAll(".js-close-receive-modal")
-    .forEach(btn => {
-      if (btn.dataset.bound === "1") return;
+  modal.classList.remove("active");
+  modal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
 
-      btn.dataset.bound = "1";
-      btn.onclick = modalClose;
+  const openBtn =
+    document.getElementById(
+      "openReceiveStockModal"
+    );
+
+  if (
+    openBtn &&
+    typeof openBtn.focus === "function"
+  ) {
+    requestAnimationFrame(() => {
+      openBtn.focus();
     });
-
-  if (modal.dataset.bound !== "1") {
-    modal.dataset.bound = "1";
-
-    modal.onclick = e => {
-      if (e.target === modal) modalClose();
-    };
   }
+
+  console.log(
+    "🔴 RSM MODAL CLOSED"
+  );
 }
 
+/* =========================
+   MODAL — RECEIVE STOCK
+   ========================= */
+function bindModal() {
+
+  const modal =
+    document.getElementById("ReceiveStockModal");
+
+  const openBtn =
+    document.getElementById("openReceiveStockModal");
+
+  if (!modal) {
+    console.warn(
+      "❌ RSM modal #ReceiveStockModal not found"
+    );
+    return;
+  }
+
+  if (!openBtn) {
+    console.warn(
+      "❌ RSM open button #openReceiveStockModal not found"
+    );
+    return;
+  }
+
+  /* =========================
+     OPEN BUTTON
+     ========================= */
+
+  if (openBtn.dataset.bound !== "1") {
+
+    openBtn.dataset.bound = "1";
+
+    openBtn.addEventListener("click", async event => {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      console.log(
+        "🟢 RSM OPEN RECEIVE MODAL"
+      );
+
+      /* Reset form */
+      resetForm();
+
+      /* Open */
+      modal.classList.add("active");
+      modal.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+      /* Move focus into the dialog after it is visible. */
+      requestAnimationFrame(() => {
+        const firstField =
+          modal.querySelector(
+            "input, select, textarea, button"
+          );
+
+        if (
+          firstField &&
+          typeof firstField.focus === "function"
+        ) {
+          firstField.focus();
+        }
+      });
+
+      /* Current date */
+      const dateInput =
+        document.getElementById("rsmDateIn");
+
+      if (dateInput) {
+
+        const today =
+          new Date()
+            .toISOString()
+            .slice(0, 10);
+
+        dateInput.value = today;
+      }
+
+      /* Load next reference number */
+      await loadRefNo();
+
+      /* Ensure drug master exists */
+      const select =
+        document.getElementById(
+          "drugSelectReceive"
+        );
+
+      if (
+        select &&
+        select.options.length <= 1
+      ) {
+        await loadDrugDropdown();
+      }
+
+      console.log(
+        "✅ RSM RECEIVE MODAL OPENED"
+      );
+    });
+  }
+
+  /* =========================
+     CLOSE BUTTONS
+     ========================= */
+
+  modal
+    .querySelectorAll(
+      ".js-close-receive-modal"
+    )
+    .forEach(button => {
+
+      if (
+        button.dataset.bound === "1"
+      ) {
+        return;
+      }
+
+      button.dataset.bound = "1";
+
+      button.addEventListener(
+        "click",
+        event => {
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          console.log(
+            "🔴 RSM CLOSE RECEIVE MODAL"
+          );
+
+          modalClose();
+        }
+      );
+
+    });
+
+  /* =========================
+     CLICK BACKDROP
+     ========================= */
+
+  if (modal.dataset.backdropBound !== "1") {
+
+    modal.dataset.backdropBound = "1";
+
+    modal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === modal
+        ) {
+
+          console.log(
+            "🔴 RSM CLOSE BY BACKDROP"
+          );
+
+          modalClose();
+        }
+
+      }
+    );
+  }
+
+  /* =========================
+     ESC KEY
+     ========================= */
+
+  if (modal.dataset.escBound !== "1") {
+
+    modal.dataset.escBound = "1";
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key !== "Escape"
+        ) {
+          return;
+        }
+
+        if (
+          modal.classList.contains("active")
+        ) {
+
+          console.log(
+            "🔴 RSM CLOSE BY ESC"
+          );
+
+          modalClose();
+        }
+
+      }
+    );
+  }
+
+  console.log(
+    "✅ RSM MODAL BOUND"
+  );
+}
 /* =========================
    BUILD PAYLOAD
    ========================= */

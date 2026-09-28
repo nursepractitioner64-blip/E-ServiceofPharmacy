@@ -1,0 +1,1371 @@
+<!-- =========================================================
+     VACCINE STOCK
+     public/views/vaccinemasterstock.html
+
+     FLOW
+     ---------------------------------------------------------
+     1. แสดงรายการ Vaccine จาก VACCINE_MASTER
+     2. แสดง Stock แยกตาม LOT / EXP
+     3. คลิก STOCK → เปิดรายละเอียดวัคซีน
+     4. ADD VACCINE STOCK → รับเข้า TYPE = IN เท่านั้น
+     5. POST /api/vaccine-master/stock
+     6. สร้าง REF_NO / MOVEMENT_ID / QRCODE จาก Backend
+     7. Refresh Stock หลังบันทึกสำเร็จ
+========================================================= -->
+
+
+<section
+  class="vaccinemasterstock-page"
+  id="vaccinemasterstockPage"
+>
+
+  <main class="psc-app">
+
+    <section class="psc-page">
+
+      <div class="psc-card psc-stock-card">
+
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <div class="vaccinemasterstock-header">
+
+          <div class="vaccinemasterstock-title">
+
+            <h1>
+              VACCINE STOCK
+            </h1>
+
+            <p>
+              ระบบจัดการรับเข้าและตรวจสอบ Stock วัคซีน
+            </p>
+
+          </div>
+
+
+          <!-- =================================================
+               ACTION BAR
+          ================================================== -->
+
+          <div class="vaccinemasterstock-action-bar">
+
+
+            <!-- BACK HOME -->
+
+            <button
+              type="button"
+              class="btn btn-back-home"
+              id="backVaccineStockHomeBtn"
+            >
+              🏠
+              หน้าแรก
+            </button>
+
+
+            <!-- ADD STOCK -->
+
+            <button
+              type="button"
+              class="btn btn-refresh"
+              id="openVaccineStockAddBtn"
+            >
+              ➕💉
+              ADD VACCINE STOCK
+            </button>
+
+
+            <!-- REPORT -->
+
+            <button
+              type="button"
+              class="btn btn-refresh"
+              id="openVaccineStockReportBtn"
+            >
+              📊
+              Report
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             SUMMARY
+        ====================================================== -->
+
+        <div class="vaccinemasterstock-summary">
+
+
+          <!-- VACCINE COUNT -->
+
+          <div
+            class="vaccinemasterstock-summary-card"
+          >
+
+            <div
+              class="vaccinemasterstock-summary-icon"
+            >
+              💉
+            </div>
+
+            <div
+              class="vaccinemasterstock-summary-content"
+            >
+
+              <span>
+                รายการวัคซีน
+              </span>
+
+              <strong
+                id="vaccineStockVaccineCount"
+              >
+                0
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- LOT COUNT -->
+
+          <div
+            class="vaccinemasterstock-summary-card"
+          >
+
+            <div
+              class="vaccinemasterstock-summary-icon"
+            >
+              📦
+            </div>
+
+            <div
+              class="vaccinemasterstock-summary-content"
+            >
+
+              <span>
+                จำนวน LOT
+              </span>
+
+              <strong
+                id="vaccineStockLotCount"
+              >
+                0
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- TOTAL STOCK -->
+
+          <div
+            class="vaccinemasterstock-summary-card"
+          >
+
+            <div
+              class="vaccinemasterstock-summary-icon"
+            >
+              🧮
+            </div>
+
+            <div
+              class="vaccinemasterstock-summary-content"
+            >
+
+              <span>
+                Stock รวม
+              </span>
+
+              <strong
+                id="vaccineStockTotalQty"
+              >
+                0
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- EXPIRING -->
+
+          <div
+            class="vaccinemasterstock-summary-card"
+          >
+
+            <div
+              class="vaccinemasterstock-summary-icon"
+            >
+              ⏰
+            </div>
+
+            <div
+              class="vaccinemasterstock-summary-content"
+            >
+
+              <span>
+                ใกล้หมดอายุ
+              </span>
+
+              <strong
+                id="vaccineStockExpiringCount"
+              >
+                0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             TABLE SECTION
+        ====================================================== -->
+
+        <div
+          class="vaccinemasterstock-table-section"
+        >
+
+
+          <!-- =================================================
+               TABLE HEADER
+          ================================================== -->
+
+          <div
+            class="vaccinemasterstock-table-header"
+          >
+
+            <div
+              class="vaccinemasterstock-table-title"
+            >
+
+              <h2>
+                รายการ Vaccine Stock
+              </h2>
+
+              <p>
+                ข้อมูลวัคซีนจาก VACCINE_MASTER
+                และ Stock จาก VACCINE_MOVEMENT
+              </p>
+
+            </div>
+
+
+            <!-- TABLE TOOLS -->
+
+            <div
+              class="vaccinemasterstock-table-tools"
+            >
+
+              <input
+                type="search"
+                id="vaccineStockSearch"
+                class="vaccinemasterstock-search"
+                placeholder="🔎 ค้นหารหัส / ชื่อวัคซีน / LOT"
+                autocomplete="off"
+              >
+
+
+              <button
+                type="button"
+                id="refreshVaccineStockBtn"
+                class="vaccinemasterstock-table-refresh"
+              >
+                🔄
+                รีเฟรช
+              </button>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =================================================
+               TABLE
+          ================================================== -->
+
+          <div
+            class="vaccinemasterstock-table-wrapper"
+          >
+
+            <table
+              class="vaccinemasterstock-table"
+              id="vaccineStockTable"
+            >
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    CODE
+                  </th>
+
+                  <th>
+                    NAME
+                  </th>
+
+                  <th>
+                    THname
+                  </th>
+
+                  <th>
+                    LOT
+                  </th>
+
+                  <th>
+                    EXP
+                  </th>
+
+                  <th>
+                    STOCK
+                  </th>
+
+                  <th>
+                    UNIT
+                  </th>
+
+                  <th>
+                    Action
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody
+                id="vaccineStockTableBody"
+              >
+
+                <tr>
+
+                  <td
+                    colspan="8"
+                    class="vaccinemasterstock-table-loading"
+                  >
+                    🔄 กำลังโหลดข้อมูล...
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+
+          <!-- =================================================
+               TABLE FOOTER
+          ================================================== -->
+
+          <div
+            class="vaccinemasterstock-table-footer"
+          >
+
+            <span
+              id="vaccineStockTableCount"
+            >
+              0 รายการ
+            </span>
+
+
+            <span
+              id="vaccineStockTableStatus"
+            >
+              พร้อมใช้งาน
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</section>
+
+
+
+<!-- =========================================================
+     ADD VACCINE STOCK MODAL
+========================================================= -->
+
+<div
+  class="vaccinestock-add-modal"
+  id="vaccineStockAddModal"
+  aria-hidden="true"
+  hidden
+>
+
+  <!-- OVERLAY -->
+
+  <div
+    class="vaccinestock-add-modal-overlay"
+    id="closeVaccineStockAddOverlay"
+  ></div>
+
+
+  <!-- MODAL BOX -->
+
+  <div
+    class="vaccinestock-add-modal-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vaccineStockAddModalTitle"
+  >
+
+
+    <!-- =====================================================
+         MODAL HEADER
+    ====================================================== -->
+
+    <div
+      class="vaccinestock-add-modal-header"
+    >
+
+      <div>
+
+        <h2
+          id="vaccineStockAddModalTitle"
+        >
+          ➕ รับเข้าวัคซีน
+        </h2>
+
+        <p>
+          เพิ่ม Vaccine Stock เข้าระบบ
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="vaccinestock-add-modal-close"
+        id="closeVaccineStockAddBtn"
+        aria-label="ปิด"
+      >
+        ✖️
+      </button>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+      id="vaccineStockAddForm"
+      autocomplete="off"
+    >
+
+
+<div class="vaccinestock-form-row">
+      <div
+        class="vaccinestock-ref-preview"
+      >
+
+        <div>
+
+          <span>
+            REF_NO
+          </span>
+
+          <strong
+            id="vaccineStockNextRefNo"
+          >
+            กำลังตรวจสอบ...
+          </strong>
+
+        </div>
+
+      </div>
+
+      <div
+        class="vaccinestock-ref-preview"
+      >
+
+        <div>
+
+          <span>
+            TYPE
+          </span>
+
+          <strong
+            id="vaccineStockType"
+          >
+            IN
+          </strong>
+
+        </div>
+
+      </div>
+<div
+  class="vaccinestock-form-group vaccinestock-ref-preview"
+>
+
+  <div>
+
+    <label for="vaccineStockDate">
+      วันที่รับเข้า
+    </label>
+
+    <input
+      type="date"
+      id="vaccineStockDate"
+      name="date"
+      required
+    >
+
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- =================================================
+     ROW 1 : VACCINE CODE + NAME
+================================================== -->
+
+<div class="vaccinestock-form-row vaccinestock-form-row-vaccine">
+
+  <!-- VACCINE CODE -->
+
+  <div class="vaccinestock-form-group vaccinestock-form-vaccine-code">
+
+    <label for="vaccineStockCode">
+      Vaccine Code
+    </label>
+
+    <select
+      id="vaccineStockCode"
+      name="code"
+      required
+    >
+
+      <option value="">
+        -- เลือกวัคซีน --
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- VACCINE NAME -->
+
+  <div class="vaccinestock-form-group vaccinestock-form-vaccine-name">
+
+    <label for="vaccineStockName">
+      NAME
+    </label>
+
+    <input
+      type="text"
+      id="vaccineStockName"
+      name="name"
+      placeholder="ชื่อวัคซีน"
+      readonly
+    >
+
+  </div>
+
+</div>
+
+
+
+<!-- =================================================
+     ROW 2 : QTY + UNIT + LOT + EXP
+================================================== -->
+
+<div class="vaccinestock-form-row vaccinestock-form-row-stock">
+
+  <!-- QTY -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockQty">
+      จำนวน
+    </label>
+
+    <input
+      type="number"
+      id="vaccineStockQty"
+      name="qty"
+      min="1"
+      step="1"
+      placeholder="0"
+      required
+    >
+
+  </div>
+
+
+  <!-- UNIT -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockUnit">
+      หน่วย
+    </label>
+
+    <input
+      type="text"
+      id="vaccineStockUnit"
+      name="unit"
+      value="dose"
+      placeholder="dose"
+      required
+    >
+
+  </div>
+
+
+  <!-- LOT -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockLot">
+      LOT
+    </label>
+
+    <input
+      type="text"
+      id="vaccineStockLot"
+      name="lot"
+      placeholder="เช่น LOT001"
+      autocomplete="off"
+      required
+    >
+
+  </div>
+
+
+  <!-- EXP -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockExp">
+      EXP
+    </label>
+
+    <input
+      type="date"
+      id="vaccineStockExp"
+      name="exp"
+      required
+    >
+
+  </div>
+
+</div>
+
+
+
+<!-- =================================================
+     ROW 3 : LOCATION + TARGET + USER
+================================================== -->
+
+<div class="vaccinestock-form-row vaccinestock-form-row-location">
+
+  <!-- LOCATION -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockLocation">
+      Location
+    </label>
+
+    <input
+      type="text"
+      id="vaccineStockLocation"
+      name="location"
+      placeholder="เช่น ห้องวัคซีน"
+      autocomplete="off"
+      required
+    >
+
+  </div>
+
+
+  <!-- TARGET -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockTarget">
+      TARGET
+    </label>
+
+    <input
+      type="text"
+      id="vaccineStockTarget"
+      name="target"
+      placeholder="หน่วยงาน / จุดใช้งาน"
+      autocomplete="off"
+      required
+    >
+
+  </div>
+
+
+  <!-- USER -->
+
+  <div class="vaccinestock-form-group">
+
+    <label for="vaccineStockUser">
+      ผู้บันทึก
+    </label>
+
+    <input
+      type="text"
+      id="vaccineStockUser"
+      name="user"
+      placeholder="ชื่อผู้บันทึก"
+      autocomplete="off"
+      required
+    >
+
+  </div>
+
+</div>
+
+
+
+<!-- =================================================
+     ROW 4 : REMARK
+================================================== -->
+
+<div class="vaccinestock-form-group vaccinestock-form-row-remark">
+
+  <label for="vaccineStockRemark">
+    หมายเหตุ
+  </label>
+
+  <textarea
+    id="vaccineStockRemark"
+    name="remark"
+    rows="3"
+    placeholder="รายละเอียดเพิ่มเติม"
+  ></textarea>
+
+</div>
+
+
+
+
+
+
+      <!-- =================================================
+           MODAL FOOTER
+      ================================================== -->
+
+      <div
+        class="vaccinestock-add-modal-footer"
+      >
+
+        <button
+          type="button"
+          class="vaccinestock-btn vaccinestock-btn-light"
+          id="cancelVaccineStockAddBtn"
+        >
+          🚫
+          ยกเลิก
+        </button>
+
+
+        <button
+          type="submit"
+          class="vaccinestock-btn vaccinestock-btn-success"
+          id="saveVaccineStockBtn"
+        >
+          💾
+          บันทึก Stock
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     VACCINE STOCK DETAIL MODAL
+========================================================= -->
+
+<div
+  class="vaccinestock-detail-modal"
+  id="vaccineStockDetailModal"
+  aria-hidden="true"
+  hidden
+>
+
+
+  <!-- OVERLAY -->
+
+  <div
+    class="vaccinestock-detail-modal-overlay"
+    id="closeVaccineStockDetailOverlay"
+  ></div>
+
+
+  <!-- MODAL -->
+
+  <div
+    class="vaccinestock-detail-modal-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vaccineStockDetailTitle"
+  >
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div
+      class="vaccinestock-detail-modal-header"
+    >
+
+      <div>
+
+        <h2
+          id="vaccineStockDetailTitle"
+        >
+          รายละเอียด Vaccine Stock
+        </h2>
+
+        <p>
+          รายละเอียด Stock แยกตาม LOT / EXP
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="vaccinestock-detail-close"
+        id="closeVaccineStockDetailBtn"
+        aria-label="ปิด"
+      >
+        ✖️
+      </button>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CONTENT
+    ====================================================== -->
+
+    <div
+      class="vaccinestock-detail-content"
+    >
+
+
+      <!-- CODE -->
+
+      <div
+        class="vaccinestock-detail-item"
+      >
+
+        <span>
+          CODE
+        </span>
+
+        <strong
+          id="vaccineStockDetailCode"
+        >
+          -
+        </strong>
+
+      </div>
+
+
+
+      <!-- NAME -->
+
+      <div
+        class="vaccinestock-detail-item vaccinestock-detail-wide"
+      >
+
+        <span>
+          NAME
+        </span>
+
+        <strong
+          id="vaccineStockDetailName"
+        >
+          -
+        </strong>
+
+      </div>
+
+
+
+      <!-- THNAME -->
+
+      <div
+        class="vaccinestock-detail-item vaccinestock-detail-wide"
+      >
+
+        <span>
+          THname
+        </span>
+
+        <strong
+          id="vaccineStockDetailTHname"
+        >
+          -
+        </strong>
+
+      </div>
+
+
+
+      <!-- STOCK LIST -->
+
+      <div
+        class="vaccinestock-detail-stock-section"
+      >
+
+        <div
+          class="vaccinestock-detail-stock-header"
+        >
+
+          <h3>
+            📦 Stock ตาม LOT
+          </h3>
+
+        </div>
+
+
+        <div
+          class="vaccinestock-detail-stock-wrapper"
+        >
+
+          <table
+            class="vaccinestock-detail-stock-table"
+            id="vaccineStockDetailTable"
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  LOT
+                </th>
+
+                <th>
+                  EXP
+                </th>
+
+                <th>
+                  QTY
+                </th>
+
+                <th>
+                  UNIT
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="vaccineStockDetailBody"
+            >
+
+              <tr>
+
+                <td
+                  colspan="4"
+                  class="vaccinestock-detail-loading"
+                >
+                  🔄 กำลังโหลดข้อมูล...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- TOTAL -->
+
+      <div
+        class="vaccinestock-detail-total"
+      >
+
+        <span>
+          Stock รวม
+        </span>
+
+        <strong
+          id="vaccineStockDetailTotal"
+        >
+          0
+        </strong>
+
+      </div>
+
+
+
+      <!-- NOTE -->
+
+      <div
+        id="vaccineStockDetailNote"
+        class="vaccinestock-detail-note"
+      ></div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div
+      class="vaccinestock-detail-modal-footer"
+    >
+
+      <button
+        type="button"
+        class="vaccinestock-detail-btn-close"
+        id="closeVaccineStockDetailModalBtn"
+      >
+        ปิด
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     STOCK MOVEMENT DETAIL MODAL
+========================================================= -->
+
+<div
+  class="vaccinestock-movement-modal"
+  id="vaccineStockMovementModal"
+  aria-hidden="true"
+  hidden
+>
+
+  <div
+    class="vaccinestock-movement-modal-overlay"
+    id="closeVaccineStockMovementOverlay"
+  ></div>
+
+
+  <div
+    class="vaccinestock-movement-modal-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vaccineStockMovementTitle"
+  >
+
+    <div
+      class="vaccinestock-movement-modal-header"
+    >
+
+      <div>
+
+        <h2
+          id="vaccineStockMovementTitle"
+        >
+          ประวัติการเคลื่อนไหว Stock
+        </h2>
+
+        <p>
+          VACCINE_MOVEMENT
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="vaccinestock-movement-close"
+        id="closeVaccineStockMovementBtn"
+      >
+        ✖️
+      </button>
+
+    </div>
+
+
+    <div
+      class="vaccinestock-movement-content"
+    >
+
+      <div
+        class="vaccinestock-movement-table-wrapper"
+      >
+
+        <table
+          class="vaccinestock-movement-table"
+          id="vaccineStockMovementTable"
+        >
+
+          <thead>
+
+            <tr>
+
+              <th>
+                MOVEMENT_ID
+              </th>
+
+              <th>
+                TYPE
+              </th>
+
+              <th>
+                REF_NO
+              </th>
+
+              <th>
+                DATE
+              </th>
+
+              <th>
+                LOT
+              </th>
+
+              <th>
+                QTY
+              </th>
+
+              <th>
+                USER
+              </th>
+
+              <th>
+                Location
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody
+            id="vaccineStockMovementBody"
+          >
+
+            <tr>
+
+              <td
+                colspan="8"
+                class="vaccinestock-movement-loading"
+              >
+                🔄 กำลังโหลดข้อมูล...
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="vaccinestock-movement-modal-footer"
+    >
+
+      <button
+        type="button"
+        class="vaccinestock-movement-btn-close"
+        id="closeVaccineStockMovementModalBtn"
+      >
+        ปิด
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     SUCCESS MODAL
+========================================================= -->
+
+<div
+  class="vaccinestock-success-modal"
+  id="vaccineStockSuccessModal"
+  aria-hidden="true"
+  hidden
+>
+
+  <div
+    class="vaccinestock-success-modal-overlay"
+  ></div>
+
+
+  <div
+    class="vaccinestock-success-modal-box"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <div
+      class="vaccinestock-success-icon"
+    >
+      ✅
+    </div>
+
+
+    <h2>
+      บันทึกสำเร็จ
+    </h2>
+
+
+    <p
+      id="vaccineStockSuccessMessage"
+    >
+      บันทึก Vaccine Stock สำเร็จ
+    </p>
+
+
+    <div
+      class="vaccinestock-success-ref"
+    >
+
+      <span>
+        REF_NO
+      </span>
+
+      <strong
+        id="vaccineStockSuccessRefNo"
+      >
+        -
+      </strong>
+
+    </div>
+
+
+    <div
+      class="vaccinestock-success-movement"
+    >
+
+      <span>
+        MOVEMENT_ID
+      </span>
+
+      <strong
+        id="vaccineStockSuccessMovementId"
+      >
+        -
+      </strong>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="vaccinestock-success-btn"
+      id="closeVaccineStockSuccessBtn"
+    >
+      ตกลง
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     ERROR MODAL
+========================================================= -->
+
+<div
+  class="vaccinestock-error-modal"
+  id="vaccineStockErrorModal"
+  aria-hidden="true"
+  hidden
+>
+
+  <div
+    class="vaccinestock-error-modal-overlay"
+  ></div>
+
+
+  <div
+    class="vaccinestock-error-modal-box"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <div
+      class="vaccinestock-error-icon"
+    >
+      ⚠️
+    </div>
+
+
+    <h2>
+      ไม่สามารถบันทึกข้อมูลได้
+    </h2>
+
+
+    <p
+      id="vaccineStockErrorMessage"
+    >
+      เกิดข้อผิดพลาด
+    </p>
+
+
+    <button
+      type="button"
+      class="vaccinestock-error-btn"
+      id="closeVaccineStockErrorBtn"
+    >
+      ปิด
+    </button>
+
+  </div>
+
+</div>

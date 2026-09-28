@@ -1,0 +1,449 @@
+<!-- =====================================================
+     VACCINE MASTER PAGE
+===================================================== -->
+
+<section
+  class="vaccinemaster-page"
+  id="vaccinemasterPage"
+>
+
+  <main class="psc-app">
+
+    <section class="psc-page">
+
+      <div class="psc-card psc-stock-card">
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="psc-stock-header">
+
+          <div class="psc-stock-title">
+
+            <h1>
+              VACCINE MASTER
+            </h1>
+
+            <p>
+              การจัดการข้อมูลวัคซีนทั้งหมด
+            </p>
+
+          </div>
+
+
+<div class="dsc-dispense-action-bar">
+
+  <!-- BACK HOME -->
+  <button
+    type="button"
+    class="btn btn-back-home"
+    id="backEmergencyHomeBtn"
+  >
+    🏠
+    หน้าแรก
+  </button>
+
+
+  <!-- ADD VACCINE MASTER -->
+  <button
+    type="button"
+    class="btn btn-refresh"
+    id="openAddvaccinemasterModal"
+  >
+    ➕💉
+    ADD VACCINE MASTER
+  </button>
+
+
+  <!-- REPORT -->
+  <button
+    type="button"
+    class="btn btn-refresh"
+    id="openVaccineReportBtn"
+  >
+    📊
+    Report
+  </button>
+
+</div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TABLE SECTION
+        ================================================== -->
+
+        <div class="vaccinemaster-table-section">
+
+          <div class="vaccinemaster-table-header">
+
+            <div class="vaccinemaster-table-title">
+
+              <h2>
+                รายการวัคซีน
+              </h2>
+
+              <p>
+                ข้อมูลจาก Sheet : VACCINE_MASTER
+              </p>
+
+            </div>
+
+
+            <div class="vaccinemaster-table-tools">
+
+              <input
+                type="search"
+                id="vaccinemasterSearch"
+                class="vaccinemaster-search"
+                placeholder="🔎 ค้นหารหัส / ชื่อวัคซีน"
+                autocomplete="off"
+              >
+
+
+              <button
+                type="button"
+                id="refreshVaccinemasterBtn"
+                class="vaccinemaster-table-refresh"
+              >
+                🔄
+                รีเฟรช
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================
+               TABLE
+          ================================================== -->
+
+          <div class="vaccinemaster-table-wrapper">
+
+<table
+  class="vaccinemaster-table"
+  id="vaccinemasterTable"
+>
+
+  <thead>
+    <tr>
+
+      <th>CODE</th>
+
+      <th>NAME</th>
+
+      <th>THname</th>
+
+      <th>Action</th>
+
+    </tr>
+  </thead>
+
+
+  <tbody
+    id="vaccinemasterTableBody"
+  >
+
+    <tr>
+
+      <td
+        colspan="4"
+        class="vaccinemaster-table-loading"
+      >
+        🔄 กำลังโหลดข้อมูล...
+      </td>
+
+    </tr>
+
+  </tbody>
+
+</table>
+
+          </div>
+
+
+          <!-- =================================================
+               TABLE FOOTER
+          ================================================== -->
+
+          <div class="vaccinemaster-table-footer">
+
+            <span
+              id="vaccinemasterTableCount"
+            >
+              0 รายการ
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</section>
+
+
+
+<!-- =====================================================
+     VACCINE MASTER MODAL
+===================================================== -->
+
+<div
+  class="vaccinemaster-modal"
+  id="vaccinemasterModal"
+  aria-hidden="true"
+  hidden
+>
+
+  <div
+    class="vaccinemaster-modal-overlay"
+    id="closeVaccinemasterModal"
+  ></div>
+
+
+  <div
+    class="vaccinemaster-modal-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vaccinemasterModalTitle"
+  >
+
+    <div class="vaccinemaster-modal-header">
+
+      <div>
+
+        <h2 id="vaccinemasterModalTitle">
+          เพิ่มรายการ Vaccine Master
+        </h2>
+
+        <p>
+          บันทึกข้อมูลลง Sheet : VACCINE_MASTER
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="vaccinemaster-modal-close"
+        id="closeVaccinemasterModalBtn"
+        aria-label="ปิด"
+      >
+        ✖️
+      </button>
+
+    </div>
+
+
+    <form
+      id="vaccinemasterForm"
+      autocomplete="off"
+    >
+
+      <!-- CODE -->
+
+      <div class="vaccinemaster-form-group">
+
+        <label for="vaccinemasterCode">
+          CODE
+        </label>
+
+        <input
+          type="text"
+          id="vaccinemasterCode"
+          name="code"
+          placeholder="VAC0001"
+          autocomplete="off"
+          required
+        >
+
+      </div>
+
+
+      <!-- NAME -->
+
+      <div class="vaccinemaster-form-group">
+
+        <label for="vaccinemasterName">
+          NAME
+        </label>
+
+        <input
+          type="text"
+          id="vaccinemasterName"
+          name="name"
+          placeholder="Vaccine Name"
+          autocomplete="off"
+          required
+        >
+
+      </div>
+
+
+      <!-- THNAME -->
+
+      <div class="vaccinemaster-form-group">
+
+        <label for="vaccinemasterTHname">
+          THname
+        </label>
+
+        <input
+          type="text"
+          id="vaccinemasterTHname"
+          name="THname"
+          placeholder="ชื่อวัคซีนภาษาไทย"
+          autocomplete="off"
+          required
+        >
+
+      </div>
+
+
+      <div class="vaccinemaster-modal-footer">
+
+        <button
+          type="button"
+          class="vaccinemaster-btn vaccinemaster-btn-light"
+          id="cancelVaccinemasterModal"
+        >
+          🚫
+          ยกเลิก
+        </button>
+
+
+        <button
+          type="submit"
+          class="vaccinemaster-btn vaccinemaster-btn-success"
+          id="saveVaccinemasterBtn"
+        >
+          💾
+          บันทึก
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     VACCINE STOCK DETAIL MODAL
+===================================================== -->
+
+<div
+  class="vaccinemaster-detail-modal"
+  id="vaccineStockDetailModal"
+  aria-hidden="true"
+  hidden
+>
+
+  <div
+    class="vaccinemaster-detail-modal-overlay"
+    id="closeVaccineStockDetailOverlay"
+  ></div>
+
+
+  <div
+    class="vaccinemaster-detail-modal-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vaccineStockDetailTitle"
+  >
+
+    <div class="vaccinemaster-detail-modal-header">
+
+      <div>
+
+        <div
+          class="vaccinemaster-detail-modal-title"
+          id="vaccineStockDetailTitle"
+        >
+          รายละเอียดวัคซีน
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="vaccinemaster-detail-close"
+        id="closeVaccineStockDetailModal"
+        aria-label="ปิด"
+      >
+        ✖️
+      </button>
+
+    </div>
+
+
+    <div class="vaccinemaster-detail-content">
+
+      <div
+        class="vaccinemaster-detail-code"
+        id="vaccineStockDetailCode"
+      ></div>
+
+
+      <div
+        class="vaccinemaster-detail-name"
+        id="vaccineStockDetailName"
+      ></div>
+
+
+      <div
+        class="vaccinemaster-detail-stock"
+        id="vaccineStockDetailBody"
+      ></div>
+
+
+      <div class="vaccinemaster-detail-total">
+
+        <span>
+          รวม
+        </span>
+
+        <strong>
+          <span id="vaccineStockDetailTotal">
+            0
+          </span>
+        </strong>
+
+      </div>
+
+
+      <div
+        id="vaccineStockDetailNote"
+        class="vaccinemaster-detail-note"
+      ></div>
+
+    </div>
+
+
+    <div class="vaccinemaster-detail-modal-footer">
+
+      <button
+        type="button"
+        class="vaccinemaster-detail-btn-close"
+        id="closeVaccineStockDetailModalBtn"
+      >
+        ปิด
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

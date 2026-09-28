@@ -1,73 +1,169 @@
-/*********************************************************
- * VACCINE MASTER CLIENT
- *
- * FILE:
- * public/modules/vaccinemaster/vaccinemaster.client.js
- *
- * FIX VERSION
- *
- * 1. Vaccine Master Modal เปิดจากปุ่ม Vaccine Master
- * 2. Vaccine Stock Modal เปิดจากปุ่ม Vaccine Stock
- * 3. 👁️ เปิด Vaccine Stock Detail Modal
- * 4. Modal ทุกตัว hidden ตอนเริ่มหน้า
- * 5. รองรับปุ่มปิดทุกตัว
- * 6. รองรับ VACCINE_MOVEMENT
- * 7. แสดง LOT / EXP / QTY
- * 8. รวม Stock
- * 9. แจ้งเตือนใกล้หมดอายุ
- * 10. Event binding แบบ delegation
- *********************************************************/
+/* =========================================================
+   VACCINE MASTER MAIN CLIENT
+
+   FILE:
+   public/modules/vaccinemaster/vaccinemaster.client.js
+
+   หน้าที่:
+   - ควบคุมหน้า Vaccine Master
+   - เปิด vaccinemasteritem.html
+   - เปิด Vaccine Stock
+   - เปิด Stock Detail
+   - Edit / Delete
+   - Refresh
+   - Submit Form
+   - ใช้ Central SPA Navigation ของ app.js
+========================================================= */
+
+import VM from "./vaccinemaster.shared.js";
+
+import "./vaccinemaster.modals.js";
+import "./vaccinemaster.api.js";
+import "./vaccinemaster.table.js";
+import "./vaccinemaster.stock.js";
+import "./vaccinemaster.crud.js";
+import "./vaccinemaster.utils.js";
 
 
-let vaccineMasterData = [];
+/* =========================================================
+   CONFIG
+========================================================= */
 
-let initialized = false;
+const VACCINE_MASTER_ITEM_VIEW =
+  "/views/vaccinemasteritem.html";
 
 
-/* =====================================================
+/* =========================================================
    INIT
-===================================================== */
+========================================================= */
 
-export async function init() {
+async function init() {
+
+  console.log("💉 Vaccine Master init()");
+
+  VM.moduleActive = true;
+
+  const page =
+    document.getElementById(
+      "vaccinemasterPage"
+    );
+
+  if (!page) {
+
+    console.error(
+      "❌ #vaccinemasterPage NOT FOUND"
+    );
+
+    return;
+
+  }
 
   console.log(
-    "💉 Vaccine Master init()"
+    "✅ #vaccinemasterPage FOUND"
   );
 
-  /*
-   * ปิด Modal ทุกตัวทันที
-   */
-  forceCloseAllModals();
 
+  /* =====================================================
+     BIND EVENTS
+  ===================================================== */
 
-  /*
-   * Bind events เพียงครั้งเดียว
-   */
-  if (!initialized) {
+  if (!VM.initialized) {
 
     bindEvents();
 
-    initialized = true;
+    VM.initialized = true;
 
   }
 
 
-  /*
-   * ตั้งค่าวันที่ Stock
-   */
-  setDefaultStockDate();
+  /* =====================================================
+     WAIT DOM
+  ===================================================== */
+
+  await new Promise(resolve => {
+
+    requestAnimationFrame(() => {
+
+      requestAnimationFrame(resolve);
+
+    });
+
+  });
 
 
-  /*
-   * โหลด Vaccine Master
-   */
-  await loadVaccineMaster();
+  /* =========================================================
+     LOAD VACCINE MASTER
+  ========================================================= */
+
+  try {
+
+    console.log(
+      "📦 START LOAD VACCINE MASTER"
+    );
 
 
-  /*
-   * เติม Vaccine Select
-   */
-  populateVaccineStockSelect();
+    await VM.loadVaccineMaster();
+
+
+    console.log(
+      "✅ LOAD VACCINE MASTER COMPLETE"
+    );
+
+
+    console.log(
+      "📦 DATA:",
+      VM.vaccineMasterData
+    );
+
+
+    /* =====================================================
+       FORCE RENDER
+    ===================================================== */
+
+    if (
+      typeof VM.renderTable ===
+      "function"
+    ) {
+
+      VM.renderTable(
+        VM.vaccineMasterData
+      );
+
+
+      console.log(
+        "✅ VACCINE MASTER TABLE RENDERED"
+      );
+
+    } else {
+
+      console.error(
+        "❌ VM.renderTable() NOT FOUND"
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "❌ LOAD VACCINE MASTER:",
+      error
+    );
+
+  }
+
+
+  /* =====================================================
+     STOCK SELECT
+  ===================================================== */
+
+  if (
+    typeof VM.populateVaccineStockSelect ===
+    "function"
+  ) {
+
+    VM.populateVaccineStockSelect();
+
+  }
 
 
   console.log(
@@ -77,70 +173,9 @@ export async function init() {
 }
 
 
-/* =====================================================
-   FORCE CLOSE ALL MODALS
-===================================================== */
-
-function forceCloseAllModals() {
-
-  const ids = [
-
-    "vaccinemasterModal",
-
-    "vaccineStockDetailModal",
-
-    "vaccinemasterStockModal"
-
-  ];
-
-
-  ids.forEach(
-    id => {
-
-      const modal =
-        document.getElementById(id);
-
-
-      if (!modal) return;
-
-
-      modal.classList.remove(
-        "show"
-      );
-
-
-      modal.hidden = true;
-
-
-      modal.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-    }
-  );
-
-
-  document.body.classList.remove(
-    "vaccinemaster-modal-open"
-  );
-
-
-  document.body.classList.remove(
-    "vaccinemaster-detail-modal-open"
-  );
-
-
-  document.body.classList.remove(
-    "vaccinemaster-stock-modal-open"
-  );
-
-}
-
-
-/* =====================================================
-   EVENT BINDING
-===================================================== */
+/* =========================================================
+   BIND EVENTS
+========================================================= */
 
 function bindEvents() {
 
@@ -149,10 +184,6 @@ function bindEvents() {
   );
 
 
-  /*
-   * ใช้ document delegation
-   * เพราะปุ่ม 👁️ ถูกสร้างหลังโหลดข้อมูล
-   */
   document.addEventListener(
     "click",
     handleClick,
@@ -173,20 +204,687 @@ function bindEvents() {
     false
   );
 
+
+  console.log(
+    "✅ Vaccine Master events bound"
+  );
+
 }
 
 
-/* =====================================================
-   CLICK HANDLER
-===================================================== */
+/* =========================================================
+   DESTROY
+========================================================= */
 
-async function handleClick(event) {
+function destroy() {
 
-  /*
-   * ================================================
-   * VACCINE MASTER
-   * ================================================
-   */
+  console.log(
+    "🧹 Vaccine Master destroy()"
+  );
+
+
+  VM.moduleActive = false;
+
+
+  document.removeEventListener(
+    "click",
+    handleClick,
+    false
+  );
+
+
+  document.removeEventListener(
+    "submit",
+    handleSubmit,
+    false
+  );
+
+
+  document.removeEventListener(
+    "keydown",
+    handleKeydown,
+    false
+  );
+
+
+  if (
+    typeof VM.forceCloseAllModals ===
+    "function"
+  ) {
+
+    VM.forceCloseAllModals();
+
+  }
+
+
+  VM.vaccineMasterData = [];
+
+  VM.initialized = false;
+
+}
+
+
+/* =========================================================
+   CENTRAL SPA NAVIGATION
+========================================================= */
+
+function navigateByRoute(
+  route
+) {
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    ) => {
+
+      const targetRoute =
+        String(
+          route || ""
+        ).trim();
+
+
+      if (!targetRoute) {
+
+        reject(
+          new Error(
+            "Route is required"
+          )
+        );
+
+        return;
+
+      }
+
+
+      console.log(
+        `🧭 VACCINE MASTER NAVIGATE: ${targetRoute}`
+      );
+
+
+      /* =====================================================
+         EXISTING DATA ROUTE
+      ===================================================== */
+
+      const existing =
+        document.querySelector(
+          `[data-route="${CSS.escape(targetRoute)}"]`
+        );
+
+
+      if (existing) {
+
+        existing.click();
+
+        resolve();
+
+        return;
+
+      }
+
+
+      /* =====================================================
+         CREATE TEMP NAVIGATION BUTTON
+      ===================================================== */
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.setAttribute(
+        "data-route",
+        targetRoute
+      );
+
+
+      button.style.display =
+        "none";
+
+
+      document.body.appendChild(
+        button
+      );
+
+
+      button.click();
+
+
+      setTimeout(
+        () => {
+
+          if (
+            button.parentNode
+          ) {
+
+            button.parentNode.removeChild(
+              button
+            );
+
+          }
+
+        },
+        100
+      );
+
+
+      resolve();
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   OPEN VACCINE MASTER ITEM PAGE
+========================================================= */
+
+async function openVaccineMasterItem() {
+
+  console.log(
+    "🧾 OPEN VACCINE MASTER ITEM"
+  );
+
+
+  try {
+
+    /* =====================================================
+       LOAD VIEW HTML
+    ===================================================== */
+
+    const response =
+      await fetch(
+        VACCINE_MASTER_ITEM_VIEW,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        `HTTP ${response.status} - ${VACCINE_MASTER_ITEM_VIEW}`
+      );
+
+    }
+
+
+    const html =
+      await response.text();
+
+
+    if (!html.trim()) {
+
+      throw new Error(
+        "vaccinemasteritem.html ไม่มีเนื้อหา"
+      );
+
+    }
+
+
+    /* =====================================================
+       FIND SPA CONTENT CONTAINER
+    ===================================================== */
+
+    const container =
+      document.querySelector(
+        "#app"
+      ) ||
+      document.querySelector(
+        "#appContent"
+      ) ||
+      document.querySelector(
+        "#pageContent"
+      ) ||
+      document.querySelector(
+        ".app-content"
+      );
+
+
+    if (!container) {
+
+      throw new Error(
+        "ไม่พบ SPA content container"
+      );
+
+    }
+
+
+    /* =====================================================
+       HIDE OLD VACCINE MASTER PAGE
+    ===================================================== */
+
+    const vaccineMasterPage =
+      document.getElementById(
+        "vaccinemasterPage"
+      );
+
+
+    if (vaccineMasterPage) {
+
+      vaccineMasterPage.style.display =
+        "none";
+
+    }
+
+
+    /* =====================================================
+       LOAD ITEM VIEW
+    ===================================================== */
+
+    container.innerHTML =
+      html;
+
+
+    console.log(
+      "✅ VACCINE MASTER ITEM VIEW LOADED"
+    );
+
+
+    /* =====================================================
+       WAIT DOM READY
+    ===================================================== */
+
+    await new Promise(resolve => {
+
+      requestAnimationFrame(() => {
+
+        requestAnimationFrame(resolve);
+
+      });
+
+    });
+
+
+    /* =====================================================
+       LOAD VACCINE MASTER DATA
+    ===================================================== */
+
+    console.log(
+      "📦 AUTO LOAD VACCINE MASTER ITEM TABLE"
+    );
+
+
+    if (
+      typeof VM.loadVaccineMaster ===
+      "function"
+    ) {
+
+      await VM.loadVaccineMaster();
+
+
+      console.log(
+        "✅ VACCINE MASTER ITEM TABLE LOADED"
+      );
+
+    } else {
+
+      console.error(
+        "❌ VM.loadVaccineMaster() NOT FOUND"
+      );
+
+    }
+
+
+    /* =====================================================
+       POPULATE STOCK SELECT
+    ===================================================== */
+
+    if (
+      typeof VM.populateVaccineStockSelect ===
+      "function"
+    ) {
+
+      VM.populateVaccineStockSelect();
+
+    }
+
+
+    /* =====================================================
+       SET DEFAULT STOCK DATE
+    ===================================================== */
+
+    if (
+      typeof VM.setDefaultStockDate ===
+      "function"
+    ) {
+
+      VM.setDefaultStockDate();
+
+    }
+
+
+    /* =====================================================
+       DISPATCH ITEM VIEW LOADED
+    ===================================================== */
+
+    document.dispatchEvent(
+      new CustomEvent(
+        "vaccinemasteritem:loaded"
+      )
+    );
+
+
+    console.log(
+      "🎉 VACCINE MASTER ITEM READY"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ OPEN VACCINE MASTER ITEM:",
+      error
+    );
+
+
+    alert(
+      "ไม่สามารถเปิดหน้า Vaccine Master Item ได้\n\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DIRECT OPEN MASTER MODAL
+========================================================= */
+
+function openMasterModalDirect() {
+
+  const modal =
+    document.getElementById(
+      "vaccinemasterModal"
+    );
+
+
+  if (!modal) {
+
+    console.error(
+      "❌ #vaccinemasterModal NOT FOUND"
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    "➕💉 OPEN ADD VACCINE MASTER MODAL"
+  );
+
+
+  /* =====================================================
+     CLOSE STOCK MODAL
+  ===================================================== */
+
+  const stockModal =
+    document.getElementById(
+      "vaccinemasterStockModal"
+    );
+
+
+  if (stockModal) {
+
+    stockModal.classList.remove(
+      "show"
+    );
+
+    stockModal.hidden =
+      true;
+
+    stockModal.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+  }
+
+
+  /* =====================================================
+     CLOSE DETAIL MODAL
+  ===================================================== */
+
+  const detailModal =
+    document.getElementById(
+      "vaccineStockDetailModal"
+    );
+
+
+  if (detailModal) {
+
+    detailModal.classList.remove(
+      "show"
+    );
+
+    detailModal.hidden =
+      true;
+
+    detailModal.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+  }
+
+
+  /* =====================================================
+     RESET FORM
+  ===================================================== */
+
+  const form =
+    document.getElementById(
+      "vaccinemasterForm"
+    );
+
+
+  if (form) {
+
+    form.reset();
+
+    delete form.dataset.editingCode;
+
+  }
+
+
+  /* =====================================================
+     CODE EDITABLE
+  ===================================================== */
+
+  const code =
+    document.getElementById(
+      "vaccinemasterCode"
+    );
+
+
+  if (code) {
+
+    code.readOnly =
+      false;
+
+  }
+
+
+  /* =====================================================
+     OPEN
+  ===================================================== */
+
+  modal.hidden =
+    false;
+
+
+  modal.removeAttribute(
+    "hidden"
+  );
+
+
+  modal.classList.add(
+    "show"
+  );
+
+
+  modal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+
+  document.body.classList.add(
+    "vaccinemaster-modal-open"
+  );
+
+
+  /* =====================================================
+     FOCUS
+  ===================================================== */
+
+  setTimeout(
+    () => {
+
+      const input =
+        document.getElementById(
+          "vaccinemasterCode"
+        );
+
+
+      if (input) {
+
+        input.focus();
+
+      }
+
+    },
+    50
+  );
+
+
+  console.log(
+    "✅ ADD VACCINE MASTER MODAL OPENED"
+  );
+
+}
+
+
+/* =========================================================
+   DIRECT CLOSE MASTER MODAL
+========================================================= */
+
+function closeMasterModalDirect() {
+
+  const modal =
+    document.getElementById(
+      "vaccinemasterModal"
+    );
+
+
+  if (!modal) {
+
+    return;
+
+  }
+
+
+  const active =
+    document.activeElement;
+
+
+  if (
+    active &&
+    modal.contains(active) &&
+    typeof active.blur ===
+      "function"
+  ) {
+
+    active.blur();
+
+  }
+
+
+  modal.classList.remove(
+    "show"
+  );
+
+
+  modal.hidden =
+    true;
+
+
+  modal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
+  document.body.classList.remove(
+    "vaccinemaster-modal-open"
+  );
+
+
+  console.log(
+    "✖️ Vaccine Master Modal CLOSED"
+  );
+
+}
+
+
+/* =========================================================
+   HANDLE CLICK
+========================================================= */
+
+async function handleClick(
+  event
+) {
+
+  if (!VM.moduleActive) {
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     VACCINE MASTER ITEM
+  ======================================================= */
+
+  const vaccineMasterItemBtn =
+    event.target.closest(
+      "#openVaccineMasterItem"
+    );
+
+
+  if (
+    vaccineMasterItemBtn
+  ) {
+
+    event.preventDefault();
+
+    event.stopImmediatePropagation();
+
+
+    console.log(
+      "🖱️ CLICK: VACCINE MASTER ITEM"
+    );
+
+
+    await openVaccineMasterItem();
+
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     LEGACY ADD VACCINE MASTER MODAL
+  ======================================================= */
 
   const masterOpenBtn =
     event.target.closest(
@@ -194,51 +892,100 @@ async function handleClick(event) {
     );
 
 
-  if (masterOpenBtn) {
+  if (
+    masterOpenBtn
+  ) {
 
     event.preventDefault();
 
-    event.stopPropagation();
+    event.stopImmediatePropagation();
+
 
     console.log(
-      "📝 OPEN VACCINE MASTER MODAL"
+      "🖱️ CLICK: ADD VACCINE MASTER MODAL"
     );
 
-    openMasterModal();
+
+    openMasterModalDirect();
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * VACCINE STOCK
-   *
-   * HTML:
-   * id="openAddInventoryModal"
-   * ================================================
-   */
+  /* =======================================================
+     REPORT
+  ======================================================= */
 
-const stockBtn =
-  event.target.closest(
-    "#openVaccinemasterStockModal"
-  );
+  const reportBtn =
+    event.target.closest(
+      "#openVaccineReportBtn"
+    );
 
-if (stockBtn) {
-  event.preventDefault();
-  event.stopPropagation();
 
-  openVaccineStockModal();
+  if (
+    reportBtn
+  ) {
 
-  return;
-}
+    event.preventDefault();
 
-  /*
-   * ================================================
-   * STOCK DETAIL 👁️
-   * ================================================
-   */
+    event.stopImmediatePropagation();
+
+
+    console.log(
+      "📊 CLICK: VACCINE REPORT"
+    );
+
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     VACCINE STOCK
+  ======================================================= */
+
+  const stockBtn =
+    event.target.closest(
+      "#openVaccinemasterStockModal"
+    );
+
+
+  if (
+    stockBtn
+  ) {
+
+    event.preventDefault();
+
+    event.stopImmediatePropagation();
+
+
+    if (
+      typeof VM.openVaccineStockModal ===
+      "function"
+    ) {
+
+      VM.openVaccineStockModal();
+
+    } else {
+
+      console.error(
+        "❌ VM.openVaccineStockModal() NOT FOUND"
+      );
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     STOCK DETAIL
+  ======================================================= */
 
   const detailBtn =
     event.target.closest(
@@ -246,22 +993,19 @@ if (stockBtn) {
     );
 
 
-  if (detailBtn) {
+  if (
+    detailBtn
+  ) {
 
     event.preventDefault();
 
-    event.stopPropagation();
+    event.stopImmediatePropagation();
+
 
     const code =
       detailBtn.getAttribute(
         "data-vaccinemaster-detail"
       );
-
-
-    console.log(
-      "👁️ CLICK VACCINE STOCK DETAIL:",
-      code
-    );
 
 
     if (!code) {
@@ -275,92 +1019,296 @@ if (stockBtn) {
     }
 
 
-    await openStockDetail(
-      code
-    );
+    if (
+      typeof VM.openStockDetail ===
+      "function"
+    ) {
+
+      await VM.openStockDetail(
+        code
+      );
+
+    } else {
+
+      console.error(
+        "❌ VM.openStockDetail() NOT FOUND"
+      );
+
+    }
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * EDIT
-   * ================================================
-   */
+  /* =======================================================
+     VACCINE MASTER EDIT / DELETE
+     
+     รองรับทั้งรูปแบบใหม่:
 
-  const editBtn =
+       data-action="edit"
+       data-code="..."
+
+       data-action="delete"
+       data-code="..."
+
+     และรูปแบบเดิม:
+
+       data-vaccinemaster-edit="..."
+       data-vaccinemaster-delete="..."
+  ======================================================= */
+
+  const vaccineMasterActionBtn =
     event.target.closest(
-      "[data-vaccinemaster-edit]"
+      [
+        ".vaccinemaster-icon-btn[data-action][data-code]",
+        "[data-vaccinemaster-edit]",
+        "[data-vaccinemaster-delete]"
+      ].join(",")
     );
 
 
-  if (editBtn) {
+  if (
+    vaccineMasterActionBtn
+  ) {
 
     event.preventDefault();
 
-    event.stopPropagation();
+    event.stopImmediatePropagation();
 
-    const code =
-      editBtn.getAttribute(
+
+    let action =
+      String(
+        vaccineMasterActionBtn.getAttribute(
+          "data-action"
+        ) || ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    let code =
+      String(
+        vaccineMasterActionBtn.getAttribute(
+          "data-code"
+        ) || ""
+      )
+        .trim();
+
+
+    /* =====================================================
+       LEGACY EDIT
+    ===================================================== */
+
+    if (
+      !action &&
+      vaccineMasterActionBtn.hasAttribute(
         "data-vaccinemaster-edit"
-      );
+      )
+    ) {
+
+      action =
+        "edit";
 
 
-    if (!code) return;
+      code =
+        String(
+          vaccineMasterActionBtn.getAttribute(
+            "data-vaccinemaster-edit"
+          ) || ""
+        )
+          .trim();
+
+    }
 
 
-    editVaccine(
-      code
-    );
+    /* =====================================================
+       LEGACY DELETE
+    ===================================================== */
 
-    return;
-
-  }
-
-
-  /*
-   * ================================================
-   * DELETE
-   * ================================================
-   */
-
-  const deleteBtn =
-    event.target.closest(
-      "[data-vaccinemaster-delete]"
-    );
-
-
-  if (deleteBtn) {
-
-    event.preventDefault();
-
-    event.stopPropagation();
-
-    const code =
-      deleteBtn.getAttribute(
+    if (
+      !action &&
+      vaccineMasterActionBtn.hasAttribute(
         "data-vaccinemaster-delete"
+      )
+    ) {
+
+      action =
+        "delete";
+
+
+      code =
+        String(
+          vaccineMasterActionBtn.getAttribute(
+            "data-vaccinemaster-delete"
+          ) || ""
+        )
+          .trim();
+
+    }
+
+
+    console.log(
+      "🖱️ VACCINE MASTER ACTION:",
+      {
+        action,
+        code
+      }
+    );
+
+
+    /* =====================================================
+       CHECK CODE
+    ===================================================== */
+
+    if (!code) {
+
+      console.error(
+        "❌ Vaccine Master CODE is empty"
+      );
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       EDIT
+    ===================================================== */
+
+    if (
+      action === "edit"
+    ) {
+
+      console.log(
+        "✏️ EDIT VACCINE MASTER:",
+        code
       );
 
 
-    if (!code) return;
+      if (
+        typeof VM.editVaccine !==
+        "function"
+      ) {
+
+        console.error(
+          "❌ VM.editVaccine() NOT FOUND"
+        );
+
+        return;
+
+      }
 
 
-    await deleteVaccine(
-      code
+      try {
+
+        await VM.editVaccine(
+          code
+        );
+
+
+        console.log(
+          "✅ EDIT VACCINE MASTER COMPLETE:",
+          code
+        );
+
+      } catch (error) {
+
+        console.error(
+          "❌ EDIT VACCINE MASTER:",
+          error
+        );
+
+
+        alert(
+          "ไม่สามารถแก้ไข Vaccine Master ได้\n\n" +
+          error.message
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       DELETE
+    ===================================================== */
+
+    if (
+      action === "delete"
+    ) {
+
+      console.log(
+        "🗑️ DELETE VACCINE MASTER:",
+        code
+      );
+
+
+      if (
+        typeof VM.deleteVaccine !==
+        "function"
+      ) {
+
+        console.error(
+          "❌ VM.deleteVaccine() NOT FOUND"
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        await VM.deleteVaccine(
+          code
+        );
+
+
+        console.log(
+          "✅ DELETE VACCINE MASTER COMPLETE:",
+          code
+        );
+
+      } catch (error) {
+
+        console.error(
+          "❌ DELETE VACCINE MASTER:",
+          error
+        );
+
+
+        alert(
+          "ไม่สามารถลบ Vaccine Master ได้\n\n" +
+          error.message
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    console.warn(
+      "⚠️ Unknown Vaccine Master action:",
+      action
     );
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * REFRESH
-   * ================================================
-   */
+  /* =======================================================
+     REFRESH
+  ======================================================= */
 
   const refreshBtn =
     event.target.closest(
@@ -368,58 +1316,58 @@ if (stockBtn) {
     );
 
 
-  if (refreshBtn) {
+  if (
+    refreshBtn
+  ) {
 
     event.preventDefault();
 
-    event.stopPropagation();
+    event.stopImmediatePropagation();
 
-    await loadVaccineMaster();
 
-    populateVaccineStockSelect();
+    if (
+      typeof VM.loadVaccineMaster ===
+      "function"
+    ) {
+
+      await VM.loadVaccineMaster();
+
+    }
+
+
+    const stockCodeSelect =
+      document.getElementById(
+        "vaccinemasterStockCode"
+      );
+
+
+    if (
+      stockCodeSelect &&
+      typeof VM.populateVaccineStockSelect ===
+        "function"
+    ) {
+
+      VM.populateVaccineStockSelect();
+
+    }
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * MASTER MODAL CLOSE
-   * ================================================
-   */
+  /* =======================================================
+     MASTER MODAL CLOSE
+  ======================================================= */
 
   if (
     event.target.closest(
       "#closeVaccinemasterModalBtn"
-    )
-  ) {
-
-    event.preventDefault();
-
-    closeMasterModal();
-
-    return;
-
-  }
-
-
-  if (
+    ) ||
     event.target.closest(
       "#cancelVaccinemasterModal"
-    )
-  ) {
-
-    event.preventDefault();
-
-    closeMasterModal();
-
-    return;
-
-  }
-
-
-  if (
+    ) ||
     event.target.closest(
       "#closeVaccinemasterModal"
     )
@@ -427,30 +1375,26 @@ if (stockBtn) {
 
     event.preventDefault();
 
-    closeMasterModal();
+
+    closeMasterModalDirect();
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * STOCK DETAIL CLOSE
-   *
-   * รองรับทั้ง 3 ID
-   * ================================================
-   */
+  /* =======================================================
+     STOCK DETAIL CLOSE
+  ======================================================= */
 
   if (
     event.target.closest(
       "#closeVaccineStockDetailModal"
-    )
-    ||
+    ) ||
     event.target.closest(
       "#closeVaccineStockDetailModalBtn"
-    )
-    ||
+    ) ||
     event.target.closest(
       "#closeVaccineStockDetailOverlay"
     )
@@ -458,24 +1402,30 @@ if (stockBtn) {
 
     event.preventDefault();
 
-    closeStockDetail();
+
+    if (
+      typeof VM.closeStockDetail ===
+      "function"
+    ) {
+
+      VM.closeStockDetail();
+
+    }
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * VACCINE STOCK MODAL CLOSE
-   * ================================================
-   */
+  /* =======================================================
+     VACCINE STOCK CLOSE
+  ======================================================= */
 
   if (
     event.target.closest(
       "#closeVaccinemasterStockModal"
-    )
-    ||
+    ) ||
     event.target.closest(
       "#cancelVaccinemasterStockModal"
     )
@@ -483,1477 +1433,63 @@ if (stockBtn) {
 
     event.preventDefault();
 
-    closeVaccineStockModal();
-
-    return;
-
-  }
-
-}
-
-
-/* =====================================================
-   LOAD VACCINE MASTER
-===================================================== */
-
-async function loadVaccineMaster() {
-
-  const tbody =
-    document.getElementById(
-      "vaccinemasterTableBody"
-    );
-
-
-  if (!tbody) {
-
-    console.warn(
-      "⚠️ vaccinemasterTableBody not found"
-    );
-
-    return;
-
-  }
-
-
-  tbody.innerHTML = `
-
-    <tr>
-
-      <td
-        colspan="5"
-        class="vaccinemaster-loading"
-      >
-        🔄 กำลังโหลดข้อมูลวัคซีน...
-      </td>
-
-    </tr>
-
-  `;
-
-
-  try {
-
-    console.log(
-      "📦 LOAD VACCINE MASTER"
-    );
-
-
-    const response =
-      await fetch(
-        "/api/vaccine-master",
-        {
-          cache: "no-store"
-        }
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        `API HTTP ${response.status}`
-      );
-
-    }
-
-
-    const result =
-      await response.json();
-
-
-    vaccineMasterData =
-      Array.isArray(result)
-        ? result
-        : (
-          Array.isArray(
-            result.data
-          )
-            ? result.data
-            : []
-        );
-
-
-    console.log(
-      "✅ VACCINE MASTER ROWS =",
-      vaccineMasterData.length
-    );
-
-
-    renderTable(
-      vaccineMasterData
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "❌ LOAD VACCINE MASTER:",
-      error
-    );
-
-
-    tbody.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="5"
-          class="vaccinemaster-error"
-        >
-
-          ❌ ไม่สามารถโหลดข้อมูลวัคซีนได้
-
-          <br>
-
-          ${escapeHtml(
-            error.message
-          )}
-
-        </td>
-
-      </tr>
-
-    `;
-
-  }
-
-}
-
-
-/* =====================================================
-   RENDER TABLE
-===================================================== */
-
-function renderTable(
-  data
-) {
-
-  const tbody =
-    document.getElementById(
-      "vaccinemasterTableBody"
-    );
-
-
-  const count =
-    document.getElementById(
-      "vaccinemasterTableCount"
-    );
-
-
-  if (!tbody) return;
-
-
-  if (
-    !Array.isArray(data)
-    ||
-    data.length === 0
-  ) {
-
-    tbody.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="5"
-          class="vaccinemaster-empty"
-        >
-          ไม่พบข้อมูลวัคซีน
-        </td>
-
-      </tr>
-
-    `;
-
-
-    if (count) {
-
-      count.textContent =
-        "0 รายการ";
-
-    }
-
-
-    return;
-
-  }
-
-
-  tbody.innerHTML =
-    data
-      .map(
-        (
-          item,
-          index
-        ) => {
-
-          const code =
-            item.code ??
-            item.CODE ??
-            "";
-
-
-          const name =
-            item.name ??
-            item.NAME ??
-            "";
-
-
-          const thname =
-            item.THname ??
-            item.thname ??
-            item.THNAME ??
-            "";
-
-
-          const balance =
-            Number(
-              item.balance ??
-              item.BALANCE ??
-              0
-            );
-
-
-          return `
-
-            <tr>
-
-              <td
-                class="vaccinemaster-col-no"
-              >
-                ${index + 1}
-              </td>
-
-
-              <td>
-
-                <span
-                  class="vaccinemaster-code"
-                >
-                  ${escapeHtml(
-                    code
-                  )}
-                </span>
-
-              </td>
-
-
-              <td>
-
-                <div
-                  class="vaccinemaster-name"
-                >
-
-                  <div
-                    class="vaccinemaster-name-en"
-                  >
-                    ${escapeHtml(
-                      name
-                    )}
-                  </div>
-
-
-                  ${
-                    thname
-                      ? `
-
-                        <div
-                          class="vaccinemaster-name-th"
-                        >
-                          ${escapeHtml(
-                            thname
-                          )}
-                        </div>
-
-                      `
-                      : ""
-                  }
-
-                </div>
-
-              </td>
-
-
-              <td
-                class="vaccinemaster-balance"
-              >
-
-                ${formatNumber(
-                  balance
-                )}
-
-              </td>
-
-
-              <td>
-
-                <div
-                  class="vaccinemaster-actions"
-                >
-
-                  <button
-                    type="button"
-                    class="
-                      vaccinemaster-icon-btn
-                      vaccinemaster-detail-btn
-                    "
-                    data-vaccinemaster-detail="${escapeHtml(
-                      code
-                    )}"
-                    title="ดูรายละเอียด Stock"
-                    aria-label="ดูรายละเอียด Stock"
-                  >
-                    👁️
-                  </button>
-
-
-                  <button
-                    type="button"
-                    class="
-                      vaccinemaster-icon-btn
-                      vaccinemaster-edit-btn
-                    "
-                    data-vaccinemaster-edit="${escapeHtml(
-                      code
-                    )}"
-                    title="แก้ไข"
-                    aria-label="แก้ไข"
-                  >
-                    ✏️
-                  </button>
-
-
-                  <button
-                    type="button"
-                    class="
-                      vaccinemaster-icon-btn
-                      vaccinemaster-delete-btn
-                    "
-                    data-vaccinemaster-delete="${escapeHtml(
-                      code
-                    )}"
-                    title="ลบ"
-                    aria-label="ลบ"
-                  >
-                    🗑️
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      )
-      .join("");
-
-
-  if (count) {
-
-    count.textContent =
-      `${data.length} รายการ`;
-
-  }
-
-}
-
-
-/* =====================================================
-   OPEN VACCINE MASTER MODAL
-===================================================== */
-
-function openMasterModal() {
-
-  const modal =
-    document.getElementById(
-      "vaccinemasterModal"
-    );
-
-
-  if (!modal) {
-
-    console.error(
-      "❌ vaccinemasterModal not found"
-    );
-
-    return;
-
-  }
-
-
-  closeStockDetail();
-
-  closeVaccineStockModal();
-
-
-  modal.hidden = false;
-
-  modal.classList.add(
-    "show"
-  );
-
-  modal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-
-  document.body.classList.add(
-    "vaccinemaster-modal-open"
-  );
-
-
-  setTimeout(
-    () => {
-
-      document
-        .getElementById(
-          "vaccinemasterCode"
-        )
-        ?.focus();
-
-    },
-    50
-  );
-
-
-  console.log(
-    "✅ Vaccine Master Modal OPEN"
-  );
-
-}
-
-
-/* =====================================================
-   CLOSE VACCINE MASTER MODAL
-===================================================== */
-
-function closeMasterModal() {
-
-  const modal =
-    document.getElementById(
-      "vaccinemasterModal"
-    );
-
-
-  if (!modal) return;
-
-
-  modal.classList.remove(
-    "show"
-  );
-
-
-  modal.hidden = true;
-
-
-  modal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-
-  document.body.classList.remove(
-    "vaccinemaster-modal-open"
-  );
-
-
-  console.log(
-    "✖️ Vaccine Master Modal CLOSE"
-  );
-
-}
-
-
-/* =====================================================
-   AUTO RCIN PREVIEW
-   Final RCIN is generated by backend on save.
-   ===================================================== */
-async function loadVaccineStockRefNo() {
-
-  const refEl =
-    document.getElementById(
-      "vaccinemasterStockRefNo"
-    );
-
-  if (!refEl) return;
-
-  refEl.value =
-    "กำลังสร้างเลข...";
-
-  refEl.readOnly = true;
-
-  try {
-
-    const response =
-      await fetch(
-        "/api/vaccine-master/stock/next-ref-no",
-        {
-          cache: "no-store"
-        }
-      );
-
-    const result =
-      await response.json();
 
     if (
-      !response.ok ||
-      !result.ok
+      typeof VM.closeVaccineStockModal ===
+      "function"
     ) {
-      throw new Error(
-        result.message ||
-        `HTTP ${response.status}`
-      );
+
+      VM.closeVaccineStockModal();
+
     }
 
-    refEl.value =
-      result.data?.REF_NO ||
-      "";
-
-  } catch (error) {
-
-    console.error(
-      "❌ LOAD VACCINE RCIN:",
-      error
-    );
-
-    refEl.value =
-      "AUTO — สร้างเมื่อบันทึก";
-  }
-}
-
-
-/* =====================================================
-   OPEN VACCINE STOCK MODAL
-===================================================== */
-
-function openVaccineStockModal() {
-
-  const modal =
-    document.getElementById(
-      "vaccinemasterStockModal"
-    );
-
-
-  if (!modal) {
-
-    console.error(
-      "❌ vaccinemasterStockModal NOT FOUND"
-    );
 
     return;
 
   }
 
 
-  console.log(
-    "💉 OPEN VACCINE STOCK MODAL"
-  );
-
-
-  /*
-   * ปิด Modal อื่นก่อน
-   */
-  closeMasterModal();
-
-  closeStockDetail();
-
-
-  /*
-   * เติม Select ใหม่
-   */
-  populateVaccineStockSelect();
-
-
-  /*
-   * ตั้งวันที่
-   */
-  setDefaultStockDate();
-
-
-  loadVaccineStockRefNo();
-
-
-  /*
-   * เปิด Modal
-   */
-  modal.hidden = false;
-
-  modal.classList.add(
-    "show"
-  );
-
-  modal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-
-  document.body.classList.add(
-    "vaccinemaster-stock-modal-open"
-  );
-
-
-  setTimeout(
-    () => {
-
-      document
-        .getElementById(
-          "vaccinemasterStockCode"
-        )
-        ?.focus();
-
-    },
-    50
-  );
-
-
-  console.log(
-    "✅ Vaccine Stock Modal OPEN"
-  );
-
-}
-
-
-/* =====================================================
-   CLOSE VACCINE STOCK MODAL
-===================================================== */
-
-function closeVaccineStockModal() {
-
-  const modal =
-    document.getElementById(
-      "vaccinemasterStockModal"
-    );
-
-
-  if (!modal) return;
-
-
-  modal.classList.remove(
-    "show"
-  );
-
-
-  modal.hidden = true;
-
-
-  modal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-
-  document.body.classList.remove(
-    "vaccinemaster-stock-modal-open"
-  );
-
-
-  console.log(
-    "✖️ Vaccine Stock Modal CLOSE"
-  );
-
-}
-
-
-/* =====================================================
-   OPEN STOCK DETAIL
-===================================================== */
-
-async function openStockDetail(
-  code
-) {
-
-  console.log(
-    "🔎 OPEN STOCK DETAIL:",
-    code
-  );
-
-
-  const vaccine =
-    vaccineMasterData.find(
-      item => {
-
-        const itemCode =
-          String(
-            item.code ??
-            item.CODE ??
-            ""
-          )
-            .trim()
-            .toUpperCase();
-
-
-        return (
-          itemCode ===
-          String(
-            code
-          )
-            .trim()
-            .toUpperCase()
-        );
-
-      }
-    );
-
-
-  if (!vaccine) {
-
-    console.error(
-      "❌ Vaccine not found:",
-      code
-    );
-
-
-    alert(
-      "ไม่พบข้อมูลวัคซีน"
-    );
-
-
-    return;
-
-  }
-
-
-  const modal =
-    document.getElementById(
-      "vaccineStockDetailModal"
-    );
-
-
-  if (!modal) {
-
-    console.error(
-      "❌ vaccineStockDetailModal NOT FOUND"
-    );
-
-    return;
-
-  }
-
-
-  const codeEl =
-    document.getElementById(
-      "vaccineStockDetailCode"
-    );
-
-
-  const nameEl =
-    document.getElementById(
-      "vaccineStockDetailName"
-    );
-
-
-  const bodyEl =
-    document.getElementById(
-      "vaccineStockDetailBody"
-    );
-
-
-  const totalEl =
-    document.getElementById(
-      "vaccineStockDetailTotal"
-    );
-
-
-  const noteEl =
-    document.getElementById(
-      "vaccineStockDetailNote"
+  /* =======================================================
+     BACK HOME
+  ======================================================= */
+
+  const backHomeBtn =
+    event.target.closest(
+      "#backEmergencyHomeBtn"
     );
 
 
   if (
-    !codeEl
-    ||
-    !nameEl
-    ||
-    !bodyEl
-    ||
-    !totalEl
-    ||
-    !noteEl
+    backHomeBtn
   ) {
 
-    console.error(
-      "❌ Stock Detail Modal elements missing",
-      {
-        codeEl: !!codeEl,
-        nameEl: !!nameEl,
-        bodyEl: !!bodyEl,
-        totalEl: !!totalEl,
-        noteEl: !!noteEl
-      }
-    );
+    event.preventDefault();
 
-
-    return;
-
-  }
-
-
-  const vaccineCode =
-    vaccine.code ??
-    vaccine.CODE ??
-    code;
-
-
-  const vaccineName =
-    vaccine.name ??
-    vaccine.NAME ??
-    "";
-
-
-  const vaccineTHname =
-    vaccine.THname ??
-    vaccine.thname ??
-    vaccine.THNAME ??
-    "";
-
-
-  /*
-   * HEADER
-   */
-
-  codeEl.textContent =
-    vaccineCode;
-
-
-  nameEl.innerHTML = `
-
-    <div
-      class="vaccinemaster-detail-name-en"
-    >
-      ${escapeHtml(
-        vaccineName
-      )}
-    </div>
-
-    ${
-      vaccineTHname
-        ? `
-
-          <div
-            class="vaccinemaster-detail-thname"
-          >
-            ${escapeHtml(
-              vaccineTHname
-            )}
-          </div>
-
-        `
-        : ""
-    }
-
-  `;
-
-
-  /*
-   * RESET
-   */
-
-  bodyEl.innerHTML = `
-
-    <div
-      class="vaccinemaster-detail-loading"
-    >
-      🔄 กำลังโหลด Stock...
-    </div>
-
-  `;
-
-
-  totalEl.textContent =
-    "0";
-
-
-  noteEl.innerHTML =
-    "";
-
-
-  /*
-   * ปิด Modal อื่น
-   */
-  closeMasterModal();
-
-  closeVaccineStockModal();
-
-
-  /*
-   * เปิด Stock Detail
-   */
-  modal.hidden = false;
-
-  modal.classList.add(
-    "show"
-  );
-
-  modal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-
-  document.body.classList.add(
-    "vaccinemaster-detail-modal-open"
-  );
-
-
-  console.log(
-    "✅ Stock Detail Modal OPEN"
-  );
-
-
-  /*
-   * LOAD STOCK
-   */
-
-  try {
-
-    const url =
-      `/api/vaccine-master/${encodeURIComponent(
-        vaccineCode
-      )}/stock`;
+    event.stopImmediatePropagation();
 
 
     console.log(
-      "📦 LOAD STOCK:",
-      url
+      "🏠 CLICK: BACK HOME"
     );
 
 
-    const response =
-      await fetch(
-        url,
-        {
-          cache: "no-store"
-        }
+    try {
+
+      await navigateByRoute(
+        "dashboard"
       );
 
 
-    if (!response.ok) {
-
-      throw new Error(
-        `API HTTP ${response.status}`
+      console.log(
+        "✅ BACK HOME → dashboard"
       );
 
-    }
+    } catch (error) {
 
-
-    const result =
-      await response.json();
-
-
-    const stock =
-      Array.isArray(result)
-        ? result
-        : (
-          Array.isArray(
-            result.data
-          )
-            ? result.data
-            : []
-        );
-
-
-    console.log(
-      "✅ STOCK ROWS =",
-      stock.length
-    );
-
-
-    renderStockDetail(
-      stock,
-      totalEl,
-      noteEl,
-      bodyEl
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "❌ LOAD VACCINE STOCK:",
-      error
-    );
-
-
-    bodyEl.innerHTML = `
-
-      <div
-        class="vaccinemaster-detail-error"
-      >
-
-        ❌ ไม่สามารถโหลด Stock ได้
-
-        <br>
-
-        ${escapeHtml(
-          error.message
-        )}
-
-      </div>
-
-    `;
-
-  }
-
-}
-
-
-/* =====================================================
-   RENDER STOCK DETAIL
-===================================================== */
-
-function renderStockDetail(
-  stock,
-  totalEl,
-  noteEl,
-  bodyEl
-) {
-
-  if (
-    !Array.isArray(stock)
-    ||
-    stock.length === 0
-  ) {
-
-    bodyEl.innerHTML = `
-
-      <div
-        class="vaccinemaster-no-stock"
-      >
-        📦 ยังไม่มีข้อมูล Stock
-      </div>
-
-    `;
-
-
-    totalEl.textContent =
-      "0";
-
-
-    noteEl.innerHTML =
-      "";
-
-
-    return;
-
-  }
-
-
-  let total = 0;
-
-
-  const today =
-    new Date();
-
-
-  today.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-
-  const warningDate =
-    new Date(
-      today.getTime()
-      +
-      (
-        90 *
-        24 *
-        60 *
-        60 *
-        1000
-      )
-    );
-
-
-  const nearExpiry = [];
-
-
-  const rows = [];
-
-
-  for (
-    const item of stock
-  ) {
-
-    const lot =
-      item.lot ??
-      item.LOT ??
-      "-";
-
-
-    const exp =
-      item.exp ??
-      item.EXP ??
-      "";
-
-
-    const qty =
-      Number(
-        item.quantity ??
-        item.qty ??
-        item.QTY ??
-        item.balance ??
-        item.BALANCE ??
-        0
+      console.error(
+        "❌ BACK HOME:",
+        error
       );
-
-
-    if (
-      qty <= 0
-    ) {
-
-      continue;
-
-    }
-
-
-    total +=
-      qty;
-
-
-    const expDate =
-      parseDate(
-        exp
-      );
-
-
-    if (
-      expDate
-      &&
-      expDate >= today
-      &&
-      expDate <= warningDate
-    ) {
-
-      nearExpiry.push({
-
-        lot,
-
-        qty
-
-      });
-
-    }
-
-
-    rows.push({
-
-      lot,
-
-      exp,
-
-      qty
-
-    });
-
-  }
-
-
-  if (
-    rows.length === 0
-  ) {
-
-    bodyEl.innerHTML = `
-
-      <div
-        class="vaccinemaster-no-stock"
-      >
-        📦 ยังไม่มี Stock คงเหลือ
-      </div>
-
-    `;
-
-  }
-
-  else {
-
-    bodyEl.innerHTML =
-      rows
-        .map(
-          item => `
-
-            <div
-              class="vaccinemaster-stock-line"
-            >
-
-              <span
-                class="vaccinemaster-stock-lot"
-              >
-                LOT ${escapeHtml(
-                  item.lot
-                )}
-              </span>
-
-
-              <span
-                class="vaccinemaster-stock-exp"
-              >
-                EXP ${escapeHtml(
-                  formatDate(
-                    item.exp
-                  )
-                )}
-              </span>
-
-
-              <strong
-                class="vaccinemaster-stock-qty"
-              >
-                จำนวน ${formatNumber(
-                  item.qty
-                )}
-              </strong>
-
-            </div>
-
-          `
-        )
-        .join("");
-
-  }
-
-
-  totalEl.textContent =
-    formatNumber(
-      total
-    );
-
-
-  if (
-    nearExpiry.length > 0
-  ) {
-
-    const nearTotal =
-      nearExpiry.reduce(
-        (
-          sum,
-          item
-        ) =>
-          sum + item.qty,
-        0
-      );
-
-
-    const lots =
-      nearExpiry
-        .map(
-          item =>
-            `LOT ${escapeHtml(
-              item.lot
-            )}`
-        )
-        .join(
-          ", "
-        );
-
-
-    noteEl.innerHTML = `
-
-      <div
-        class="vaccinemaster-warning"
-      >
-
-        <div
-          class="vaccinemaster-warning-title"
-        >
-          ⚠️ หมายเหตุ
-        </div>
-
-
-        <div>
-
-          ใกล้หมดอายุ
-
-          จำนวน
-
-          <strong>
-            ${formatNumber(
-              nearTotal
-            )}
-          </strong>
-
-        </div>
-
-
-        <div
-          class="vaccinemaster-warning-lots"
-        >
-          (${lots})
-        </div>
-
-      </div>
-
-    `;
-
-  }
-
-  else {
-
-    noteEl.innerHTML =
-      "";
-
-  }
-
-}
-
-
-/* =====================================================
-   POPULATE VACCINE STOCK SELECT
-===================================================== */
-
-function populateVaccineStockSelect() {
-
-  const select =
-    document.getElementById(
-      "vaccinemasterStockCode"
-    );
-
-
-  if (!select) {
-
-    console.warn(
-      "⚠️ vaccinemasterStockCode not found"
-    );
-
-    return;
-
-  }
-
-
-  const currentValue =
-    select.value;
-
-
-  select.innerHTML = `
-
-    <option value="">
-      เลือกวัคซีน
-    </option>
-
-  `;
-
-
-  vaccineMasterData.forEach(
-    vaccine => {
-
-      const code =
-        vaccine.code ??
-        vaccine.CODE ??
-        "";
-
-
-      const name =
-        vaccine.name ??
-        vaccine.NAME ??
-        "";
-
-
-      if (!code) return;
-
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-
-      option.value =
-        code;
-
-
-      option.textContent =
-        `${code} - ${name}`;
-
-
-      select.appendChild(
-        option
-      );
-
-    }
-  );
-
-
-  /*
-   * ถ้ามี value เดิม
-   */
-  if (
-    currentValue
-  ) {
-
-    select.value =
-      currentValue;
-
-  }
-
-
-  /*
-   * Event select
-   */
-  if (
-    select.dataset.vaccineBound !==
-    "true"
-  ) {
-
-    select.addEventListener(
-      "change",
-      handleVaccineStockSelect
-    );
-
-
-    select.dataset.vaccineBound =
-      "true";
-
-  }
-
-}
-
-
-/* =====================================================
-   VACCINE SELECT CHANGE
-===================================================== */
-
-function handleVaccineStockSelect(
-  event
-) {
-
-  const code =
-    event.target.value;
-
-
-  const nameEl =
-    document.getElementById(
-      "vaccinemasterStockName"
-    );
-
-
-  const thnameEl =
-    document.getElementById(
-      "vaccinemasterStockTHname"
-    );
-
-
-  if (
-    !code
-  ) {
-
-    if (nameEl) {
-
-      nameEl.value =
-        "";
-
-    }
-
-
-    if (thnameEl) {
-
-      thnameEl.value =
-        "";
 
     }
 
@@ -1962,117 +1498,27 @@ function handleVaccineStockSelect(
 
   }
 
-
-  const vaccine =
-    vaccineMasterData.find(
-      item =>
-        String(
-          item.code ??
-          item.CODE ??
-          ""
-        )
-          .trim()
-          .toUpperCase()
-        ===
-        String(
-          code
-        )
-          .trim()
-          .toUpperCase()
-    );
-
-
-  if (!vaccine) return;
-
-
-  if (nameEl) {
-
-    nameEl.value =
-      vaccine.name ??
-      vaccine.NAME ??
-      "";
-
-  }
-
-
-  if (thnameEl) {
-
-    thnameEl.value =
-      vaccine.THname ??
-      vaccine.thname ??
-      vaccine.THNAME ??
-      "";
-
-  }
-
 }
 
 
-/* =====================================================
-   DEFAULT STOCK DATE
-===================================================== */
-
-function setDefaultStockDate() {
-
-  const dateEl =
-    document.getElementById(
-      "vaccinemasterStockDate"
-    );
-
-
-  if (!dateEl) return;
-
-
-  if (
-    dateEl.value
-  ) return;
-
-
-  const today =
-    new Date();
-
-
-  const yyyy =
-    today.getFullYear();
-
-
-  const mm =
-    String(
-      today.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
-
-
-  const dd =
-    String(
-      today.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
-
-
-  dateEl.value =
-    `${yyyy}-${mm}-${dd}`;
-
-}
-
-
-/* =====================================================
-   FORM SUBMIT
-===================================================== */
+/* =========================================================
+   HANDLE SUBMIT
+========================================================= */
 
 async function handleSubmit(
   event
 ) {
 
-  /*
-   * ================================================
-   * VACCINE MASTER FORM
-   * ================================================
-   */
+  if (!VM.moduleActive) {
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     VACCINE MASTER FORM
+  ======================================================= */
 
   const masterForm =
     event.target.closest(
@@ -2080,24 +1526,44 @@ async function handleSubmit(
     );
 
 
-  if (masterForm) {
+  if (
+    masterForm
+  ) {
 
     event.preventDefault();
 
-    await saveVaccineMaster(
-      masterForm
+
+    console.log(
+      "💾 SUBMIT VACCINE MASTER"
     );
+
+
+    if (
+      typeof VM.saveVaccineMaster ===
+      "function"
+    ) {
+
+      await VM.saveVaccineMaster(
+        masterForm
+      );
+
+    } else {
+
+      console.error(
+        "❌ VM.saveVaccineMaster() NOT FOUND"
+      );
+
+    }
+
 
     return;
 
   }
 
 
-  /*
-   * ================================================
-   * VACCINE STOCK FORM
-   * ================================================
-   */
+  /* =======================================================
+     VACCINE STOCK FORM
+  ======================================================= */
 
   const stockForm =
     event.target.closest(
@@ -2105,774 +1571,57 @@ async function handleSubmit(
     );
 
 
-  if (stockForm) {
+  if (
+    stockForm
+  ) {
 
     event.preventDefault();
 
-    await saveVaccineStock(
-      stockForm
+
+    console.log(
+      "💾 SUBMIT VACCINE STOCK"
     );
-
-    return;
-
-  }
-
-}
-
-
-/* =====================================================
-   SAVE VACCINE MASTER
-===================================================== */
-
-async function saveVaccineMaster(
-  form
-) {
-
-  const code =
-    document
-      .getElementById(
-        "vaccinemasterCode"
-      )
-      ?.value
-      .trim();
-
-
-  const name =
-    document
-      .getElementById(
-        "vaccinemasterName"
-      )
-      ?.value
-      .trim();
-
-
-  const THname =
-    document
-      .getElementById(
-        "vaccinemasterTHname"
-      )
-      ?.value
-      .trim();
-
-
-  if (!code) {
-
-    alert(
-      "กรุณาระบุ CODE"
-    );
-
-    return;
-
-  }
-
-
-  if (!name) {
-
-    alert(
-      "กรุณาระบุ NAME"
-    );
-
-    return;
-
-  }
-
-
-  if (!THname) {
-
-    alert(
-      "กรุณาระบุ THname"
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    const editingCode =
-      form.dataset.editingCode;
-
-
-    let response;
 
 
     if (
-      editingCode
+      typeof VM.saveVaccineStock ===
+      "function"
     ) {
 
-      response =
-        await fetch(
-          `/api/vaccine-master/${encodeURIComponent(
-            editingCode
-          )}`,
-          {
+      await VM.saveVaccineStock(
+        stockForm
+      );
 
-            method:
-              "PUT",
+    } else {
 
-            headers: {
-
-              "Content-Type":
-                "application/json"
-
-            },
-
-            body:
-              JSON.stringify({
-
-                name,
-
-                THname
-
-              })
-
-          }
-        );
-
-    }
-
-    else {
-
-      response =
-        await fetch(
-          "/api/vaccine-master",
-          {
-
-            method:
-              "POST",
-
-            headers: {
-
-              "Content-Type":
-                "application/json"
-
-            },
-
-            body:
-              JSON.stringify({
-
-                code,
-
-                name,
-
-                THname
-
-              })
-
-          }
-        );
-
-    }
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        result.message ||
-        `HTTP ${response.status}`
+      console.error(
+        "❌ VM.saveVaccineStock() NOT FOUND"
       );
 
     }
 
 
-    alert(
-      editingCode
-        ? "แก้ไขข้อมูลสำเร็จ"
-        : "เพิ่มข้อมูล Vaccine Master สำเร็จ"
-    );
-
-
-    closeMasterModal();
-
-
-    form.reset();
-
-
-    delete form.dataset.editingCode;
-
-
-    await loadVaccineMaster();
-
-
-    populateVaccineStockSelect();
-
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      "❌ SAVE VACCINE MASTER:",
-      error
-    );
-
-
-    alert(
-      error.message
-    );
+    return;
 
   }
 
 }
 
 
-/* =====================================================
-   SAVE VACCINE STOCK
-===================================================== */
-
-async function saveVaccineStock(
-  form
-) {
-
-  const code =
-    document
-      .getElementById(
-        "vaccinemasterStockCode"
-      )
-      ?.value
-      .trim();
-
-
-  const name =
-    document
-      .getElementById(
-        "vaccinemasterStockName"
-      )
-      ?.value
-      .trim();
-
-
-  const date =
-    document
-      .getElementById(
-        "vaccinemasterStockDate"
-      )
-      ?.value
-      .trim();
-
-
-  const user =
-    document
-      .getElementById(
-        "vaccinemasterStockUser"
-      )
-      ?.value
-      .trim();
-
-
-  const location =
-    document
-      .getElementById(
-        "vaccinemasterStockLocation"
-      )
-      ?.value
-      .trim();
-
-
-  const qty =
-    Number(
-      document
-        .getElementById(
-          "vaccinemasterStockQty"
-        )
-        ?.value
-    );
-
-
-  const unit =
-    document
-      .getElementById(
-        "vaccinemasterStockUnit"
-      )
-      ?.value
-      .trim();
-
-
-  const lot =
-    document
-      .getElementById(
-        "vaccinemasterStockLot"
-      )
-      ?.value
-      .trim();
-
-
-  const exp =
-    document
-      .getElementById(
-        "vaccinemasterStockExp"
-      )
-      ?.value
-      .trim();
-
-
-  const remark =
-    document
-      .getElementById(
-        "vaccinemasterStockRemark"
-      )
-      ?.value
-      .trim();
-
-
-  if (!code) {
-
-    alert(
-      "กรุณาเลือกวัคซีน"
-    );
-
-    return;
-
-  }
-
-
-  if (!date) {
-
-    alert(
-      "กรุณาระบุวันที่รับเข้า"
-    );
-
-    return;
-
-  }
-
-
-  if (!user) {
-
-    alert(
-      "กรุณาระบุผู้รับเข้า"
-    );
-
-    return;
-
-  }
-
-
-  if (
-    !qty
-    ||
-    qty <= 0
-  ) {
-
-    alert(
-      "กรุณาระบุจำนวน"
-    );
-
-    return;
-
-  }
-
-
-  if (!lot) {
-
-    alert(
-      "กรุณาระบุ LOT"
-    );
-
-    return;
-
-  }
-
-
-  if (!exp) {
-
-    alert(
-      "กรุณาระบุวันหมดอายุ"
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    /*
-     * Endpoint สำหรับบันทึก Stock
-     *
-     * ถ้า backend ของคุณใช้ endpoint อื่น
-     * เปลี่ยนเฉพาะ URL ตรงนี้
-     */
-
-    const response =
-      await fetch(
-        "/api/vaccine-master/stock",
-        {
-
-          method:
-            "POST",
-
-          headers: {
-
-            "Content-Type":
-              "application/json"
-
-          },
-
-          body:
-            JSON.stringify({
-
-              type:
-                "IN",
-
-              date,
-
-              code,
-
-              name,
-
-              qty,
-
-              unit,
-
-              lot,
-
-              exp,
-
-              user,
-
-              location,
-
-              remark
-
-            })
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        result.message ||
-        `HTTP ${response.status}`
-      );
-
-    }
-
-
-    alert(
-      "บันทึก Vaccine Stock สำเร็จ"
-    );
-
-
-    closeVaccineStockModal();
-
-
-    form.reset();
-
-
-    setDefaultStockDate();
-
-
-    await loadVaccineMaster();
-
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      "❌ SAVE VACCINE STOCK:",
-      error
-    );
-
-
-    alert(
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   EDIT VACCINE
-===================================================== */
-
-function editVaccine(
-  code
-) {
-
-  const vaccine =
-    vaccineMasterData.find(
-      item =>
-        String(
-          item.code ??
-          item.CODE ??
-          ""
-        )
-          .trim()
-          .toUpperCase()
-        ===
-        String(
-          code
-        )
-          .trim()
-          .toUpperCase()
-    );
-
-
-  if (!vaccine) {
-
-    alert(
-      "ไม่พบข้อมูลวัคซีน"
-    );
-
-    return;
-
-  }
-
-
-  openMasterModal();
-
-
-  const codeEl =
-    document.getElementById(
-      "vaccinemasterCode"
-    );
-
-
-  const nameEl =
-    document.getElementById(
-      "vaccinemasterName"
-    );
-
-
-  const thnameEl =
-    document.getElementById(
-      "vaccinemasterTHname"
-    );
-
-
-  const form =
-    document.getElementById(
-      "vaccinemasterForm"
-    );
-
-
-  if (codeEl) {
-
-    codeEl.value =
-      vaccine.code ??
-      vaccine.CODE ??
-      "";
-
-  }
-
-
-  if (nameEl) {
-
-    nameEl.value =
-      vaccine.name ??
-      vaccine.NAME ??
-      "";
-
-  }
-
-
-  if (thnameEl) {
-
-    thnameEl.value =
-      vaccine.THname ??
-      vaccine.thname ??
-      vaccine.THNAME ??
-      "";
-
-  }
-
-
-  /*
-   * CODE ไม่ควรแก้ตอน Edit
-   */
-  if (codeEl) {
-
-    codeEl.readOnly =
-      true;
-
-  }
-
-
-  if (form) {
-
-    form.dataset.editingCode =
-      code;
-
-  }
-
-}
-
-
-/* =====================================================
-   DELETE VACCINE
-===================================================== */
-
-async function deleteVaccine(
-  code
-) {
-
-  const vaccine =
-    vaccineMasterData.find(
-      item =>
-        String(
-          item.code ??
-          item.CODE ??
-          ""
-        )
-          .trim()
-          .toUpperCase()
-        ===
-        String(
-          code
-        )
-          .trim()
-          .toUpperCase()
-    );
-
-
-  const name =
-    vaccine?.name ??
-    vaccine?.NAME ??
-    code;
-
-
-  const confirmed =
-    confirm(
-      `ต้องการลบวัคซีน\n\n${name}\nCODE: ${code}\n\nหรือไม่?`
-    );
-
-
-  if (!confirmed) {
-
-    return;
-
-  }
-
-
-  try {
-
-    const response =
-      await fetch(
-        `/api/vaccine-master/${encodeURIComponent(
-          code
-        )}`,
-        {
-
-          method:
-            "DELETE"
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        result.message ||
-        `HTTP ${response.status}`
-      );
-
-    }
-
-
-    alert(
-      "ลบข้อมูลสำเร็จ"
-    );
-
-
-    await loadVaccineMaster();
-
-
-    populateVaccineStockSelect();
-
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      "❌ DELETE VACCINE:",
-      error
-    );
-
-
-    alert(
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   CLOSE STOCK DETAIL
-===================================================== */
-
-function closeStockDetail() {
-
-  const modal =
-    document.getElementById(
-      "vaccineStockDetailModal"
-    );
-
-
-  if (!modal) return;
-
-
-  modal.classList.remove(
-    "show"
-  );
-
-
-  modal.hidden = true;
-
-
-  modal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-
-  document.body.classList.remove(
-    "vaccinemaster-detail-modal-open"
-  );
-
-
-  console.log(
-    "✖️ Vaccine Stock Detail CLOSE"
-  );
-
-}
-
-
-/* =====================================================
-   KEYBOARD
-===================================================== */
+/* =========================================================
+   ESC KEY
+========================================================= */
 
 function handleKeydown(
   event
 ) {
+
+  if (!VM.moduleActive) {
+
+    return;
+
+  }
+
 
   if (
     event.key !==
@@ -2884,294 +1633,36 @@ function handleKeydown(
   }
 
 
-  closeMasterModal();
-
-  closeStockDetail();
-
-  closeVaccineStockModal();
-
-}
+  closeMasterModalDirect();
 
 
-/* =====================================================
-   FORMAT NUMBER
-===================================================== */
+  if (
+    typeof VM.closeStockDetail ===
+    "function"
+  ) {
 
-function formatNumber(
-  value
-) {
-
-  const number =
-    Number(
-      value || 0
-    );
-
-
-  return number.toLocaleString(
-    "th-TH"
-  );
-
-}
-
-
-/* =====================================================
-   FORMAT DATE
-===================================================== */
-
-function formatDate(
-  value
-) {
-
-  if (!value) {
-
-    return "-";
-
-  }
-
-
-  const date =
-    parseDate(
-      value
-    );
-
-
-  if (!date) {
-
-    return String(
-      value
-    );
-
-  }
-
-
-  return date.toLocaleDateString(
-    "th-TH",
-    {
-
-      day:
-        "2-digit",
-
-      month:
-        "2-digit",
-
-      year:
-        "numeric"
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   PARSE DATE
-===================================================== */
-
-function parseDate(
-  value
-) {
-
-  if (!value) {
-
-    return null;
+    VM.closeStockDetail();
 
   }
 
 
   if (
-    value instanceof Date
+    typeof VM.closeVaccineStockModal ===
+    "function"
   ) {
 
-    return value;
+    VM.closeVaccineStockModal();
 
   }
-
-
-  const text =
-    String(
-      value
-    ).trim();
-
-
-  /*
-   * YYYY-MM-DD
-   */
-  const isoMatch =
-    text.match(
-      /^(\d{4})-(\d{1,2})-(\d{1,2})$/
-    );
-
-
-  if (isoMatch) {
-
-    let year =
-      Number(
-        isoMatch[1]
-      );
-
-
-    const month =
-      Number(
-        isoMatch[2]
-      ) - 1;
-
-
-    const day =
-      Number(
-        isoMatch[3]
-      );
-
-
-    if (
-      year > 2400
-    ) {
-
-      year -= 543;
-
-    }
-
-
-    const date =
-      new Date(
-        year,
-        month,
-        day
-      );
-
-
-    if (
-      !Number.isNaN(
-        date.getTime()
-      )
-    ) {
-
-      return date;
-
-    }
-
-  }
-
-
-  /*
-   * DD/MM/YYYY
-   * DD-MM-YYYY
-   */
-  const parts =
-    text.split(
-      /[\/\-]/
-    );
-
-
-  if (
-    parts.length === 3
-  ) {
-
-    let day =
-      Number(
-        parts[0]
-      );
-
-
-    let month =
-      Number(
-        parts[1]
-      ) - 1;
-
-
-    let year =
-      Number(
-        parts[2]
-      );
-
-
-    if (
-      year > 2400
-    ) {
-
-      year -= 543;
-
-    }
-
-
-    const date =
-      new Date(
-        year,
-        month,
-        day
-      );
-
-
-    if (
-      !Number.isNaN(
-        date.getTime()
-      )
-      &&
-      date.getDate() ===
-        day
-      &&
-      date.getMonth() ===
-        month
-    ) {
-
-      return date;
-
-    }
-
-  }
-
-
-  const date =
-    new Date(
-      text
-    );
-
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return null;
-
-  }
-
-
-  return date;
 
 }
 
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
+/* =========================================================
+   EXPORT
+========================================================= */
 
-function escapeHtml(
-  value
-) {
-
-  return String(
-    value ?? ""
-  )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
+export {
+  init,
+  destroy
+};

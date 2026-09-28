@@ -1,63 +1,112 @@
 <!-- =========================================================
-RECEIVE STOCK MODULE (RSM)
-Scoped UI — ไม่ชน Module อื่น
+     RECEIVE STOCK MODULE (RSM)
+     FULLY SCOPED UI
+     ไม่มี psc-* / dsc-* / class จาก Module อื่น
 ========================================================= -->
-<main class="psc-app">
-<section class="psc-page" id="rsmPage">
 
-  <div class="psc-card psc-stock-card">
+<main class="rsm-page" id="rsmPage">
 
-    <div class="psc-stock-header">
+  <div class="rsm-container">
 
-        <div class="psc-stock-title">
-          <h1>Inventory Stock</h1>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <section class="rsm-header-card">
+
+      <div class="rsm-header-left">
+
+        <span class="rsm-badge">
+          📦 Inventory Stock
+        </span>
+
+        <h1>
+          Inventory Stock
+        </h1>
 
         <p>
           จัดการข้อมูลเวชภัณฑ์ ยา และอุปกรณ์ภายในคลัง
         </p>
-        </div>
 
-       
-           <div class="dsc-dispense-action-bar">
+      </div>
 
-   <!-- หน้าแรก -->
+
+      <!-- ===================================================
+           ACTION BAR
+      ==================================================== -->
+
+      <div class="rsm-action-bar">
+
+        <!-- หน้าแรก -->
         <button
+          type="button"
           class="rsm-btn rsm-btn-primary"
           id="backHomeBtn"
-          type="button"
         >
           🏠
           <span>หน้าแรก</span>
         </button>
 
-  <button class="rsm-btn rsm-btn-primary"
-          id="openReceiveStockModal">
 
-    📥
-    <span>รับสินค้าเข้า</span>
-
-  </button>
-
-  <button class="rsm-btn rsm-btn-success"
-          id="openStickerPrint">
-
-    🖨️
-    <span>พิมพ์สติกเกอร์</span>
-
-  </button>
+        <!-- รับสินค้าเข้า -->
+        <button
+          type="button"
+          class="rsm-btn rsm-btn-primary"
+          id="openReceiveStockModal"
+        >
+          📥
+          <span>รับสินค้าเข้า</span>
+        </button>
 
 
+        <!-- พิมพ์สติกเกอร์ -->
+        <button
+          type="button"
+          class="rsm-btn rsm-btn-success"
+          id="openStickerPrint"
+        >
+          🖨️
+          <span>พิมพ์สติกเกอร์</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TABLE CARD
+    ====================================================== -->
+
+    <section class="rsm-card">
+
+      <div class="rsm-table-toolbar">
+
+        <div class="rsm-toolbar-title">
+
+          <h3>
+            รายการรับสินค้าเข้าคลัง
+          </h3>
+
+          <span>
+            รายการเวชภัณฑ์และยาที่รับเข้าระบบ
+          </span>
 
         </div>
 
       </div>
 
-    <!-- ================= TABLE CARD ================= -->
-     <div class="psc-table-wrap">
 
-        <table class="psc-table">
+      <!-- ===================================================
+           TABLE
+      ==================================================== -->
 
-            <thead>
+      <div class="rsm-table-wrapper">
+
+        <table class="rsm-table">
+
+          <thead>
+
             <tr>
               <th>DATE</th>
               <th>CODE</th>
@@ -68,97 +117,184 @@ Scoped UI — ไม่ชน Module อื่น
               <th>EXP</th>
               <th>QRCODE</th>
             </tr>
+
           </thead>
 
-            <tbody id="receiveStockTable"></tbody>
+          <tbody id="receiveStockTable"></tbody>
 
-          </table>
-
-        </div>     
+        </table>
 
       </div>
 
+    </section>
+
   </div>
 
-</section>
 </main>
+
+
 <!-- =========================================================
-MODAL
+     RECEIVE STOCK MODAL
 ========================================================= -->
 
-<div class="rsm-modal" id="ReceiveStockModal">
+<div
+  class="rsm-modal"
+  id="ReceiveStockModal"
+  aria-hidden="true"
+>
 
-  <div class="rsm-modal-card">
+  <div
+    class="rsm-modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="rsmReceiveModalTitle"
+  >
 
-    <!-- HEADER -->
+    <!-- =====================================================
+         MODAL HEADER
+    ====================================================== -->
+
     <div class="rsm-modal-header">
 
       <div>
-        <h2>รับสินค้าเข้าคลัง</h2>
-        <p>เพิ่มรายการรับยาและเวชภัณฑ์</p>
+
+        <h2 id="rsmReceiveModalTitle">
+          รับสินค้าเข้าคลัง
+        </h2>
+
+        <p>
+          เพิ่มรายการรับยาและเวชภัณฑ์
+        </p>
+
       </div>
 
-      <button type="button"
-        class="rsm-btn rsm-btn-light js-close-receive-modal">
 
+      <button
+        type="button"
+        class="rsm-btn rsm-btn-light js-close-receive-modal"
+        aria-label="ปิดหน้าต่าง"
+      >
         ✖️
-
       </button>
 
     </div>
 
-    <!-- FORM -->
-    <form id="receivestockForm"
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+      id="receivestockForm"
       class="rsm-form"
-      novalidate>
+      novalidate
+    >
 
-      <input type="hidden"
-             name="type"
-             value="IN" />
+      <input
+        type="hidden"
+        name="type"
+        value="IN"
+      />
+
 
       <div class="rsm-form-grid">
 
-        <!-- RECEIVE NO -->
-        <div class="rsm-field">
-          <label>เลขที่รับเข้า</label>
+        <!-- =================================================
+             RECEIVE NO
+        ================================================== -->
 
-          <input type="text"
-                 name="receivestockNo"
-                 id="receivestockNo"
-                 readonly />  
+        <div class="rsm-field">
+
+          <label for="receivestockNo">
+            เลขที่รับเข้า
+          </label>
+
+          <input
+            type="text"
+            name="receivestockNo"
+            id="receivestockNo"
+            readonly
+          />
+
         </div>
 
-        <!-- DATE -->
-        <div class="rsm-field">
-          <label>วันที่รับเข้า</label>
 
-          <input type="date"
-                 name="dateIn"
-                 required />
-        </div>
-        <!-- SUPPLIER -->
-        <div class="rsm-field">
-          <label>Supplier</label>
+        <!-- =================================================
+             DATE
+        ================================================== -->
 
-          <input type="text"
-                 name="supplier"
-                 required />
-        </div>
-                <!-- USER -->
         <div class="rsm-field">
-          <label>User</label>
 
-          <input type="text"
-                 name="user"
-                 required />
+          <label for="rsmDateIn">
+            วันที่รับเข้า
+          </label>
+
+          <input
+            type="date"
+            name="dateIn"
+            id="rsmDateIn"
+            required
+          />
+
         </div>
 
-        <!-- DRUG -->
+
+        <!-- =================================================
+             SUPPLIER
+        ================================================== -->
+
+        <div class="rsm-field">
+
+          <label for="rsmSupplier">
+            Supplier
+          </label>
+
+          <input
+            type="text"
+            name="supplier"
+            id="rsmSupplier"
+            autocomplete="off"
+            required
+          />
+
+        </div>
+
+
+        <!-- =================================================
+             USER
+        ================================================== -->
+
+        <div class="rsm-field">
+
+          <label for="rsmUser">
+            User
+          </label>
+
+          <input
+            type="text"
+            name="user"
+            id="rsmUser"
+            autocomplete="off"
+            required
+          />
+
+        </div>
+
+
+        <!-- =================================================
+             DRUG
+        ================================================== -->
+
         <div class="rsm-field rsm-field-lg">
-          <label>รหัสยา</label>
 
-          <select id="drugSelectReceive"
-                  required>
+          <label for="drugSelectReceive">
+            รหัสยา
+          </label>
+
+          <select
+            id="drugSelectReceive"
+            required
+          >
 
             <option value="">
               เลือกยา
@@ -166,76 +302,142 @@ MODAL
 
           </select>
 
-          <input type="hidden"
-                 name="code"
-                 id="code" />
+
+          <input
+            type="hidden"
+            name="code"
+            id="code"
+          />
+
         </div>
 
-        <!-- NAME -->
+
+        <!-- =================================================
+             NAME
+        ================================================== -->
+
         <div class="rsm-field rsm-field-lg">
-          <label>ชื่อยา</label>
 
-          <input type="text"
-                 name="name"
-                 id="name"
-                 readonly />
+          <label for="name">
+            ชื่อยา
+          </label>
+
+          <input
+            type="text"
+            name="name"
+            id="name"
+            readonly
+          />
+
         </div>
 
-        <!-- QTY -->
+
+        <!-- =================================================
+             QTY
+        ================================================== -->
+
         <div class="rsm-field">
-          <label>จำนวน</label>
 
-          <input type="number"
-                 name="qty"
-                 required />
+          <label for="rsmQty">
+            จำนวน
+          </label>
+
+          <input
+            type="number"
+            name="qty"
+            id="rsmQty"
+            min="1"
+            step="1"
+            required
+          />
+
         </div>
 
-        <!-- UNIT -->
+
+        <!-- =================================================
+             UNIT
+        ================================================== -->
+
         <div class="rsm-field">
-          <label>หน่วย</label>
 
-          <input type="text"
-                 name="unit"
-                 id="unit"
-                 readonly />
+          <label for="unit">
+            หน่วย
+          </label>
+
+          <input
+            type="text"
+            name="unit"
+            id="unit"
+            readonly
+          />
+
         </div>
 
-        <!-- LOT -->
+
+        <!-- =================================================
+             LOT
+        ================================================== -->
+
         <div class="rsm-field">
-          <label>LOT</label>
 
-          <input type="text"
-                 name="lot"
-                 required />
+          <label for="rsmLot">
+            LOT
+          </label>
+
+          <input
+            type="text"
+            name="lot"
+            id="rsmLot"
+            autocomplete="off"
+            required
+          />
+
         </div>
 
-        <!-- EXP -->
+
+        <!-- =================================================
+             EXP
+        ================================================== -->
+
         <div class="rsm-field">
-          <label>วันหมดอายุ</label>
 
-          <input type="date"
-                 name="exp"
-                 required />
+          <label for="rsmExp">
+            วันหมดอายุ
+          </label>
+
+          <input
+            type="date"
+            name="exp"
+            id="rsmExp"
+            required
+          />
+
         </div>
-
-
 
       </div>
 
-      <!-- FOOTER -->
+
+      <!-- ===================================================
+           MODAL FOOTER
+      ==================================================== -->
+
       <div class="rsm-modal-footer">
 
-        <button type="button"
-        class="rsm-btn rsm-btn-light js-close-receive-modal">
-  🚫 ยกเลิก
-</button>
+        <button
+          type="button"
+          class="rsm-btn rsm-btn-light js-close-receive-modal"
+        >
+          🚫
+          <span>ยกเลิก</span>
+        </button>
 
-        <button type="submit"
-                class="rsm-btn rsm-btn-success">
 
+        <button
+          type="submit"
+          class="rsm-btn rsm-btn-success"
+        >
           💾
-          บันทึกข้อมูล
-
+          <span>บันทึกข้อมูล</span>
         </button>
 
       </div>
@@ -247,161 +449,212 @@ MODAL
 </div>
 
 
-<div class="rsm-modal" id="DispenseModal">
+<!-- =========================================================
+     DISPENSE MODAL
+     RSM SCOPED
+     
+     หมายเหตุ:
+     เก็บ ID เดิมไว้เพื่อไม่ให้ JS เดิมพัง
+========================================================= -->
 
-  <div class="rsm-modal-card">
+<div
+  class="rsm-modal"
+  id="DispenseModal"
+  aria-hidden="true"
+>
 
-    <!-- HEADER -->
+  <div
+    class="rsm-modal-card rsm-dispense-modal-card"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
     <div class="rsm-modal-header">
 
       <div>
-        <h2>จำหน่ายออกจากคลัง</h2>
-        <p>จำหน่ายยาและเวชภัณฑ์</p>
+
+        <h2>
+          จ่ายยา
+        </h2>
+
+        <p>
+          บันทึกรายการจ่ายยาออกจากคลัง
+        </p>
+
       </div>
 
-      <button type="button"
-        class="rsm-btn rsm-btn-light js-close-receive-modal">
 
+      <button
+        type="button"
+        class="rsm-btn rsm-btn-light"
+        id="closeDispenseModal"
+      >
         ✖️
-
       </button>
 
     </div>
 
-    <!-- FORM -->
-    <form id="dispenseForm"
-          class="rsm-form">
 
-      <input type="hidden"
-             name="type"
-             value="OUT" />
+    <!-- =====================================================
+         FORM AREA
+    ====================================================== -->
 
-      <div class="rsm-form-grid">
+    <div class="rsm-form-grid">
 
-        <!-- DISPENSE NO -->
-        <div class="rsm-field">
-          <label>เลขที่จำหน่าย</label>
+      <!-- DRUG -->
 
-          <input type="text"
-                 name="dispenseNo"
-                 id="dispenseNo"
-                 readonly />  
-        </div>
+      <div class="rsm-field rsm-field-lg">
 
-        <!-- DATE -->
-        <div class="rsm-field">
-          <label>วันที่จำหน่าย</label>
+        <label for="drugSelectDispense">
+          รหัสยา
+        </label>
 
-          <input type="date"
-                 name="dateIn"
-                 required />
-        </div>
-        <!-- SUPPLIER -->
-        <div class="rsm-field">
-          <label>Supplier</label>
+        <select
+          id="drugSelectDispense"
+          required
+        >
 
-          <input type="text"
-                 name="supplier"
-                 required />
-        </div>
-                <!-- USER -->
-        <div class="rsm-field">
-          <label>User</label>
+          <option value="">
+            เลือกยา
+          </option>
 
-          <input type="text"
-                 name="user"
-                 required />
-        </div>
-
-        <!-- DRUG -->
-        <div class="rsm-field rsm-field-lg">
-          <label>รหัสยา</label>
-
-          <select id="drugSelectReceive"
-                  required>
-
-            <option value="">
-              เลือกยา
-            </option>
-
-          </select>
-
-          <input type="hidden"
-                 name="code"
-                 id="code" />
-        </div>
-
-        <!-- NAME -->
-        <div class="rsm-field rsm-field-lg">
-          <label>ชื่อยา</label>
-
-          <input type="text"
-                 name="name"
-                 id="name"
-                 readonly />
-        </div>
-
-        <!-- QTY -->
-        <div class="rsm-field">
-          <label>จำนวน</label>
-
-          <input type="number"
-                 name="qty"
-                 required />
-        </div>
-
-        <!-- UNIT -->
-        <div class="rsm-field">
-          <label>หน่วย</label>
-
-          <input type="text"
-                 name="unit"
-                 id="unit"
-                 readonly />
-        </div>
-
-        <!-- LOT -->
-        <div class="rsm-field">
-          <label>LOT</label>
-
-          <input type="text"
-                 name="lot"
-                 required />
-        </div>
-
-        <!-- EXP -->
-        <div class="rsm-field">
-          <label>วันหมดอายุ</label>
-
-          <input type="date"
-                 name="exp"
-                 required />
-        </div>
+        </select>
 
 
+        <input
+          type="hidden"
+          name="code"
+          id="dispenseCode"
+        />
 
       </div>
 
-      <!-- FOOTER -->
-      <div class="rsm-modal-footer">
 
-        <button type="button"
-        class="rsm-btn rsm-btn-light js-close-receive-modal">
-  🚫 ยกเลิก
-</button>
+      <!-- NAME -->
 
-        <button type="submit"
-                class="rsm-btn rsm-btn-success">
+      <div class="rsm-field rsm-field-lg">
 
-          💾
-          บันทึกข้อมูล
+        <label for="dispenseName">
+          ชื่อยา
+        </label>
 
-        </button>
+        <input
+          type="text"
+          name="name"
+          id="dispenseName"
+          readonly
+        />
 
       </div>
 
-    </form>
+
+      <!-- QTY -->
+
+      <div class="rsm-field">
+
+        <label for="dispenseQty">
+          จำนวน
+        </label>
+
+        <input
+          type="number"
+          name="qty"
+          id="dispenseQty"
+          min="1"
+          step="1"
+          required
+        />
+
+      </div>
+
+
+      <!-- UNIT -->
+
+      <div class="rsm-field">
+
+        <label for="dispenseUnit">
+          หน่วย
+        </label>
+
+        <input
+          type="text"
+          name="unit"
+          id="dispenseUnit"
+          readonly
+        />
+
+      </div>
+
+
+      <!-- LOT -->
+
+      <div class="rsm-field">
+
+        <label for="dispenseLot">
+          LOT
+        </label>
+
+        <input
+          type="text"
+          name="lot"
+          id="dispenseLot"
+          required
+        />
+
+      </div>
+
+
+      <!-- EXP -->
+
+      <div class="rsm-field">
+
+        <label for="dispenseExp">
+          วันหมดอายุ
+        </label>
+
+        <input
+          type="date"
+          name="exp"
+          id="dispenseExp"
+          required
+        />
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div class="rsm-modal-footer">
+
+      <button
+        type="button"
+        class="rsm-btn rsm-btn-light"
+        id="rsmCancelDispense"
+      >
+        🚫
+        <span>ยกเลิก</span>
+      </button>
+
+      <button
+        type="button"
+        class="rsm-btn rsm-btn-success"
+        id="rsmSaveDispense"
+      >
+        💾
+        <span>บันทึกข้อมูล</span>
+      </button>
+
+    </div>
 
   </div>
 
 </div>
+

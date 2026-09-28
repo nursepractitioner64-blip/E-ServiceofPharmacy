@@ -6,3 +6,34 @@ function render(d){
 }
 export async function init(){console.log("💊 Controlled Drug Loaded");try{const r=await fetch(`/api/controlleddrug/summary?t=${Date.now()}`,{cache:"no-store"});const j=await r.json();if(!j.success)throw Error(j.message);render(j.data||{})}catch(e){console.error(e)}}
 export function destroy(){}
+
+
+/* =========================================================
+   LIVE SYSTEM SUMMARY
+========================================================= */
+
+async function loadSystemSummary() {
+  try {
+    const response = await fetch("/api/dashboard/system");
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const summary = data?.data || data?.summary || data || {};
+
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (el && value !== undefined && value !== null) {
+        el.textContent = value;
+      }
+    };
+
+    set("totalItems", summary.total);
+    set("readyItems", summary.ready);
+    set("missingItems", summary.missing);
+    set("expireItems", summary.expire);
+  } catch (error) {
+    console.error("❌ Controlled Drug dashboard load failed:", error);
+  }
+}
