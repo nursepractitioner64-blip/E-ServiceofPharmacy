@@ -1,0 +1,3044 @@
+/* =========================================================
+
+   VACCINE MANAGEMENT — STOCK SUMMARY
+
+   File: public/modules/vaccinemanagement/vaccinemanagement.style.css
+
+   Scope: #vaccineStockSummaryRoot only
+
+   Theme: Modern Healthcare / Teal Mint
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot {
+
+  --vm-primary: #087f8c;
+
+  --vm-primary-dark: #075b66;
+
+  --vm-primary-light: #e8f8f6;
+
+  --vm-mint: #d7f4eb;
+
+  --vm-text: #173b49;
+
+  --vm-muted: #718692;
+
+  --vm-border: #e3edf0;
+
+  --vm-surface: #ffffff;
+
+  --vm-soft-bg: #f7fbfc;
+
+  --vm-success: #087f5b;
+
+  --vm-warning: #a16207;
+
+  --vm-danger: #c24141;
+
+
+
+  width: 100%;
+
+  margin-top: 22px;
+
+  color: var(--vm-text);
+
+  font-family: "Prompt", "Kanit", sans-serif;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+
+#vaccineStockSummaryRoot *,
+
+#vaccineStockSummaryRoot *::before,
+
+#vaccineStockSummaryRoot *::after {
+
+  box-sizing: border-box;
+
+}
+
+
+
+/* =========================================================
+
+   MAIN CARD
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-card {
+
+  overflow: hidden;
+
+  border: 1px solid var(--vm-border);
+
+  border-radius: 20px;
+
+  background: var(--vm-surface);
+
+  box-shadow:
+
+    0 4px 12px rgba(23, 59, 73, 0.025),
+
+    0 14px 36px rgba(23, 59, 73, 0.055);
+
+  transition: box-shadow 0.2s ease;
+
+}
+
+
+
+/* =========================================================
+
+   HEADER
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-heading {
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 25px 26px;
+
+  overflow: hidden;
+
+  color: #fff;
+
+  background: linear-gradient(
+
+    120deg,
+
+    #075b66 0%,
+
+    #087f8c 52%,
+
+    #20a99b 100%
+
+  );
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-heading::after {
+
+  content: "";
+
+  position: absolute;
+
+  top: -85px;
+
+  right: 100px;
+
+  width: 220px;
+
+  height: 220px;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+
+  border-radius: 50%;
+
+  box-shadow:
+
+    0 0 0 30px rgba(255, 255, 255, 0.035),
+
+    0 0 0 65px rgba(255, 255, 255, 0.025);
+
+  pointer-events: none;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-heading > * {
+
+  position: relative;
+
+  z-index: 1;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-eyebrow {
+
+  margin-bottom: 6px;
+
+  color: rgba(255, 255, 255, 0.82);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.6px;
+
+  line-height: 1.5;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-heading h2,
+
+#vaccineStockSummaryRoot .vm-stock-modal-header h3 {
+
+  margin: 0;
+
+  color: inherit;
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  line-height: 1.4;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-heading p,
+
+#vaccineStockSummaryRoot .vm-stock-modal-header p {
+
+  margin: 6px 0 0;
+
+  color: rgba(255, 255, 255, 0.86);
+
+  font-size: 12px;
+
+  line-height: 1.7;
+
+}
+
+
+
+/* =========================================================
+
+   REFRESH BUTTON
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-refresh {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  min-height: 42px;
+
+  padding: 10px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.42);
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  color: #fff;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.18s ease,
+
+    border-color 0.18s ease,
+
+    transform 0.18s ease;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-refresh:hover {
+
+  border-color: rgba(255, 255, 255, 0.7);
+
+  background: rgba(255, 255, 255, 0.24);
+
+  transform: translateY(-1px);
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-refresh:active {
+
+  transform: translateY(0);
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-refresh:focus-visible,
+
+#vaccineStockSummaryRoot .vm-detail-button:focus-visible,
+
+#vaccineStockSummaryRoot .vm-stock-modal-x:focus-visible {
+
+  outline: 3px solid rgba(20, 184, 166, 0.4);
+
+  outline-offset: 3px;
+
+}
+
+
+
+/* =========================================================
+
+   TOOLBAR
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-toolbar {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 18px 22px;
+
+  border-bottom: 1px solid #edf2f5;
+
+  background: #fff;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-search {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  width: min(100%, 390px);
+
+  min-height: 43px;
+
+  padding: 0 14px;
+
+  border: 1px solid #dce7eb;
+
+  border-radius: 12px;
+
+  background: #f9fcfd;
+
+  color: var(--vm-muted);
+
+  transition:
+
+    border-color 0.18s ease,
+
+    box-shadow 0.18s ease,
+
+    background 0.18s ease;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-search span {
+
+  flex-shrink: 0;
+
+  font-size: 19px;
+
+  line-height: 1;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-search input {
+
+  width: 100%;
+
+  min-width: 0;
+
+  padding: 9px 0;
+
+  border: 0;
+
+  outline: 0;
+
+  background: transparent;
+
+  color: var(--vm-text);
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-search input::placeholder {
+
+  color: #91a2ab;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-search:focus-within {
+
+  border-color: #21a99b;
+
+  background: #fff;
+
+  box-shadow: 0 0 0 4px rgba(32, 169, 155, 0.11);
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-count {
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  color: var(--vm-muted);
+  font-size: 12px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+
+#vaccineStockSummaryRoot .vm-stock-count strong {
+
+  color: var(--vm-primary-dark);
+
+  font-weight: 700;
+
+}
+
+
+
+/* =========================================================
+
+   MAIN TABLE
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table-wrap {
+
+  width: 100%;
+
+  overflow-x: auto;
+
+  overscroll-behavior-x: contain;
+
+  scrollbar-width: thin;
+
+  scrollbar-color: #bfdad9 #f4f8f9;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table-wrap::-webkit-scrollbar {
+
+  height: 7px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table-wrap::-webkit-scrollbar-track {
+
+  background: #f4f8f9;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table-wrap::-webkit-scrollbar-thumb {
+
+  border-radius: 20px;
+
+  background: #bfdad9;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table {
+
+  width: 100%;
+
+  min-width: 760px;
+
+  margin: 0;
+
+  border-collapse: separate;
+
+  border-spacing: 0;
+
+  background: #fff;
+
+  font-size: 12px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table th {
+
+  padding: 15px 16px;
+
+  border: 0;
+
+  border-bottom: 1px solid #e3edf0;
+
+  background: #f5fafb;
+
+  color: #59717d;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.55px;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table td {
+
+  padding: 15px 16px;
+
+  border: 0;
+
+  border-bottom: 1px solid #edf2f5;
+
+  background: #fff;
+
+  color: #405966;
+
+  vertical-align: middle;
+
+  transition: background 0.15s ease;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table tbody tr:last-child td {
+
+  border-bottom: 0;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table tbody tr:hover td {
+
+  background: #f4fbf9;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table .vm-number {
+
+  text-align: right;
+
+  font-variant-numeric: tabular-nums;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-table .vm-action-col {
+
+  text-align: center;
+
+  white-space: nowrap;
+
+}
+
+
+
+/* =========================================================
+
+   VACCINE CODE / NAME
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-code {
+
+  display: inline-block;
+
+  max-width: 100%;
+
+  padding: 5px 9px;
+
+  overflow-wrap: anywhere;
+
+  border: 1px solid #cceee8;
+
+  border-radius: 8px;
+
+  background: #effbf8;
+
+  color: #08796e;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-name {
+
+  min-width: 170px;
+
+  color: #173b49;
+
+  font-weight: 600;
+
+  line-height: 1.7;
+
+}
+
+
+
+/* =========================================================
+
+   STOCK QUANTITY
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-qty {
+
+  color: var(--vm-success);
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  font-variant-numeric: tabular-nums;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-zero {
+
+  color: var(--vm-danger);
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  font-variant-numeric: tabular-nums;
+
+}
+
+
+
+/* =========================================================
+
+   DETAIL BUTTON
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-detail-button {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  min-height: 34px;
+
+  padding: 7px 12px;
+
+  border: 1px solid #b9e8df;
+
+  border-radius: 9px;
+
+  background: #f0fbf8;
+
+  color: #08796e;
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.18s ease,
+
+    border-color 0.18s ease,
+
+    box-shadow 0.18s ease,
+
+    transform 0.18s ease;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-detail-button:hover {
+
+  border-color: #62c8b7;
+
+  background: #dff7f0;
+
+  box-shadow: 0 3px 8px rgba(8, 127, 140, 0.08);
+
+  transform: translateY(-1px);
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-detail-button:active {
+
+  transform: translateY(0);
+
+}
+
+
+
+/* =========================================================
+
+   LOADING / EMPTY STATE
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-state-cell {
+
+  padding: 34px 16px !important;
+
+  color: var(--vm-muted) !important;
+
+  text-align: center;
+
+  line-height: 1.8;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-footnote {
+
+  padding: 13px 22px;
+
+  border-top: 1px solid #edf2f5;
+
+  background: #f9fcfd;
+
+  color: #7b909a;
+
+  font-size: 10px;
+
+  line-height: 1.7;
+
+}
+
+
+
+/* =========================================================
+
+   ERROR
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-error {
+
+  margin: 15px 20px 20px;
+
+  padding: 13px 15px;
+
+  border: 1px solid #fecaca;
+
+  border-radius: 12px;
+
+  background: #fff5f5;
+
+  color: #b91c1c;
+
+  font-size: 12px;
+
+  line-height: 1.7;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-error[hidden],
+
+#vaccineStockSummaryRoot .vm-stock-modal[hidden] {
+
+  display: none !important;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-error-text {
+
+  color: #b91c1c !important;
+
+}
+
+
+
+/* =========================================================
+
+   STOCK DETAIL MODAL
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal {
+
+  position: fixed;
+
+  z-index: 12000;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 22px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-backdrop {
+
+  position: absolute;
+
+  inset: 0;
+
+  background: rgba(13, 37, 47, 0.58);
+
+  backdrop-filter: blur(4px);
+
+  -webkit-backdrop-filter: blur(4px);
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-panel {
+
+  position: relative;
+
+  z-index: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  width: min(920px, 100%);
+
+  max-height: min(86vh, 780px);
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
+
+  border-radius: 20px;
+
+  background: #fff;
+
+  box-shadow: 0 28px 90px rgba(13, 37, 47, 0.3);
+
+  animation: vm-modal-enter 0.2s ease-out;
+
+}
+
+
+
+@keyframes vm-modal-enter {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(8px) scale(0.99);
+
+  }
+
+
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+
+  }
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-header {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 22px 24px;
+
+  background: linear-gradient(
+
+    120deg,
+
+    #075b66 0%,
+
+    #087f8c 58%,
+
+    #20a99b 100%
+
+  );
+
+  color: #fff;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-header h3 {
+
+  font-size: 19px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-header p {
+
+  overflow-wrap: anywhere;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-x {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 38px;
+
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.36);
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.13);
+
+  color: #fff;
+
+  font-family: inherit;
+
+  font-size: 24px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.18s ease,
+
+    transform 0.18s ease;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-x:hover {
+
+  background: rgba(255, 255, 255, 0.25);
+
+  transform: rotate(3deg);
+
+}
+
+
+
+/* =========================================================
+
+   MODAL TOTAL
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-total {
+
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px 12px;
+
+  padding: 18px 24px;
+
+  border-bottom: 1px solid #e8f0f2;
+
+  background: linear-gradient(90deg, #f0fbf8, #f9fcfd);
+
+  color: #627b85;
+
+  font-size: 12px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-modal-total strong {
+
+  color: var(--vm-success);
+
+  font-size: 27px;
+
+  font-weight: 700;
+
+  line-height: 1.3;
+
+  font-variant-numeric: tabular-nums;
+
+}
+
+
+
+/* =========================================================
+
+   MODAL DETAIL TABLE
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-wrap {
+
+  overflow: auto;
+
+  overscroll-behavior: contain;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-table {
+
+  min-width: 600px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-table th {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 2;
+
+}
+
+
+
+/* =========================================================
+
+   EXPIRY BADGES
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-expiry-badge {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 5px 9px;
+
+  border: 1px solid transparent;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  line-height: 1.5;
+
+  white-space: nowrap;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-expiry-badge.ok {
+
+  border-color: #bbf7d0;
+
+  background: #ecfdf3;
+
+  color: #166534;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-expiry-badge.warning {
+
+  border-color: #fde68a;
+
+  background: #fffbeb;
+
+  color: #92400e;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-expiry-badge.expired {
+
+  border-color: #fecaca;
+
+  background: #fff1f2;
+
+  color: #b91c1c;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-expiry-badge.unknown {
+
+  border-color: #e2e8f0;
+
+  background: #f8fafc;
+
+  color: #475569;
+
+}
+
+
+
+/* =========================================================
+
+   MODAL BODY SCROLLBAR
+
+========================================================= */
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-wrap {
+
+  scrollbar-width: thin;
+
+  scrollbar-color: #bfdad9 #f4f8f9;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-wrap::-webkit-scrollbar {
+
+  width: 7px;
+
+  height: 7px;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-wrap::-webkit-scrollbar-track {
+
+  background: #f4f8f9;
+
+}
+
+
+
+#vaccineStockSummaryRoot .vm-stock-detail-wrap::-webkit-scrollbar-thumb {
+
+  border-radius: 20px;
+
+  background: #bfdad9;
+
+}
+
+
+
+/* =========================================================
+
+   BODY MODAL STATE
+
+========================================================= */
+
+
+
+body.vm-stock-modal-open {
+
+  overflow: hidden;
+
+}
+
+
+
+/* =========================================================
+
+   RESPONSIVE — TABLET
+
+========================================================= */
+
+
+
+@media (max-width: 768px) {
+
+  #vaccineStockSummaryRoot {
+
+    margin-top: 16px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-card {
+
+    border-radius: 16px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-heading {
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 20px 17px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-heading::after {
+
+    right: -40px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-heading h2 {
+
+    font-size: 18px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-heading p {
+
+    font-size: 11px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-refresh {
+
+    min-height: 37px;
+
+    padding: 8px 11px;
+
+    font-size: 11px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-toolbar {
+
+    align-items: stretch;
+
+    flex-direction: column;
+
+    gap: 11px;
+
+    padding: 14px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-search {
+
+    width: 100%;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-count {
+
+    text-align: right;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-table th,
+
+  #vaccineStockSummaryRoot .vm-stock-table td {
+
+    padding: 12px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-modal {
+
+    padding: 12px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-modal-panel {
+
+    max-height: 92vh;
+
+    border-radius: 15px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-modal-header {
+
+    padding: 18px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-modal-total {
+
+    padding: 15px 18px;
+
+  }
+
+}
+
+
+
+/* =========================================================
+
+   RESPONSIVE — SMALL MOBILE
+
+========================================================= */
+
+
+
+@media (max-width: 480px) {
+
+  #vaccineStockSummaryRoot .vm-stock-heading {
+
+    flex-direction: column;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-heading h2 {
+
+    font-size: 17px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-refresh {
+
+    align-self: flex-start;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-modal-header h3 {
+
+    font-size: 16px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-modal-total strong {
+
+    font-size: 23px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-footnote {
+
+    padding: 12px 14px;
+
+  }
+
+
+
+  #vaccineStockSummaryRoot .vm-stock-error {
+
+    margin: 12px;
+
+  }
+
+}
+
+
+
+/* =========================================================
+
+   REDUCED MOTION
+
+========================================================= */
+
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  #vaccineStockSummaryRoot *,
+
+  #vaccineStockSummaryRoot *::before,
+
+  #vaccineStockSummaryRoot *::after {
+
+    scroll-behavior: auto !important;
+
+    transition: none !important;
+
+    animation: none !important;
+
+  }
+
+}
+
+
+
+  /* =========================================
+
+     VACCINE MANAGEMENT DESIGN SYSTEM
+
+  ========================================= */
+
+  .ems-check-app {
+
+    --vm-primary: #087f8c;
+
+    --vm-primary-dark: #075b66;
+
+    --vm-primary-light: #e7f7f7;
+
+    --vm-mint: #d9f4eb;
+
+    --vm-text: #173b49;
+
+    --vm-muted: #708692;
+
+    --vm-border: #e5edf1;
+
+    --vm-surface: #ffffff;
+
+    --vm-bg: #f3f8fa;
+
+
+
+    width: 100%;
+
+    min-height: 100%;
+
+    padding: 24px;
+
+    color: var(--vm-text);
+
+    font-family: "Prompt", "Kanit", sans-serif;
+
+    background:
+
+      radial-gradient(
+
+        circle at 5% 0%,
+
+        rgba(163, 229, 217, 0.22),
+
+        transparent 30%
+
+      ),
+
+      var(--vm-bg);
+
+    box-sizing: border-box;
+
+  }
+
+
+
+  .ems-check-app *,
+
+  .ems-check-app *::before,
+
+  .ems-check-app *::after {
+
+    box-sizing: border-box;
+
+  }
+
+
+
+  /* =========================================
+
+     MAIN CONTAINER
+
+  ========================================= */
+
+  .ems-check-app .stock-card {
+
+    width: 100%;
+
+    max-width: 1600px;
+
+    margin: 0 auto;
+
+    overflow: visible;
+
+    border: 1px solid rgba(220, 234, 239, 0.9);
+
+    border-radius: 22px;
+
+    background: var(--vm-surface);
+
+    box-shadow: 0 12px 40px rgba(29, 76, 91, 0.07);
+
+  }
+
+
+
+  /* =========================================
+
+     HEADER
+
+  ========================================= */
+
+  .ems-check-app .stock-header {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 24px;
+
+    min-height: 145px;
+
+    padding: 30px 34px;
+
+    overflow: visible;
+
+    color: #ffffff;
+
+    border: 0;
+
+    border-radius: 21px 21px 0 0;
+
+    background: linear-gradient(
+
+      120deg,
+
+      #075b66 0%,
+
+      #087f8c 52%,
+
+      #21a99d 100%
+
+    );
+
+  }
+
+
+
+  .ems-check-app .stock-header::after {
+
+    content: "";
+
+    position: absolute;
+
+    right: 95px;
+
+    top: -85px;
+
+    width: 240px;
+
+    height: 240px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 50%;
+
+    box-shadow:
+
+      0 0 0 30px rgba(255, 255, 255, 0.035),
+
+      0 0 0 65px rgba(255, 255, 255, 0.025);
+
+    pointer-events: none;
+
+  }
+
+
+
+  .ems-check-app .stock-header-left {
+
+    position: relative;
+
+    z-index: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    min-width: 0;
+
+  }
+
+
+
+  .ems-check-app .stock-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex: 0 0 76px;
+
+    width: 76px;
+
+    height: 76px;
+
+    font-size: 37px;
+
+    border: 1px solid rgba(255, 255, 255, 0.24);
+
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.14);
+
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    backdrop-filter: blur(8px);
+
+  }
+
+
+
+  .ems-check-app .stock-header h1 {
+
+    margin: 0 0 9px;
+
+    color: #ffffff;
+
+    font-size: clamp(21px, 2.2vw, 30px);
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+
+    line-height: 1.3;
+
+  }
+
+
+
+  .ems-check-app .stock-header p {
+
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.86);
+
+    font-size: 14px;
+
+    font-weight: 400;
+
+    line-height: 1.6;
+
+  }
+
+
+
+  .ems-check-app .stock-header-right {
+
+    position: relative;
+
+    z-index: 10;
+
+    flex-shrink: 0;
+
+  }
+
+
+
+  /* =========================================
+
+     USER MENU
+
+  ========================================= */
+
+  .ems-check-app .ems-user-menu {
+
+    position: relative;
+
+  }
+
+
+
+  .ems-check-app .ems-user-trigger {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    min-height: 58px;
+
+    padding: 8px 13px;
+
+    color: #ffffff;
+
+    text-align: left;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    border-radius: 15px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    cursor: pointer;
+
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+  }
+
+
+
+  .ems-check-app .ems-user-trigger:hover {
+
+    background: rgba(255, 255, 255, 0.2);
+
+    border-color: rgba(255, 255, 255, 0.45);
+
+  }
+
+
+
+  .ems-check-app .ems-user-avatar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 40px;
+
+    height: 40px;
+
+    color: var(--vm-primary-dark);
+
+    font-size: 16px;
+
+    border-radius: 13px;
+
+    background: #ffffff;
+
+  }
+
+
+
+  .ems-check-app .ems-user-avatar.large {
+
+    width: 46px;
+
+    height: 46px;
+
+    font-size: 18px;
+
+    border: 1px solid var(--vm-border);
+
+    background: var(--vm-primary-light);
+
+  }
+
+
+
+  .ems-check-app .ems-user-info,
+
+  .ems-check-app .ems-user-dropdown-header > div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+  }
+
+
+
+  .ems-check-app .ems-user-info strong,
+
+  .ems-check-app .ems-user-dropdown-header strong {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+  }
+
+
+
+  .ems-check-app .ems-user-info small {
+
+    color: rgba(255, 255, 255, 0.76);
+
+    font-size: 11px;
+
+  }
+
+
+
+  .ems-check-app .ems-user-arrow {
+
+    margin-left: 5px;
+
+    font-size: 11px;
+
+    opacity: 0.85;
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown {
+
+    position: absolute;
+
+    top: calc(100% + 10px);
+
+    right: 0;
+
+    z-index: 100;
+
+    display: none;
+
+    width: 245px;
+
+    padding: 12px;
+
+    color: var(--vm-text);
+
+    border: 1px solid var(--vm-border);
+
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow: 0 16px 42px rgba(24, 65, 78, 0.17);
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown.show,
+
+  .ems-check-app .ems-user-dropdown.active {
+
+    display: block;
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 8px 6px 13px;
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown-header strong {
+
+    color: var(--vm-text);
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown-header small {
+
+    color: var(--vm-muted);
+
+    font-size: 11px;
+
+  }
+
+
+
+  .ems-check-app .ems-user-divider {
+
+    height: 1px;
+
+    margin: 5px 0;
+
+    background: var(--vm-border);
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown > button {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    width: 100%;
+
+    padding: 11px 10px;
+
+    color: #45606c;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    text-align: left;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    transition: color 0.2s ease, background 0.2s ease;
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown > button:hover {
+
+    color: var(--vm-primary-dark);
+
+    background: var(--vm-primary-light);
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown > button i {
+
+    width: 18px;
+
+    text-align: center;
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown > button.ems-user-logout {
+
+    color: #c44747;
+
+  }
+
+
+
+  .ems-check-app .ems-user-dropdown > button.ems-user-logout:hover {
+
+    background: #fff0f0;
+
+  }
+
+
+
+  /* =========================================
+
+     NAVIGATION MENU
+
+  ========================================= */
+
+  .ems-check-app .ems-check-menu {
+
+    display: grid;
+
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    gap: 15px;
+
+    padding: 27px 28px 29px;
+
+    border-bottom: 1px solid #edf2f5;
+
+    background: #ffffff;
+
+  }
+
+
+
+.ems-check-app .ems-check-menu-btn {
+
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  gap: 17px;
+
+  min-width: 0;
+
+  min-height: 148px;
+
+  padding: 19px 17px;
+
+  overflow: hidden;
+
+  color: var(--vm-text);
+
+  font-family: inherit;
+
+  text-align: center;
+
+  border: 1px solid var(--vm-border);
+
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+
+    transform 0.22s ease,
+
+    border-color 0.22s ease,
+
+    box-shadow 0.22s ease,
+
+    background 0.22s ease;
+
+}
+
+
+
+.ems-check-app .ems-menu-icon {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  align-self: center;
+
+  margin: 0 auto;
+
+}
+
+
+
+.ems-check-app .ems-menu-text {
+
+  width: 100%;
+
+  text-align: center;
+
+}
+
+
+
+.ems-check-app .ems-check-menu-btn::after {
+
+  content: "";
+
+  position: absolute;
+
+  right: -22px;
+
+  bottom: -32px;
+
+  width: 85px;
+
+  height: 85px;
+
+  border-radius: 50%;
+
+  background: var(--vm-primary-light);
+
+  opacity: 0;
+
+  transition: opacity 0.22s ease;
+
+  pointer-events: none;
+
+}
+
+
+
+.ems-check-app .ems-check-menu-btn:hover {
+
+  transform: translateY(-4px);
+
+  border-color: #9bd8d6;
+
+  background: #fbffff;
+
+  box-shadow: 0 10px 25px rgba(8, 127, 140, 0.1);
+
+}
+
+
+
+.ems-check-app .ems-check-menu-btn:hover::after {
+
+  opacity: 0.85;
+
+}
+
+
+
+  .ems-check-app .ems-check-menu-btn:focus-visible,
+
+  .ems-check-app .ems-user-trigger:focus-visible,
+
+  .ems-check-app .ems-user-dropdown button:focus-visible {
+
+    outline: 3px solid rgba(8, 127, 140, 0.35);
+
+    outline-offset: 3px;
+
+  }
+
+
+
+  .ems-check-app .ems-menu-icon {
+
+    position: relative;
+
+    z-index: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 49px;
+
+    height: 49px;
+
+    font-size: 24px;
+
+    border: 1px solid #d9f0ef;
+
+    border-radius: 15px;
+
+    background: linear-gradient(145deg, #e9f9f6, #e7f4fb);
+
+  }
+
+
+
+  .ems-check-app .ems-menu-text {
+
+    position: relative;
+
+    z-index: 1;
+
+    display: block;
+
+    width: 100%;
+
+    color: #284c59;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    line-height: 1.65;
+
+    overflow-wrap: anywhere;
+
+  }
+
+
+
+  /* =========================================
+
+     STOCK SUMMARY SECTION
+
+  ========================================= */
+
+  .ems-check-app .vaccine-stock-summary-section {
+
+    min-width: 0;
+
+    padding: 28px;
+
+    border-radius: 0 0 22px 22px;
+
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+
+  }
+
+
+
+  .ems-check-app .vaccine-stock-loading {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    min-height: 145px;
+
+    padding: 24px;
+
+    color: var(--vm-muted);
+
+    font-size: 14px;
+
+    text-align: center;
+
+    border: 1px dashed #cbdfe5;
+
+    border-radius: 16px;
+
+    background: #f8fbfc;
+
+  }
+
+
+
+  .ems-check-app .vaccine-stock-loading::before {
+
+    content: "";
+
+    width: 20px;
+
+    height: 20px;
+
+    flex: 0 0 20px;
+
+    border: 2px solid #cde7e5;
+
+    border-top-color: var(--vm-primary);
+
+    border-radius: 50%;
+
+    animation: vm-spin 0.8s linear infinite;
+
+  }
+
+
+
+  @keyframes vm-spin {
+
+    to {
+
+      transform: rotate(360deg);
+
+    }
+
+  }
+
+
+
+  /* =========================================
+
+     RESPONSIVE
+
+  ========================================= */
+
+  @media (max-width: 1100px) {
+
+    .ems-check-app {
+
+      padding: 16px;
+
+    }
+
+
+
+    .ems-check-app .ems-check-menu {
+
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+
+      gap: 12px;
+
+      padding: 22px;
+
+    }
+
+
+
+    .ems-check-app .ems-check-menu-btn {
+
+      min-height: 135px;
+
+    }
+
+  }
+
+
+
+  @media (max-width: 700px) {
+
+    .ems-check-app {
+
+      padding: 10px;
+
+    }
+
+
+
+    .ems-check-app .stock-card {
+
+      border-radius: 16px;
+
+    }
+
+
+
+    .ems-check-app .stock-header {
+
+      align-items: flex-start;
+
+      gap: 14px;
+
+      min-height: auto;
+
+      padding: 21px 17px;
+
+      border-radius: 15px 15px 0 0;
+
+    }
+
+
+
+    .ems-check-app .stock-header-left {
+
+      gap: 12px;
+
+    }
+
+
+
+    .ems-check-app .stock-icon {
+
+      flex-basis: 51px;
+
+      width: 51px;
+
+      height: 51px;
+
+      font-size: 26px;
+
+      border-radius: 15px;
+
+    }
+
+
+
+    .ems-check-app .stock-header h1 {
+
+      margin-bottom: 6px;
+
+      font-size: 17px;
+
+      letter-spacing: 0;
+
+    }
+
+
+
+    .ems-check-app .stock-header p {
+
+      font-size: 12px;
+
+    }
+
+
+
+    .ems-check-app .stock-header-right {
+
+      flex-shrink: 0;
+
+    }
+
+
+
+    .ems-check-app .ems-user-trigger {
+
+      min-height: 44px;
+
+      padding: 5px;
+
+      border-radius: 12px;
+
+    }
+
+
+
+    .ems-check-app .ems-user-avatar {
+
+      width: 32px;
+
+      height: 32px;
+
+      font-size: 13px;
+
+      border-radius: 10px;
+
+    }
+
+
+
+    .ems-check-app .ems-user-info,
+
+    .ems-check-app .ems-user-arrow {
+
+      display: none;
+
+    }
+
+
+
+    .ems-check-app .ems-check-menu {
+
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      gap: 10px;
+
+      padding: 17px 13px;
+
+    }
+
+
+
+    .ems-check-app .ems-check-menu-btn {
+
+      gap: 12px;
+
+      min-height: 120px;
+
+      padding: 14px;
+
+      border-radius: 14px;
+
+    }
+
+
+
+    .ems-check-app .ems-menu-icon {
+
+      width: 42px;
+
+      height: 42px;
+
+      font-size: 21px;
+
+      border-radius: 12px;
+
+    }
+
+
+
+    .ems-check-app .ems-menu-text {
+
+      font-size: 11px;
+
+    }
+
+
+
+    .ems-check-app .vaccine-stock-summary-section {
+
+      padding: 15px 13px;
+
+    }
+
+  }
+
+
+
+  @media (max-width: 380px) {
+
+    .ems-check-app .stock-header {
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .ems-check-app .stock-header-right {
+
+      position: absolute;
+
+      top: 15px;
+
+      right: 14px;
+
+    }
+
+
+
+    .ems-check-app .stock-header-left {
+
+      padding-right: 38px;
+
+    }
+
+
+
+    .ems-check-app .stock-header h1 {
+
+      font-size: 15px;
+
+    }
+
+
+
+    .ems-check-app .ems-check-menu {
+
+      gap: 8px;
+
+      padding: 12px 9px;
+
+    }
+
+
+
+    .ems-check-app .ems-check-menu-btn {
+
+      min-height: 112px;
+
+      padding: 11px;
+
+    }
+
+  }
+
+
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .ems-check-app *,
+
+    .ems-check-app *::before,
+
+    .ems-check-app *::after {
+
+      animation-duration: 0.01ms !important;
+
+      animation-iteration-count: 1 !important;
+
+      transition-duration: 0.01ms !important;
+
+    }
+
+  }
+
+
+
+
+
+
+
+/* =========================================
+
+   VACCINE SELECT — PROFESSIONAL HEALTHCARE
+
+========================================= */
+
+
+
+.ems-check-app .vm-stock-toolbar-select {
+
+  width: 100%;
+
+  margin: 0 0 22px;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-wrap {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+
+  width: 100%;
+
+  max-width: 760px;
+
+  padding: 22px 24px;
+
+  margin: 0;
+
+  background: linear-gradient(135deg, #ffffff 0%, #f5fbfb 100%);
+
+  border: 1px solid #dcebea;
+
+  border-radius: 18px;
+
+  box-shadow: 0 5px 18px rgba(16, 93, 98, 0.06);
+
+  box-sizing: border-box;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-heading {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-icon {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex: 0 0 46px;
+
+  width: 46px;
+
+  height: 46px;
+
+  color: #087f8c;
+
+  font-size: 23px;
+
+  background: #e2f5f2;
+
+  border: 1px solid #ccebe6;
+
+  border-radius: 14px;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-label-group {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-label {
+
+  color: #173c42;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  line-height: 1.5;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-hint {
+
+  color: #71878b;
+
+  font-size: 12px;
+
+  font-weight: 400;
+
+  line-height: 1.5;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-control {
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-search-icon {
+
+  position: absolute;
+
+  left: 16px;
+
+  z-index: 1;
+
+  color: #087f8c;
+
+  font-size: 17px;
+
+  pointer-events: none;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select {
+
+  display: block;
+
+  width: 100%;
+
+  min-height: 54px;
+
+  padding: 12px 48px 12px 45px;
+
+  color: #23474c;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  line-height: 1.5;
+
+  background-color: #ffffff;
+
+  border: 1px solid #cbdedd;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  box-sizing: border-box;
+
+  cursor: pointer;
+
+  transition:
+
+    border-color 0.2s ease,
+
+    box-shadow 0.2s ease,
+
+    background-color 0.2s ease;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select:hover:not(:disabled) {
+
+  border-color: #78c7c5;
+
+  background-color: #fcffff;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select:focus {
+
+  border-color: #0b929b;
+
+  box-shadow: 0 0 0 4px rgba(8, 127, 140, 0.12);
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select:disabled {
+
+  color: #84999b;
+
+  background-color: #f4f8f8;
+
+  border-color: #e0e9e8;
+
+  cursor: wait;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-chevron {
+
+  position: absolute;
+
+  right: 17px;
+
+  color: #658589;
+
+  font-size: 13px;
+
+  pointer-events: none;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-footer {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color: #71878b;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+
+}
+
+
+
+.ems-check-app .vm-vaccine-select-footer i {
+
+  color: #0b929b;
+
+  font-size: 14px;
+
+}
+
+
+
+/* Responsive */
+
+@media (max-width: 576px) {
+
+  .ems-check-app .vm-vaccine-select-wrap {
+
+    padding: 17px;
+
+    gap: 12px;
+
+    border-radius: 15px;
+
+  }
+
+
+
+  .ems-check-app .vm-vaccine-select-icon {
+
+    flex-basis: 42px;
+
+    width: 42px;
+
+    height: 42px;
+
+    font-size: 21px;
+
+  }
+
+
+
+  .ems-check-app .vm-vaccine-select-label {
+
+    font-size: 15px;
+
+  }
+
+
+
+  .ems-check-app .vm-vaccine-select {
+
+    min-height: 50px;
+
+    font-size: 13px;
+
+  }
+
+}
+
+
+
+
+
+
+
+

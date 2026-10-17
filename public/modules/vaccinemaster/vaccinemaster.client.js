@@ -170,6 +170,21 @@ async function init() {
     "✅ Vaccine Master ready"
   );
 
+  const refreshHistoryBtn = document.getElementById(
+  "refreshVaccineDispenseHistoryBtn"
+);
+
+if (refreshHistoryBtn && !refreshHistoryBtn.dataset.bound) {
+  refreshHistoryBtn.dataset.bound = "true";
+
+  refreshHistoryBtn.addEventListener("click", () => {
+    loadVaccineDispenseHistory();
+  });
+}
+
+// โหลดประวัติเมื่อเปิดหน้า
+loadVaccineDispenseHistory();
+
 }
 
 
@@ -843,11 +858,6 @@ async function handleClick(
   event
 ) {
 
-  if (!VM.moduleActive) {
-
-    return;
-
-  }
 
 
   /* =======================================================
@@ -1655,6 +1665,150 @@ function handleKeydown(
 
   }
 
+}
+
+/* =========================================================
+   VACCINE DISPENSE HISTORY
+   Source: VACCINE_MOVEMENT
+   Filter: TYPE = OUT
+========================================================= */
+
+async function loadVaccineDispenseHistory() {
+  const tbody = document.getElementById("vrDispenseHistoryBody");
+  const countEl = document.getElementById("vrHistoryCount");
+
+  if (!tbody) {
+    console.warn("ไม่พบ vrDispenseHistoryBody");
+    return;
+  }
+
+  const escapeHistoryHtml = value =>
+    String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
+  const displayDate = value => {
+    if (!value) return "-";
+
+    const text = String(value).trim();
+    const match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+    if (match) {
+      return `${match[3].padStart(2, "0")}/${match[2].padStart(2, "0")}/${match[1]}`;
+    }
+
+    return text;
+  };
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="11" class="text-center py-4">
+        กำลังโหลดประวัติการจ่ายวัคซีน...
+      </td>
+    </tr>
+  `;
+
+  try {
+    const response = await fetch(
+      "/api/vaccine-master/stock/movements",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json"
+        },
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(
+        result.message || "ไม่สามารถโหลดข้อมูลได้"
+      );
+    }
+
+    // กรองซ้ำที่หน้าเว็บเพื่อแสดงเฉพาะ TYPE = OUT
+    const rows = (Array.isArray(result.data) ? result.data : [])
+      .filter(row =>
+        String(row.type ?? row.TYPE ?? "")
+          .trim()
+          .toUpperCase() === "OUT"
+      );
+
+    if (countEl) {
+      countEl.textContent = rows.length.toLocaleString("th-TH");
+    }
+
+    if (rows.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="11" class="text-center py-4 text-muted">
+            ยังไม่มีประวัติการจ่ายวัคซีน
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(row => {
+      const date = row.date ?? row.DATE;
+      const refNo = row.refNo ?? row.REF_NO;
+      const code = row.code ?? row.CODE;
+      const name = row.name ?? row.NAME;
+      const lot = row.lot ?? row.LOT;
+      const exp = row.exp ?? row.EXP;
+      const qty = row.qty ?? row.QTY;
+      const unit = row.unit ?? row.UNIT;
+      const target = row.target ?? row.TARGET;
+      const user = row.user ?? row.USER;
+      const location = row.location ?? row.Location ?? row.LOCATION;
+
+      return `
+        <tr>
+          <td>${escapeHistoryHtml(displayDate(date))}</td>
+          <td>${escapeHistoryHtml(refNo || "-")}</td>
+          <td>${escapeHistoryHtml(code || "-")}</td>
+          <td>${escapeHistoryHtml(name || "-")}</td>
+          <td>${escapeHistoryHtml(lot || "-")}</td>
+          <td>${escapeHistoryHtml(displayDate(exp))}</td>
+          <td class="text-end">${escapeHistoryHtml(qty ?? 0)}</td>
+          <td>${escapeHistoryHtml(unit || "-")}</td>
+          <td>${escapeHistoryHtml(target || "-")}</td>
+          <td>${escapeHistoryHtml(user || "-")}</td>
+          <td>${escapeHistoryHtml(location || "-")}</td>
+        </tr>
+      `;
+    }).join("");
+
+  } catch (error) {
+    console.error(
+      "❌ Load Vaccine Dispense History:",
+      error
+    );
+
+    if (countEl) {
+      countEl.textContent = "0";
+    }
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="11" class="text-center text-danger py-4">
+          โหลดประวัติการจ่ายวัคซีนไม่สำเร็จ
+          <br>
+          <small>${escapeHistoryHtml(error.message)}</small>
+        </td>
+      </tr>
+    `;
+  }
 }
 
 

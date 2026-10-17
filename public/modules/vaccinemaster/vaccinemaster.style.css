@@ -2629,3 +2629,282 @@ body.vaccinemaster-modal-open {
   }
 }
 
+
+
+/* =========================================================
+   FIX: VACCINE STOCK DETAIL MODAL
+   Target: #vaccineStockDetailModal
+   ========================================================= */
+
+/* ซ่อน Modal เมื่อมี hidden */
+#vaccineStockDetailModal[hidden] {
+  display: none !important;
+}
+
+/* แสดง Modal เมื่อ JavaScript เพิ่ม .show */
+#vaccineStockDetailModal.show {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 20px !important;
+  box-sizing: border-box !important;
+
+  background: rgba(15, 23, 42, 0.52) !important;
+  z-index: 1000000 !important;
+
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  overflow-y: auto !important;
+}
+
+/* ครอบคลุมทุกองค์ประกอบใน Modal */
+#vaccineStockDetailModal,
+#vaccineStockDetailModal * {
+  box-sizing: border-box;
+}
+
+/* Overlay */
+#vaccineStockDetailModal .vaccinemaster-detail-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* กล่องรายละเอียด */
+#vaccineStockDetailModal .vaccinemaster-detail-modal-box {
+  position: relative;
+  z-index: 2;
+
+  width: min(620px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.25);
+
+  animation: vmStockDetailIn 0.18s ease-out;
+}
+
+/* Header */
+#vaccineStockDetailModal .vaccinemaster-detail-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 20px 22px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-modal-title {
+  color: #0f766e;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+/* ปุ่มปิด */
+#vaccineStockDetailModal .vaccinemaster-detail-close {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* เนื้อหา */
+#vaccineStockDetailModal .vaccinemaster-detail-content {
+  padding: 20px 22px;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-code {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: #ecfdf5;
+  color: #0f766e;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-name {
+  margin: 12px 0 18px;
+  color: #334155;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-name-en {
+  font-weight: 600;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-thname {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* รายการ LOT / EXP / จำนวน */
+#vaccineStockDetailModal .vaccinemaster-detail-stock {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+#vaccineStockDetailModal .vaccinemaster-stock-line {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+#vaccineStockDetailModal .vaccinemaster-stock-lot {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+#vaccineStockDetailModal .vaccinemaster-stock-exp {
+  color: #64748b;
+  font-size: 12px;
+}
+
+#vaccineStockDetailModal .vaccinemaster-stock-qty {
+  color: #0f766e;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Loading / empty / error */
+#vaccineStockDetailModal .vaccinemaster-detail-loading,
+#vaccineStockDetailModal .vaccinemaster-no-stock,
+#vaccineStockDetailModal .vaccinemaster-detail-error {
+  padding: 22px 12px;
+  text-align: center;
+  color: #64748b;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-error {
+  color: #dc2626;
+  overflow-wrap: anywhere;
+}
+
+/* ยอดรวม */
+#vaccineStockDetailModal .vaccinemaster-detail-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #0f766e;
+}
+
+#vaccineStockDetailModal #vaccineStockDetailTotal {
+  font-size: 21px;
+}
+
+/* แจ้งเตือนวันหมดอายุ */
+#vaccineStockDetailModal .vaccinemaster-detail-note:empty {
+  display: none;
+}
+
+#vaccineStockDetailModal .vaccinemaster-warning {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #f3d58a;
+  border-radius: 9px;
+  background: #fff9e8;
+  color: #795300;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+#vaccineStockDetailModal .vaccinemaster-warning-title {
+  font-weight: 700;
+}
+
+/* Footer */
+#vaccineStockDetailModal .vaccinemaster-detail-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 22px 20px;
+  border-top: 1px solid #edf0f3;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-btn-close {
+  min-width: 90px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #0f766e;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+#vaccineStockDetailModal .vaccinemaster-detail-btn-close:hover {
+  background: #115e59;
+}
+
+@keyframes vmStockDetailIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 560px) {
+  #vaccineStockDetailModal.show {
+    padding: 10px !important;
+  }
+
+  #vaccineStockDetailModal .vaccinemaster-detail-modal-box {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    border-radius: 12px;
+  }
+
+  #vaccineStockDetailModal .vaccinemaster-detail-modal-header,
+  #vaccineStockDetailModal .vaccinemaster-detail-content {
+    padding: 15px;
+  }
+
+  #vaccineStockDetailModal .vaccinemaster-stock-line {
+    grid-template-columns: 1fr auto;
+  }
+
+  #vaccineStockDetailModal .vaccinemaster-stock-exp {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+

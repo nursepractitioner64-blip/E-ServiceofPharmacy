@@ -2435,3 +2435,37 @@ button[data-vaccine-stock-action]:hover {
   background: #dc3545;
   color: #fff;
 }
+
+/* =========================================================
+   DISPENSE OUT OF STOCK
+========================================================= */
+
+.vaccinemasterstock-action-bar .btn-dispense {
+  color: #ffffff;
+  background: #b45309;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.18);
+}
+
+.vaccinemasterstock-action-bar .btn-dispense:hover {
+  background: #92400e;
+  box-shadow: 0 6px 16px rgba(180, 83, 9, 0.24);
+}
+
+.vaccinestock-dispense-hint {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+#vaccineStockAvailableQty {
+  color: #047857;
+  font-weight: 700;
+}
+
+#vaccineStockUnit[readonly] {
+  background: #f1f5f9;
+  color: #475569;
+}
+

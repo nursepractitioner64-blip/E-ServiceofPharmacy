@@ -7,8 +7,9 @@
      1. แสดงรายการ Vaccine จาก VACCINE_MASTER
      2. แสดง Stock แยกตาม LOT / EXP
      3. คลิก STOCK → เปิดรายละเอียดวัคซีน
-     4. ADD VACCINE STOCK → รับเข้า TYPE = IN เท่านั้น
-     5. POST /api/vaccine-master/stock
+     4. รับเข้าวัคซีน TYPE = IN
+     5. จ่ายวัคซีนออก TYPE = OUT โดยเลือก LOT / EXP จาก Stock คงเหลือ
+     6. POST /api/vaccine-master/stock
      6. สร้าง REF_NO / MOVEMENT_ID / QRCODE จาก Backend
      7. Refresh Stock หลังบันทึกสำเร็จ
 ========================================================= -->
@@ -64,15 +65,24 @@
             </button>
 
 
-            <!-- ADD STOCK -->
+            <!-- RECEIVE STOCK -->
 
             <button
               type="button"
               class="btn btn-refresh"
               id="openVaccineStockAddBtn"
             >
-              ➕💉
-              ADD VACCINE STOCK
+              ➕ รับเข้าวัคซีน
+            </button>
+
+            <!-- DISPENSE STOCK -->
+
+            <button
+              type="button"
+              class="btn btn-dispense"
+              id="openVaccineStockDispenseBtn"
+            >
+              💉 จ่ายวัคซีนออก
             </button>
 
 
@@ -447,8 +457,8 @@
           ➕ รับเข้าวัคซีน
         </h2>
 
-        <p>
-          เพิ่ม Vaccine Stock เข้าระบบ
+        <p id="vaccineStockAddModalDescription">
+          เพิ่มวัคซีนเข้าคลัง
         </p>
 
       </div>
@@ -513,6 +523,12 @@
           >
             IN
           </strong>
+          <input
+            type="hidden"
+            id="vaccineStockTypeInput"
+            name="type"
+            value="IN"
+          >
 
         </div>
 
@@ -523,7 +539,7 @@
 
   <div>
 
-    <label for="vaccineStockDate">
+    <label for="vaccineStockDate" id="vaccineStockDateLabel">
       วันที่รับเข้า
     </label>
 
@@ -641,7 +657,7 @@
 
   <!-- LOT -->
 
-  <div class="vaccinestock-form-group">
+  <div class="vaccinestock-form-group" id="vaccineStockLotInGroup">
 
     <label for="vaccineStockLot">
       LOT
@@ -658,10 +674,24 @@
 
   </div>
 
+  <div class="vaccinestock-form-group" id="vaccineStockLotOutGroup" hidden>
+
+    <label for="vaccineStockOutLot">
+      LOT ที่ต้องการจ่าย
+    </label>
+
+    <select id="vaccineStockOutLot" name="lot" disabled>
+      <option value="">-- เลือก LOT --</option>
+    </select>
+
+    <small class="vaccinestock-dispense-hint">แสดงเฉพาะ LOT ที่มีคงเหลือ</small>
+
+  </div>
+
 
   <!-- EXP -->
 
-  <div class="vaccinestock-form-group">
+  <div class="vaccinestock-form-group" id="vaccineStockExpInGroup">
 
     <label for="vaccineStockExp">
       EXP
@@ -673,6 +703,20 @@
       name="exp"
       required
     >
+
+  </div>
+
+  <div class="vaccinestock-form-group" id="vaccineStockExpOutGroup" hidden>
+
+    <label for="vaccineStockOutExp">
+      วันหมดอายุ (EXP)
+    </label>
+
+    <select id="vaccineStockOutExp" name="exp" disabled>
+      <option value="">-- เลือก LOT ก่อน --</option>
+    </select>
+
+    <small id="vaccineStockAvailableQty" class="vaccinestock-dispense-hint">คงเหลือ: -</small>
 
   </div>
 

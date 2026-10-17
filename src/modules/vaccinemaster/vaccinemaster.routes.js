@@ -76,6 +76,15 @@ router.get(
   controller.getNextStockRefNo
 );
 
+/* =========================================================
+   GET VACCINE DISPENSE HISTORY
+   GET /api/vaccine-master/stock/movements
+========================================================= */
+
+router.get(
+  "/stock/movements",
+  controller.getVaccineDispenseHistory
+);
 
 /* =========================================================
    GET STOCK BY VACCINE CODE

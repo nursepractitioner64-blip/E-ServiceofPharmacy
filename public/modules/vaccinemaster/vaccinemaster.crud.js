@@ -440,7 +440,39 @@ function editVaccine(
      OPEN MODAL
   ===================================================== */
 
-  VM.openMasterModal();
+  
+/* =========================================================
+   OPEN MASTER MODAL FOR EDIT
+========================================================= */
+
+const modal = document.getElementById(
+  "vaccinemasterModal"
+);
+
+if (!modal) {
+  console.error(
+    "❌ #vaccinemasterModal NOT FOUND"
+  );
+
+  alert("ไม่พบหน้าต่างแก้ไขข้อมูลวัคซีน");
+  return;
+}
+
+modal.hidden = false;
+modal.removeAttribute("hidden");
+modal.style.display = "";
+modal.style.visibility = "";
+modal.style.opacity = "";
+modal.style.pointerEvents = "";
+modal.classList.add("show");
+modal.setAttribute("aria-hidden", "false");
+
+document.body.classList.add(
+  "vaccinemaster-modal-open"
+);
+
+console.log("✅ EDIT MODAL OPENED:", code);
+
 
 
   /* =====================================================

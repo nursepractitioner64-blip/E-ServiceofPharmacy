@@ -73,116 +73,90 @@
 
         </div>
 
+<!-- =================================================
+     VACCINE STOCK SUMMARY TABLE
+================================================== -->
 
-        <!-- =================================================
-             TABLE SECTION
-        ================================================== -->
+<div class="vaccinemaster-table-section">
 
-        <div class="vaccinemaster-table-section">
+  <!-- TABLE HEADER -->
+  <div class="vaccinemaster-table-header">
 
-          <div class="vaccinemaster-table-header">
+    <div class="vaccinemaster-table-title">
+      <h2>Vaccine Stock Summary</h2>
+      <p>สรุปยอดคงเหลือวัคซีน แยกตาม CODE</p>
+    </div>
 
-            <div class="vaccinemaster-table-title">
+    <div class="vaccinemaster-table-tools">
 
-              <h2>
-                รายการวัคซีน
-              </h2>
-
-              <p>
-                ข้อมูลจาก Sheet : VACCINE_MASTER
-              </p>
-
-            </div>
-
-
-            <div class="vaccinemaster-table-tools">
-
-              <input
-                type="search"
-                id="vaccinemasterSearch"
-                class="vaccinemaster-search"
-                placeholder="🔎 ค้นหารหัส / ชื่อวัคซีน"
-                autocomplete="off"
-              >
-
-
-              <button
-                type="button"
-                id="refreshVaccinemasterBtn"
-                class="vaccinemaster-table-refresh"
-              >
-                🔄
-                รีเฟรช
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- =================================================
-               TABLE
-          ================================================== -->
-
-          <div class="vaccinemaster-table-wrapper">
-
-<table
-  class="vaccinemaster-table"
-  id="vaccinemasterTable"
->
-
-  <thead>
-    <tr>
-
-      <th>CODE</th>
-
-      <th>NAME</th>
-
-      <th>THname</th>
-
-      <th>Action</th>
-
-    </tr>
-  </thead>
-
-
-  <tbody
-    id="vaccinemasterTableBody"
-  >
-
-    <tr>
-
-      <td
-        colspan="4"
-        class="vaccinemaster-table-loading"
+      <input
+        type="search"
+        id="vaccinemasterSearch"
+        class="vaccinemaster-search"
+        placeholder="🔎 ค้นหารหัส / ชื่อวัคซีน"
+        autocomplete="off"
+        aria-label="ค้นหาวัคซีน"
       >
-        🔄 กำลังโหลดข้อมูล...
-      </td>
 
-    </tr>
+      <button
+        type="button"
+        id="refreshVaccinemasterBtn"
+        class="vaccinemaster-table-refresh"
+      >
+        🔄 รีเฟรช
+      </button>
 
-  </tbody>
+    </div>
 
-</table>
+  </div>
 
-          </div>
+  <!-- SUMMARY TABLE -->
+  <div class="vaccinemaster-table-wrapper">
 
+    <table
+      class="vaccinemaster-table"
+      id="vaccinemasterTable"
+    >
 
-          <!-- =================================================
-               TABLE FOOTER
-          ================================================== -->
+      <thead>
+        <tr>
+          <th scope="col">CODE</th>
+          <th scope="col">NAME</th>
+          <th scope="col">THname</th>
+          <th scope="col" class="vm-number">STOCK</th>
+          <th scope="col">UNIT</th>
+          <th scope="col" class="vm-action-col">Action</th>
+        </tr>
+      </thead>
 
-          <div class="vaccinemaster-table-footer">
+      <tbody id="vaccinemasterTableBody">
 
-            <span
-              id="vaccinemasterTableCount"
-            >
-              0 รายการ
-            </span>
+        <tr>
+          <td
+            colspan="6"
+            class="vaccinemaster-table-loading"
+          >
+            🔄 กำลังโหลดข้อมูลสต็อกวัคซีน...
+          </td>
+        </tr>
 
-          </div>
+      </tbody>
 
-        </div>
+    </table>
+
+  </div>
+
+  <!-- TABLE FOOTER -->
+  <div class="vaccinemaster-table-footer">
+
+    <span id="vaccinemasterTableCount">
+      0 รายการ
+    </span>
+
+  </div>
+
+</div>
+
 
       </div>
 

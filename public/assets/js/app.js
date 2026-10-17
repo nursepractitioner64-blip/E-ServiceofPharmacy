@@ -32,7 +32,8 @@ const routes = {
 
 "vaccine-management": {
   view: "/views/vaccinemanagement.html",
-  script: null,
+  script: "/modules/vaccinemanagement/vaccinemanagement.client.js",
+  style: "/modules/vaccinemanagement/vaccinemanagement.style.css",
   system: "pharmacy"
 },
 
@@ -58,7 +59,7 @@ const routes = {
 
 "vaccine-record": {
   view: "/views/vaccinationrecord.html",
-  script: null,
+  script: "/modules/vaccinationrecord/vaccinationrecord.client.js",
   system: "pharmacy"
 },
 

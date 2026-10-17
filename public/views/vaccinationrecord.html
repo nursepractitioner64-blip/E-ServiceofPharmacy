@@ -1,381 +1,318 @@
 <!-- =====================================================
-     INVENTORY MASTER PAGE
+     VACCINATION RECORDS
+     ปุ่มจ่ายวัคซีนอยู่ในหน้านี้เท่านั้น
 ===================================================== -->
 
-<section
-  class="inv-page"
-  id="invPage"
->
-
+<section class="inv-page" id="invPage">
   <main class="psc-app">
-
     <section class="psc-page">
-
       <div class="psc-card psc-stock-card">
-
-
-        <!-- ======================================
-             HEADER
-        ======================================= -->
-
         <div class="psc-stock-header">
-
           <div class="psc-stock-title">
-
-            <h1>
-              Vaccination Records
-            </h1>
-
-            <p>
-             บันทึกการให้บริการวัคซีนทั้งหมด
-            </p>
-
+            <h1>Vaccination Records</h1>
+            <p>บันทึกการให้บริการวัคซีนทั้งหมด</p>
           </div>
-
 
           <div class="dsc-dispense-action-bar">
+            <button type="button" class="btn btn-back-home" id="backEmergencyHomeBtn">
+              🏠 หน้าแรก
+            </button>
+            <button type="button" class="btn btn-back-home" id="openVaccineDispenseBtn">
+              💉 จ่ายวัคซีนออก
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+        <section class="psc-page">
+      <div class="psc-card vr-history-card">
 
-                        <!-- BACK HOME -->
-<button
-  type="button"
-  class="btn btn-back-home"
-  id="backEmergencyHomeBtn"
->
-  🏠
-  หน้าแรก
-</button>
-
-<button
-  type="button"
-  class="btn btn-refresh"
-  id="openAddInventoryModal"
->
-  🧾
-  Vaccine Master
-</button>
-            
-<button
-  type="button"
-  class="btn btn-refresh"
-  id="openAddInventoryModal"
->
-  📝
-  Vaccine Stock
-</button>                        
-
+        <div class="vr-history-header">
+          <div>
+            <h2>📋 ประวัติการจ่ายวัคซีนออก</h2>
+            <p>รายการจ่ายวัคซีนจาก VACCINE_MOVEMENT (TYPE = OUT)</p>
           </div>
 
+          <button
+            type="button"
+            class="vr-btn vr-btn-primary"
+            id="refreshVaccineDispenseHistoryBtn"
+          >
+            🔄 รีเฟรช
+          </button>
         </div>
 
+        <div class="vr-history-summary">
+          <span>จำนวนรายการทั้งหมด</span>
+          <strong id="vrHistoryCount">0 รายการ</strong>
+        </div>
 
+        <div class="vr-history-table-wrap">
+          <table class="vr-history-table">
+            <thead>
+              <tr>
+                <th>วันที่</th>
+                <th>เลขที่เอกสาร</th>
+                <th>รหัส</th>
+                <th>ชื่อวัคซีน</th>
+                <th>LOT</th>
+                <th>EXP</th>
+                <th>จำนวน</th>
+                <th>หน่วย</th>
+                <th>จ่ายให้</th>
+                <th>ผู้บันทึก</th>
+                <th>Location</th>
+              </tr>
+            </thead>
 
+            <tbody id="vrDispenseHistoryBody">
+              <tr>
+                <td colspan="11" class="vr-history-empty">
+                  กำลังโหลดข้อมูล...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
       </div>
-
     </section>
-
   </main>
-
 </section>
 
 
 <!-- =====================================================
-     INVENTORY MODAL
+     DISPENSE VACCINE MODAL
 ===================================================== -->
+<div class="vr-dispense-modal" id="vaccineDispenseModal" aria-hidden="true" hidden>
+  <div class="vr-modal-overlay" id="closeVaccineDispenseOverlay"></div>
 
-<div
-  class="inv-modal"
-  id="inventoryModal"
-  aria-hidden="true"
->
-
-  <!-- OVERLAY -->
-
-  <div
-    class="inv-modal-overlay"
-    id="closeInventoryModal"
-  ></div>
-
-
-  <!-- MODAL BOX -->
-
-  <div
-    class="inv-modal-box"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="inventoryModalTitle"
-  >
-
-
-    <!-- HEADER -->
-
-    <div class="inv-modal-header">
-
+  <div class="vr-modal-box" role="dialog" aria-modal="true" aria-labelledby="vaccineDispenseTitle">
+    <div class="vr-modal-header">
       <div>
-
-        <h2 id="inventoryModalTitle">
-          เพิ่มรายการ Inventory
-        </h2>
-
-        <p>
-          บันทึกข้อมูลลง Sheet : INVENTORY_MASTER
-        </p>
-
+        <h2 id="vaccineDispenseTitle">💉 จ่ายวัคซีนออก</h2>
+        <p>เลือกวัคซีนและ LOT จาก Stock คงเหลือก่อนบันทึก</p>
       </div>
-
-
-      <button
-        type="button"
-        class="inv-modal-close"
-        id="closeInventoryModalBtn"
-        aria-label="ปิด"
-      >
-        ✖️
-      </button>
-
+      <button type="button" class="vr-close-btn" id="closeVaccineDispenseBtn" aria-label="ปิด">✖</button>
     </div>
 
-
-    <!-- FORM -->
-
-    <form id="inventoryForm">
-
-      <div class="inv-form-grid">
-
-
-        <!-- CODE -->
-
-        <div class="inv-form-group">
-
-          <label for="inventoryCode">
-            CODE
-          </label>
-
-          <input
-            type="text"
-            id="inventoryCode"
-            name="code"
-            placeholder="DRG0001"
-            autocomplete="off"
-            required
-          >
-
+    <form id="vaccineDispenseForm">
+      <div class="vr-form-grid">
+        <div class="vr-field">
+          <label for="vrDate">วันที่จ่ายออก</label>
+          <input type="date" id="vrDate" name="date" required>
+        </div>
+        <div class="vr-field">
+          <label>เลขที่เอกสาร</label>
+          <div class="vr-readonly" id="vrRefNo">กำลังตรวจสอบ...</div>
         </div>
 
-
-        <!-- UNIT -->
-
-        <div class="inv-form-group">
-
-          <label for="inventoryUnit">
-            UNIT
-          </label>
-
-          <input
-            type="text"
-            id="inventoryUnit"
-            name="unit"
-            placeholder="amp / box / pcs"
-            autocomplete="off"
-            required
-          >
-
+        <div class="vr-field vr-span-2">
+          <label for="vrVaccineCode">วัคซีน</label>
+          <select id="vrVaccineCode" name="code" required>
+            <option value="">-- เลือกวัคซีน --</option>
+          </select>
         </div>
 
-      </div>
+        <div class="vr-field vr-span-2">
+          <label for="vrVaccineName">ชื่อวัคซีน</label>
+          <input type="text" id="vrVaccineName" name="name" readonly required>
+        </div>
 
+        <div class="vr-field">
+          <label for="vrLot">LOT</label>
+          <select id="vrLot" name="lot" required disabled>
+            <option value="">-- เลือกวัคซีนก่อน --</option>
+          </select>
+        </div>
 
-      <!-- NAME -->
-
-      <div class="inv-form-group">
-
-        <label for="inventoryName">
-          NAME
-        </label>
-
-        <input
-          type="text"
-          id="inventoryName"
-          name="name"
-          placeholder="ชื่อยา / เวชภัณฑ์ / อุปกรณ์"
-          autocomplete="off"
-          required
-        >
-
-      </div>
-
-
-      <!-- REQUIRED -->
-
-      <div class="inv-form-group">
-
-        <label for="inventoryRequired">
-          REQUIRED
-        </label>
-
-        <input
-          type="number"
-          id="inventoryRequired"
-          name="required"
-          min="0"
-          step="1"
-          placeholder="0"
-          required
-        >
-
-      </div>
-
-
-      <!-- FOOTER -->
-
-      <div class="inv-modal-footer">
-
-        <button
-          type="button"
-          class="inv-btn inv-btn-light"
-          id="cancelInventoryModal"
-        >
-          🚫 ยกเลิก
-        </button>
-
-
-        <button
-          type="submit"
-          class="inv-btn inv-btn-success"
-          id="saveInventoryBtn"
-        >
-          💾
-          บันทึก
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
+<div class="vr-field">
+  <label for="vrExp">วันหมดอายุ (EXP)</label>
+  <input
+    type="text"
+    id="vrExp"
+    name="exp"
+    placeholder="เลือก LOT เพื่อแสดงวันหมดอายุ"
+    readonly
+    required
+  >
 </div>
 
 
-<!-- =====================================================
-     BACK HOME STYLE
-===================================================== -->
+        <div class="vr-field">
+          <label for="vrQty">จำนวนที่จ่าย</label>
+          <input type="number" id="vrQty" name="qty" min="1" step="1" placeholder="ระบุจำนวน" required>
+          <small id="vrAvailableQty" class="vr-available">คงเหลือ: -</small>
+        </div>
+        <div class="vr-field">
+          <label for="vrUnit">หน่วย</label>
+          <input type="text" id="vrUnit" name="unit" readonly required>
+        </div>
+
+        <div class="vr-field">
+          <label for="vrUser">ผู้บันทึก</label>
+          <input type="text" id="vrUser" name="user" autocomplete="name" placeholder="ชื่อผู้บันทึก" required>
+        </div>
+        <div class="vr-field">
+          <label for="vrLocation">Location</label>
+          <input type="text" id="vrLocation" name="location" placeholder="สถานที่จ่าย" required>
+        </div>
+
+        <div class="vr-field vr-span-2">
+          <label for="vrTarget">จ่ายให้ / หน่วยงานที่รับ</label>
+          <input type="text" id="vrTarget" name="target" placeholder="ระบุผู้รับหรือหน่วยงาน">
+        </div>
+        <div class="vr-field vr-span-2">
+          <label for="vrRemark">หมายเหตุ</label>
+          <textarea id="vrRemark" name="remark" rows="2" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+        </div>
+      </div>
+
+      <div class="vr-modal-footer">
+        <div id="vrFormMessage" class="vr-form-message" role="status"></div>
+        <button type="button" class="vr-btn vr-btn-light" id="cancelVaccineDispenseBtn">ยกเลิก</button>
+        <button type="submit" class="vr-btn vr-btn-primary" id="saveVaccineDispenseBtn">💉 ยืนยันจ่ายวัคซีน</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 
 <style>
+  .vr-history-card {
+    margin-top: 18px;
+    padding: 20px;
+    border-radius: 14px;
+    background: #fff;
+    font-family: "Prompt", sans-serif;
+  }
 
-  .btn-back-home {
-
-    display: inline-flex;
-
+  .vr-history-header {
+    display: flex;
     align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    height: 34px;
-
-    padding: 0 13px;
-
-    margin-bottom: 8px;
-
-    border: 1px solid #d9dee6;
-
-    border-radius: 7px;
-
-    background: #ffffff;
-
-    color: #495057;
-
-    font-family:
-      "Prompt",
-      "Prompt",
-      sans-serif;
-
-    font-size: 13px;
-
-    font-weight: 500;
-
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-      all .15s ease;
-
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
   }
 
+  .vr-history-header h2 {
+    margin: 0;
+    color: #153b50;
+    font-size: 19px;
+    font-weight: 700;
+  }
 
-  .btn-back-home i {
-
+  .vr-history-header p {
+    margin: 5px 0 0;
+    color: #718096;
     font-size: 12px;
-
   }
 
-
-  .btn-back-home:hover {
-
-    background: #f5f8fb;
-
-    border-color: #adb5bd;
-
-    color: #212529;
-
-    transform:
-      translateY(-1px);
-
+  .vr-history-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 14px;
+    border: 1px solid #dceef0;
+    border-radius: 9px;
+    background: #f2fafb;
+    color: #47616d;
+    font-size: 13px;
   }
 
-
-  .btn-back-home:active {
-
-    transform:
-      translateY(0);
-
+  .vr-history-summary strong {
+    color: #087f8c;
+    font-size: 15px;
   }
 
+  .vr-history-table-wrap {
+    width: 100%;
+    overflow: auto;
+    border: 1px solid #e5eaf0;
+    border-radius: 9px;
+  }
+
+  .vr-history-table {
+    width: 100%;
+    min-width: 1150px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: "Prompt", sans-serif;
+    font-size: 12px;
+  }
+
+  .vr-history-table th {
+    padding: 12px 10px;
+    background: #edf6f8;
+    color: #254b5b;
+    text-align: left;
+    white-space: nowrap;
+    font-weight: 600;
+    border-bottom: 1px solid #d9e8ec;
+  }
+
+  .vr-history-table td {
+    padding: 11px 10px;
+    color: #344256;
+    white-space: nowrap;
+    border-bottom: 1px solid #edf0f4;
+  }
+
+  .vr-history-table tbody tr:hover {
+    background: #f7fbfc;
+  }
+
+  .vr-history-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .vr-history-empty {
+    padding: 28px !important;
+    text-align: center;
+    color: #718096 !important;
+  }
+
+  .vr-history-error {
+    color: #b42318 !important;
+  }
+
+  @media (max-width: 560px) {
+    .vr-history-card {
+      padding: 13px;
+    }
+
+    .vr-history-header h2 {
+      font-size: 16px;
+    }
+  }
+  .btn-back-home{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:34px;padding:0 13px;margin-bottom:8px;border:1px solid #d9dee6;border-radius:7px;background:#fff;color:#495057;font-family:"Prompt",sans-serif;font-size:13px;font-weight:500;line-height:1;cursor:pointer;transition:all .15s ease}
+  .btn-back-home:hover{background:#f5f8fb;border-color:#adb5bd;color:#212529;transform:translateY(-1px)}
+  .vr-dispense-modal[hidden]{display:none!important}
+  .vr-dispense-modal{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;font-family:"Prompt",sans-serif}
+  .vr-modal-overlay{position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px)}
+  .vr-modal-box{position:relative;width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 24px 70px rgba(15,23,42,.25)}
+  .vr-modal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:20px 24px;border-bottom:1px solid #e8edf3}
+  .vr-modal-header h2{margin:0;color:#153b50;font-size:21px;font-weight:700}
+  .vr-modal-header p{margin:5px 0 0;color:#718096;font-size:13px}
+  .vr-close-btn{border:0;background:#f1f5f9;border-radius:8px;width:34px;height:34px;cursor:pointer}
+  #vaccineDispenseForm{padding:20px 24px 24px}
+  .vr-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+  .vr-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .vr-span-2{grid-column:1/-1}
+  .vr-field label{font-size:13px;font-weight:600;color:#344256}
+  .vr-field input,.vr-field select,.vr-field textarea,.vr-readonly{width:100%;box-sizing:border-box;min-height:40px;border:1px solid #d8e0e8;border-radius:8px;padding:9px 11px;background:#fff;color:#243447;font:13px "Prompt",sans-serif}
+  .vr-field input:focus,.vr-field select:focus,.vr-field textarea:focus{outline:2px solid #b6e4ef;border-color:#2996ae}
+  .vr-field input[readonly],.vr-readonly{background:#f5f8fb;color:#4a6072}
+  .vr-readonly{display:flex;align-items:center}
+  .vr-available{color:#087f8c;font-weight:600}
+  .vr-modal-footer{display:flex;align-items:center;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid #e8edf3}
+  .vr-form-message{flex:1;font-size:12px;color:#b42318}
+  .vr-btn{border:0;border-radius:8px;padding:10px 15px;font:500 13px "Prompt",sans-serif;cursor:pointer}
+  .vr-btn:disabled{opacity:.6;cursor:wait}
+  .vr-btn-light{background:#edf2f7;color:#344256}
+  .vr-btn-primary{background:#087f8c;color:#fff}
+  .vr-btn-primary:hover{background:#066874}
+  @media(max-width:560px){.vr-modal-box{max-height:95vh}.vr-modal-header,#vaccineDispenseForm{padding:16px}.vr-form-grid{grid-template-columns:1fr}.vr-span-2{grid-column:auto}.vr-modal-footer{flex-wrap:wrap}.vr-form-message{flex-basis:100%;order:0}}
 </style>
-
-
-<!-- =====================================================
-     BACK TO EMERGENCY CHECKLIST
-===================================================== -->
-
-<script>
-
-  document
-    .getElementById("backEmergencyHomeBtn")
-    ?.addEventListener(
-      "click",
-      () => {
-
-        /*
-         * ใช้ SPA route ของระบบ
-         * ไม่ reload emergencycheck.html
-         */
-
-        if (
-          typeof window.navigate === "function"
-        ) {
-
-          window.navigate(
-            "emergency-checklist"
-          );
-
-          return;
-
-        }
-
-
-        /*
-         * fallback กรณี app.js
-         * ไม่ได้ expose navigate()
-         */
-
-        window.location.hash =
-          "#emergency-checklist";
-
-      }
-    );
-
-</script>
-
