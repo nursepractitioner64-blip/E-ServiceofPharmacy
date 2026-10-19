@@ -1,150 +1,51 @@
 const repo = require("./receivedrug.repository");
+const { withSequenceLock } = require("../../utils/running/sequence-lock");
+const { getBangkokDateParts } = require("../../utils/running/bangkok-date");
+const { maxAnnualSequence, formatAnnualNumber } = require("../../utils/running/annual-number-format");
 
-exports.getDrugMaster = async () => {
+exports.getDrugMaster = async () => repo.getDrugMaster();
+exports.getList = async () => repo.getReceiveList();
 
-  return await repo.getDrugMaster();
+function dateParts(now = new Date()) {
+  const { yyyy, dateKey } = getBangkokDateParts(now);
+  return { yyyy, dateKey };
+}
 
-};
-
-exports.getList = async () => {
-
-  return await repo.getReceiveList();
-
-};
-
-exports.getRunningNo = async () => {
-
-  const rows =
-    await repo.getReceiveList();
-
-  const now = new Date();
-
-  const yyyy =
-    now.getFullYear();
-
-  const mm =
-    String(now.getMonth() + 1)
-      .padStart(2, "0");
-
-  const dd =
-    String(now.getDate())
-      .padStart(2, "0");
-
-  const dateKey =
-    `${yyyy}${mm}${dd}`;
-
-  const prefix =
-    `RCIC${dateKey}-`;
-
-  let maxSeq = 0;
-
-  rows.forEach(row => {
-
-    const no =
-      row.RECEIVE_NO || "";
-
-    if (no.startsWith(prefix)) {
-
-      const seq =
-        parseInt(
-          no.split("-")[1] || "0",
-          10
-        );
-
-      if (seq > maxSeq) {
-        maxSeq = seq;
-      }
-
-    }
-
+function maxSequenceFromRows(rows, field, prefix, year) {
+  const values = (rows || []).map(row => {
+    if (field === "MOVEMENT_ID") return row?.MOVEMENT_ID ?? row?.movementId;
+    if (field === "RECEIVE_NO") return row?.RECEIVE_NO ?? row?.receiveNo;
+    return row?.[field];
   });
+  return maxAnnualSequence(values, prefix, year);
+}
 
-  const nextSeq =
-    maxSeq + 1;
+async function buildNextReceiveNo(now = new Date()) {
+  const { yyyy, dateKey } = dateParts(now);
+  const rows = await repo.getReceiveList();
+  const max = maxSequenceFromRows(rows, "RECEIVE_NO", "RCIC", yyyy);
+  return formatAnnualNumber("RCIC", max + 1, now);
+}
 
-  return (
-    prefix +
-    String(nextSeq)
-      .padStart(5, "0")
-  );
+async function buildNextMovementNo(now = new Date()) {
+  const { yyyy, dateKey } = dateParts(now);
+  const rows = await repo.getStockMovements();
+  const max = maxSequenceFromRows(rows, "MOVEMENT_ID", "MV", yyyy);
+  return formatAnnualNumber("MV", max + 1, now);
+}
 
-};
+// Preview endpoints: actual create() recalculates under a lock before writing.
+exports.getRunningNo = async () => buildNextReceiveNo();
+exports.getMovementRunningNo = async () => buildNextMovementNo();
 
-exports.create = async (data) => {
+exports.create = async (data = {}) => withSequenceLock("DRUG_RECEIVE:annual-running", async () => {
+  const receiveNo = await buildNextReceiveNo();
+  const record = { ...data, receiveNo };
+  await repo.insertReceiveDrug(record);
 
-  const receiveNo =
-    await exports.getRunningNo();
+  const movementId = await buildNextMovementNo();
+  record.movementId = movementId;
+  await repo.insertStockMovement(record);
 
-  data.receiveNo =
-    receiveNo;
-
-  await repo.insertReceiveDrug(
-    data
-  );
-
-  data.movementId =
-  await exports.getMovementRunningNo();
-
-  await repo.insertStockMovement(
-    data
-  );
-
-  return {
-    receiveNo
-  };
-
-};
-
-exports.getMovementRunningNo = async () => {
-
-  const rows =
-    await repo.getStockMovements();
-
-  const now = new Date();
-
-  const yyyy = now.getFullYear();
-
-  const mm =
-    String(now.getMonth() + 1)
-      .padStart(2, "0");
-
-  const dd =
-    String(now.getDate())
-      .padStart(2, "0");
-
-  const dateKey =
-    `${yyyy}${mm}${dd}`;
-
-  const prefix =
-    `MV${dateKey}-`;
-
-  let maxSeq = 0;
-
-  rows.forEach(row => {
-
-    const no =
-      row.MOVEMENT_ID || "";
-
-    if (no.startsWith(prefix)) {
-
-      const seq =
-        parseInt(
-          no.split("-")[1] || "0",
-          10
-        );
-
-      if (seq > maxSeq) {
-        maxSeq = seq;
-      }
-
-    }
-
-  });
-
-  return (
-    prefix +
-    String(maxSeq + 1)
-      .padStart(5, "0")
-  );
-
-};
+  return { receiveNo, movementId };
+});

@@ -2,133 +2,44 @@
 
     <div class="card stock-card">
 
-    <!-- ======================================
-         HEADER
-    ======================================= -->
-    <div class="card-header stock-header">
-
-      <div class="stock-header-left">
-
-        <div class="stock-icon">
-          🚑
-        </div>
-
-        <div>
-          <h1>Emergency Checklist</h1>
-          <p>ระบบตรวจสอบอุปกรณ์ฉุกเฉิน เวชภัณฑ์ และวันหมดอายุ</p>
-        </div>
-
-      </div>
-
-<div class="stock-header-right">
-
-  <button
-    type="button"
-    class="ems-check-btn ems-check-btn-outline"
-    data-route="controlled-drug"
-  >
-    <i class="fa-solid fa-pills"></i>
-    Controlled Drug
-  </button>
-
-  <!-- USER -->
-  <div class="ems-user-menu">
-
-    <button
-      type="button"
-      class="ems-user-trigger"
-      id="emsUserTrigger"
-    >
-
-      <span class="ems-user-avatar">
-        <i class="fa-solid fa-user"></i>
-      </span>
-
-      <span class="ems-user-info">
-        <strong>สมชาย</strong>
-        <small>ผู้ใช้งาน</small>
-      </span>
-
-      <i class="fa-solid fa-chevron-down ems-user-arrow"></i>
-
-    </button>
-
-    <div
-      class="ems-user-dropdown"
-      id="emsUserDropdown"
-    >
-
-      <div class="ems-user-dropdown-header">
-
-        <span class="ems-user-avatar large">
-          <i class="fa-solid fa-user"></i>
-        </span>
-
-        <div>
-          <strong>สมชาย</strong>
-          <small>ผู้ใช้งาน</small>
-        </div>
-
-      </div>
-
-      <div class="ems-user-divider"></div>
-
-      <button type="button">
-        <i class="fa-solid fa-user"></i>
-        โปรไฟล์
-      </button>
-
-      <button type="button">
-        <i class="fa-solid fa-key"></i>
-        เปลี่ยนรหัสผ่าน
-      </button>
-
-      <div class="ems-user-divider"></div>
-
-      <button
-        type="button"
-        class="ems-user-logout"
-      >
-        <i class="fa-solid fa-right-from-bracket"></i>
-        ออกจากระบบ
-      </button>
-
+<!-- ======================================
+     HEADER — MODERN HEALTHCARE STYLE
+======================================= -->
+<div class="card-header stock-header">
+  <div class="stock-header-left">
+    <div class="stock-header-copy">
+      <h3>Emergency Checklist</h3>
+      <p>ระบบตรวจสอบอุปกรณ์ฉุกเฉิน เวชภัณฑ์ และวันหมดอายุ</p>
     </div>
-
   </div>
-
 </div>
 
-    </div>
-  <!-- ================= MENU ================= -->
-<section class="ems-check-menu">
-
-  <button class="ems-check-menu-btn" data-route="inventory-master">
-    <span class="ems-menu-icon">📦</span>
+<!-- ================= MENU: 5 HORIZONTAL CARDS ================= -->
+<section class="ems-check-menu" aria-label="Emergency Checklist Navigation">
+  <button type="button" class="ems-check-menu-btn" data-route="inventory-master">
+    <span class="ems-menu-icon" aria-hidden="true">📦</span>
     <span class="ems-menu-text">Inventory Master</span>
   </button>
 
-  <button class="ems-check-menu-btn" data-route="receive-stock">
-    <span class="ems-menu-icon">📥</span>
+  <button type="button" class="ems-check-menu-btn" data-route="branch-inventory-list" id="branchInventoryListMenu">
+    <span class="ems-menu-icon" aria-hidden="true">🧩</span>
+    <span class="ems-menu-text">Inventory List สาขา</span>
+  </button>
+
+  <button type="button" class="ems-check-menu-btn" data-route="receive-stock">
+    <span class="ems-menu-icon" aria-hidden="true">📥</span>
     <span class="ems-menu-text">Inventory Stock</span>
   </button>
 
-  <button class="ems-check-menu-btn" data-route="inventorydispense">
-    <span class="ems-menu-icon">📤</span>
+  <button type="button" class="ems-check-menu-btn" data-route="inventorydispense">
+    <span class="ems-menu-icon" aria-hidden="true">📤</span>
     <span class="ems-menu-text">Inventory Dispense</span>
   </button>
 
-
-  <button class="ems-check-menu-btn" data-route="dailycheck">
-    <span class="ems-menu-icon">📅</span>
-    <span class="ems-menu-text">Daily Check</span>
-  </button>
-
-  <button class="ems-check-menu-btn" data-route="dashboard">
-    <span class="ems-menu-icon">📋</span>
+  <button type="button" class="ems-check-menu-btn" data-route="dashboard">
+    <span class="ems-menu-icon" aria-hidden="true">📋</span>
     <span class="ems-menu-text">Report</span>
   </button>
-
 </section>
 
   <!-- ================= DAILY CHECK ================= -->

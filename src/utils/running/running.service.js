@@ -1,96 +1,30 @@
-const repo =
-  require("./running.repository");
+const repo = require("./running.repository");
+const { getBangkokDateParts } = require("./bangkok-date");
+const { maxAnnualSequence, formatAnnualNumber } = require("./annual-number-format");
 
-function pad(
-  num,
-  size = 5
-) {
-
-  return String(num)
-    .padStart(size, "0");
-
+function pad(num, size = 5) {
+  return String(num).padStart(size, "0");
 }
 
-function getYYYYMM() {
-
-  const now =
-    new Date();
-
-  const yyyy =
-    now.getFullYear();
-
-  const mm =
-    String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
-
-  return `${yyyy}${mm}`;
-
-}
-
-async function generate(
-  prefix
-) {
-
-  const ym =
-    getYYYYMM();
-
-  const key =
-    `${prefix}${ym}`;
-
-  // ======================
-  // SELECT COLUMN
-  // ======================
-  const range =
-    prefix === "MOV"
-      ? "STOCK_MOVEMENT!A:A"
-      : "STOCK_MOVEMENT!C:C";
-
-  const values =
-    await repo.getColumnValues(
-      range
-    );
-
-  // ======================
-  // FILTER PREFIX
-  // ======================
-  const matched =
-    values.filter(v =>
-      String(v)
-        .startsWith(key)
-    );
-
-  // ======================
-  // FIND MAX RUNNING
-  // ======================
-  let max = 0;
-
-  for (const value of matched) {
-
-    const parts =
-      String(value).split("-");
-
-    const running =
-      Number(parts[1] || 0);
-
-    if (running > max) {
-      max = running;
-    }
-
+function normalizeConfig(input) {
+  if (input && typeof input === "object") {
+    return {
+      prefix: String(input.prefix || ""),
+      sheet: String(input.sheet || "STOCK_MOVEMENT"),
+      column: String(input.column || "C")
+    };
   }
-
-  const next =
-    max + 1;
-
-  return `${key}-${pad(next)}`;
-
+  return { prefix: String(input || ""), sheet: "STOCK_MOVEMENT", column: "C" };
 }
 
-module.exports = {
+async function generate(input) {
+  const config = normalizeConfig(input);
+  if (!config.prefix) throw new Error("Running number prefix is required");
+  const now = new Date();
+  const { yyyy: year } = getBangkokDateParts(now);
+  const values = await repo.getColumnValues(`${config.sheet}!${config.column}:${config.column}`);
+  const next = maxAnnualSequence(values, config.prefix, year) + 1;
+  return formatAnnualNumber(config.prefix, next, now);
+}
 
-  generate,
-
-  generateRunningNumber:
-    generate
-
-};
+module.exports = { generate, generateRunningNumber: generate };

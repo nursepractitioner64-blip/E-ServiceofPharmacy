@@ -3,6 +3,14 @@ const express = require("express");
 const router = express.Router();
 
 /* =====================================================
+ * AUTHENTICATION
+ * Login/session endpoints must be mounted before protected modules.
+===================================================== */
+router.use('/auth', require('./../modules/auth/auth.routes'));
+router.use('/branches', require('../modules/branches/branches.routes'));
+router.use('/branch-inventory-list', require('../modules/branchinventorylist/branchinventorylist.routes'));
+
+/* =====================================================
  * VACCINE MASTER
  * ===================================================== */
 

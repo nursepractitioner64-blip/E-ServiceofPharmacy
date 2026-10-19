@@ -1,20 +1,8 @@
-const dayjs = require("dayjs");
+const { getBangkokDateParts } = require("./bangkok-date");
 
-
-function formatRunning(prefix, number){
-
-  const ym = dayjs().format("YYYYMM");
-
-  return (
-    prefix +
-    ym +
-    "-" +
-    String(number).padStart(5,"0")
-  );
-
+function formatRunning(prefix, number) {
+  const { yyyy, mm } = getBangkokDateParts();
+  return `${prefix}${yyyy}${mm}-${String(number).padStart(5, "0")}`;
 }
 
-
-module.exports = {
-  formatRunning
-};
+module.exports = { formatRunning };

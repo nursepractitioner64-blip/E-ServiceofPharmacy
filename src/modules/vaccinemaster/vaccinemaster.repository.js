@@ -26,7 +26,7 @@
 
    - REF_NO : RCINYYYYMM-00001
 
-   - MOVEMENT_ID : VMIYYYYMM00001
+   - MOVEMENT_ID : VMIYYYYMM-00001
 
 \========================================================= */
 
@@ -51,6 +51,9 @@ const {
 const MASTER_SHEET = "VACCINE_MASTER";
 
 const MOVEMENT_SHEET = "VACCINE_MOVEMENT";
+const { withSequenceLock } = require("../../utils/running/sequence-lock");
+const { getBangkokDateParts } = require("../../utils/running/bangkok-date");
+const { maxAnnualSequence, formatAnnualNumber } = require("../../utils/running/annual-number-format");
 
 /* =========================================================
 
@@ -1014,74 +1017,22 @@ async function deleteVaccineMaster(code) {
 
 \========================================================= */
 
-function buildNextStockRefNo(
-
-  rows = [],
-
-  now = new Date(),
-
-  type = "IN"
-
-) {
-
-  const movementType = String(type || "IN")
-
-    .trim()
-
-    .toUpperCase();
-
-  if (!["IN", "OUT"].includes(movementType)) {
-
-    throw new Error("TYPE ต้องเป็น IN หรือ OUT");
-
-  }
-
-  const year = now.getFullYear();
-
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-
-  const prefix = `RC${movementType}${year}${month}-`;
-
-  let max = 0;
-
-  for (const rawRow of rows || []) {
-
+function buildNextStockRefNo(rows = [], now = new Date(), type = "IN") {
+  const movementType = String(type || "IN").trim().toUpperCase();
+  if (!["IN", "OUT"].includes(movementType)) throw new Error("TYPE ต้องเป็น IN หรือ OUT");
+  const prefix = `RC${movementType}`;
+  const values = (rows || []).map(rawRow => {
     const row = normalizeMovement(rawRow);
-
-    const refNo = String(row.refNo || "").trim();
-
-    if (!refNo.startsWith(prefix)) {
-
-      continue;
-
-    }
-
-    const suffix = refNo.slice(prefix.length);
-
-    if (!/^\d+$/.test(suffix)) {
-
-      continue;
-
-    }
-
-    max = Math.max(max, Number(suffix));
-
-  }
-
-  const nextSequence = max + 1;
-
+    return row.refNo;
+  });
+  const { yyyy: year, mm: month } = getBangkokDateParts(now);
+  const nextSequence = maxAnnualSequence(values, prefix, year) + 1;
   return {
-
-    REF_NO: `${prefix}${String(nextSequence).padStart(5, "0")}`,
-
+    REF_NO: formatAnnualNumber(prefix, nextSequence, now),
     YEAR: year,
-
     MONTH: month,
-
     SEQUENCE: nextSequence
-
   };
-
 }
 
 /* =========================================================
@@ -1104,120 +1055,11 @@ async function getNextStockRefNo(type = "IN") {
 
 \========================================================= */
 
-function buildNextMovementId(
-
-  rows = [],
-
-  now = new Date()
-
-) {
-
-  const year =
-
-    now.getFullYear();
-
-  const month =
-
-    String(
-
-      now.getMonth() + 1
-
-    ).padStart(
-
-      2,
-
-      "0"
-
-    );
-
-  const prefix =
-
-    `VMI${year}${month}`;
-
-  let max = 0;
-
-  for (const rawRow of rows || []) {
-
-    const row =
-
-      normalizeMovement(
-
-        rawRow
-
-      );
-
-    const id =
-
-      row.movementId;
-
-    if (
-
-      !id.startsWith(prefix)
-
-    ) {
-
-      continue;
-
-    }
-
-    const match =
-
-      id.match(
-
-        /(\d+)$/
-
-      );
-
-    if (!match) {
-
-      continue;
-
-    }
-
-    const sequence =
-
-      Number(
-
-        match[1]
-
-      );
-
-    if (
-
-      Number.isFinite(sequence)
-
-    ) {
-
-      max =
-
-        Math.max(
-
-          max,
-
-          sequence
-
-        );
-
-    }
-
-  }
-
-  return (
-
-    `${prefix}${String(
-
-      max + 1
-
-    ).padStart(
-
-      5,
-
-      "0"
-
-    )}`
-
-  );
-
+function buildNextMovementId(rows = [], now = new Date()) {
+  const { yyyy: year, mm: month } = getBangkokDateParts(now);
+  const values = (rows || []).map(rawRow => normalizeMovement(rawRow).movementId);
+  const nextSequence = maxAnnualSequence(values, "VMI", year) + 1;
+  return formatAnnualNumber("VMI", nextSequence, now);
 }
 
 /* =========================================================
@@ -1464,7 +1306,7 @@ async function getVaccineStock(code) {
 
 \========================================================= */
 
-async function createVaccineStock(
+async function createVaccineStockUnlocked(
 
   data = {}
 
@@ -2016,6 +1858,12 @@ async function createVaccineStock(
 
 }
 
+
+async function createVaccineStock(data = {}) {
+  // The number shown in the form is a preview; regenerate while holding the
+  // lock so two saves in this server process cannot receive the same number.
+  return withSequenceLock("VACCINE_MOVEMENT:annual-running", () => createVaccineStockUnlocked(data));
+}
 
 /* =========================================================
    GET VACCINE DISPENSE HISTORY

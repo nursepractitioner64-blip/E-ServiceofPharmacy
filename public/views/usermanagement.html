@@ -1,0 +1,35 @@
+<section class="auth-admin-page" id="auth-user-management">
+  <div class="auth-admin-head">
+    <div>
+      <h2 class="auth-admin-title"><i class="fa-solid fa-users-gear me-2"></i>จัดการผู้ใช้งาน</h2>
+      <p class="auth-admin-subtitle">สร้างบัญชีเจ้าหน้าที่ ตั้งรหัสผ่าน และระงับบัญชี</p>
+    </div>
+    <button class="auth-admin-primary" id="auth-user-add"><i class="fa-solid fa-user-plus me-1"></i> เพิ่มผู้ใช้</button>
+  </div>
+  <div class="auth-admin-info">รหัสผ่านต้องมีอย่างน้อย 12 ตัวอักษร ระบบจะจัดเก็บเป็นแฮช ไม่บันทึกรหัสผ่านจริงใน Google Sheets</div>
+  <div id="auth-user-message" class="auth-admin-message" hidden></div>
+  <div class="auth-admin-table-card">
+    <div class="auth-admin-table-wrap">
+      <table class="auth-admin-table">
+        <thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>บทบาท</th><th>สาขาที่รับผิดชอบ</th><th>สถานะ</th><th>เข้าสู่ระบบล่าสุด</th><th class="text-end">จัดการ</th></tr></thead>
+        <tbody id="auth-user-rows"><tr><td colspan="7" class="text-center text-muted py-4">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<dialog id="auth-user-modal" class="auth-user-dialog">
+    <form id="auth-user-form">
+      <div class="auth-dialog-header"><h5 id="auth-user-modal-title">เพิ่มผู้ใช้งาน</h5><button type="button" class="auth-dialog-close" id="auth-user-close" aria-label="ปิด">×</button></div>
+      <div class="auth-dialog-body">
+        <label class="auth-form-label" for="auth-new-username">Username</label><input class="auth-form-control" id="auth-new-username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" autocomplete="off">
+        <label class="auth-form-label" for="auth-new-name">ชื่อ-นามสกุล</label><input class="auth-form-control" id="auth-new-name" required maxlength="120">
+        <label class="auth-form-label" for="auth-new-password">รหัสผ่านเริ่มต้น</label><input class="auth-form-control" id="auth-new-password" type="password" required minlength="12" autocomplete="new-password">
+        <label class="auth-form-label" for="auth-new-role">บทบาท</label><select class="auth-form-control" id="auth-new-role"><option value="STAFF">เจ้าหน้าที่ (STAFF)</option><option value="ADMIN">ผู้ดูแลระบบ (ADMIN)</option></select>
+        <label class="auth-form-label">สาขาที่รับผิดชอบ</label><div id="auth-new-branches" class="auth-branch-checks"><div class="text-muted small">กำลังโหลดสาขา...</div></div>
+      </div>
+      <div class="auth-dialog-footer"><button type="button" class="auth-admin-secondary" id="auth-user-cancel">ยกเลิก</button><button type="submit" class="auth-admin-primary" id="auth-user-save">บันทึกบัญชี</button></div>
+    </form>
+</dialog>
+
+<dialog id="auth-branch-modal" class="auth-user-dialog"><form id="auth-branch-form"><div class="auth-dialog-header"><h5 id="auth-branch-title">กำหนดสาขา</h5><button type="button" class="auth-dialog-close" id="auth-branch-close">×</button></div><div class="auth-dialog-body"><p class="text-muted small">เลือกสาขาที่เจ้าหน้าที่มีสิทธิ์บันทึกข้อมูลได้</p><div id="auth-assign-branches" class="auth-branch-checks"></div><input type="hidden" id="auth-branch-user-id"></div><div class="auth-dialog-footer"><button type="button" class="auth-admin-secondary" id="auth-branch-cancel">ยกเลิก</button><button type="submit" class="auth-admin-primary" id="auth-branch-save">บันทึกสาขา</button></div></form></dialog>

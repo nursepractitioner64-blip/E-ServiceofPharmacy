@@ -1,584 +1,1525 @@
 <!DOCTYPE html>
+
 <html lang="th">
+
+
 
 <head>
 
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Smart Pharmacy Management System</title>
-
-
-  <!-- =====================================================
-       GOOGLE FONT
-       PROMPT
-  ====================================================== -->
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-
-  <!-- =====================================================
-       FONT AWESOME
-       โหลดครั้งเดียวทั้งระบบ
-  ====================================================== -->
-
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  >
-
-
-  <!-- =====================================================
-       CSS
-  ====================================================== -->
-
-  <link rel="stylesheet" href="/assets/css/dashboard.css">
-  <link rel="stylesheet" href="/assets/css/pharmacy.css">
-  <link rel="stylesheet" href="/assets/css/dispense.css">
-  <link rel="stylesheet" href="/assets/css/emergency.css">
-  <link rel="stylesheet" href="/assets/css/inventory.css">
-  <link rel="stylesheet" href="/assets/css/receivestock.css">
-  <link rel="stylesheet" href="/assets/css/stock-balance.css">
-  <link rel="stylesheet" href="/assets/css/summarydb.css">
-  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css">
-  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.css">
-  <link rel="stylesheet"href="/modules/vaccinemasterstock/vaccinemasterstock.css">
-  <link rel="stylesheet"href="/modules/vaccinemanagement/vaccinemanagement.style.css">
+<meta name="referrer" content="no-referrer">
 
 
 
+<meta charset="UTF-8">
 
 
-  <!-- =====================================================
-       TOM SELECT
-  ====================================================== -->
 
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
-  >
+<meta
+
+name="viewport"
+
+content="width=device-width, initial-scale=1.0"
+
+>
+
+
+
+<title>Smart Pharmacy Management System</title>
+
+
+
 
 
 <!-- =====================================================
-     GLOBAL FONT CONTROL
 
-     TEXT = PROMPT
-     ICON = FONT AWESOME
+GOOGLE FONT
+
+PROMPT
+
 ====================================================== -->
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+
+
+<link
+
+rel="preconnect"
+
+href="https://fonts.gstatic.com"
+
+crossorigin
+
+>
+
+
+
+<link
+
+href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"
+
+rel="stylesheet"
+
+>
+
+
+
+
+
+<!-- =====================================================
+
+FONT AWESOME
+
+โหลดครั้งเดียวทั้งระบบ
+
+====================================================== -->
+
+
+
+<link
+
+rel="stylesheet"
+
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+
+>
+
+
+
+
+
+<!-- =====================================================
+
+CSS
+
+====================================================== -->
+
+
+
+<link rel="stylesheet" href="/assets/css/auth.css">
+
+<link rel="stylesheet" href="/assets/css/dashboard.css">
+
+<link rel="stylesheet" href="/assets/css/pharmacy.css">
+
+<link rel="stylesheet" href="/assets/css/dispense.css">
+
+<link rel="stylesheet" href="/assets/css/emergency.css">
+
+<link rel="stylesheet" href="/assets/css/inventory.css">
+
+<link rel="stylesheet" href="/assets/css/receivestock.css">
+
+<link rel="stylesheet" href="/assets/css/stock-balance.css">
+
+<link rel="stylesheet" href="/assets/css/summarydb.css">
+
+<link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css">
+
+<link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.css">
+
+<link rel="stylesheet"href="/modules/vaccinemasterstock/vaccinemasterstock.css">
+
+<link rel="stylesheet"href="/modules/vaccinemanagement/vaccinemanagement.style.css">
+
+
+
+
+
+
+
+
+
+
+
+<!-- =====================================================
+
+TOM SELECT
+
+====================================================== -->
+
+
+
+<link
+
+rel="stylesheet"
+
+href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
+
+>
+
+
+
+
+
+<!-- =====================================================
+
+GLOBAL FONT CONTROL
+
+
+
+TEXT = PROMPT
+
+ICON = FONT AWESOME
+
+====================================================== -->
+
+
 
 <style>
 
+
+
 /* =====================================================
-   GLOBAL FONT
-   TEXT ทั้งระบบ = PROMPT
+
+GLOBAL FONT
+
+TEXT ทั้งระบบ = PROMPT
+
 ===================================================== */
+
+
 
 :root {
-  --app-font-family: "Prompt", sans-serif;
+
+--app-font-family: "Prompt", sans-serif;
+
 }
+
+
 
 html,
+
 body {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
+
+
 
 body,
+
 body * {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   FORM ELEMENTS
+
+FORM ELEMENTS
+
 ===================================================== */
+
+
 
 button,
+
 input,
+
 textarea,
+
 select,
+
 option {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   TABLE
+
+TABLE
+
 ===================================================== */
+
+
 
 table,
+
 thead,
+
 tbody,
+
 tfoot,
+
 tr,
+
 th,
+
 td {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   LINKS
+
+LINKS
+
 ===================================================== */
+
+
 
 a,
+
 a * {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   MODAL
+
+MODAL
+
 ===================================================== */
+
+
 
 .modal,
+
 .modal *,
+
 #modal-root,
+
 #modal-root * {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   TOM SELECT
+
+TOM SELECT
+
 ===================================================== */
+
+
 
 .ts-control,
+
 .ts-control *,
+
 .ts-dropdown,
+
 .ts-dropdown * {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   SWEET ALERT
+
+SWEET ALERT
+
 ===================================================== */
+
+
 
 .swal2-container,
+
 .swal2-container *,
+
 .swal2-popup,
+
 .swal2-popup * {
-  font-family: "Prompt", sans-serif !important;
+
+font-family: "Prompt", sans-serif !important;
+
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME
-   ICON = FONT AWESOME
+
+FONT AWESOME
+
+ICON = FONT AWESOME
+
 ===================================================== */
+
+
 
 .fa,
+
 .fas,
+
 .far,
+
 .fal,
+
 .fab,
+
 .fad,
+
 .fa-solid,
+
 .fa-regular,
+
 .fa-light,
+
 .fa-thin,
+
 .fa-duotone,
+
 .fa-brands {
 
-  font-style: normal;
-  line-height: 1;
+
+
+font-style: normal;
+
+line-height: 1;
+
+
 
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME SOLID
+
+FONT AWESOME SOLID
+
 ===================================================== */
+
+
 
 .fa-solid,
+
 .fas {
 
-  font-family:
-    "Font Awesome 6 Free" !important;
 
-  font-weight: 900 !important;
+
+font-family:
+
+"Font Awesome 6 Free" !important;
+
+
+
+font-weight: 900 !important;
+
+
 
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME REGULAR
+
+FONT AWESOME REGULAR
+
 ===================================================== */
+
+
 
 .fa-regular,
+
 .far {
 
-  font-family:
-    "Font Awesome 6 Free" !important;
 
-  font-weight: 400 !important;
+
+font-family:
+
+"Font Awesome 6 Free" !important;
+
+
+
+font-weight: 400 !important;
+
+
 
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME BRANDS
+
+FONT AWESOME BRANDS
+
 ===================================================== */
+
+
 
 .fa-brands,
+
 .fab {
 
-  font-family:
-    "Font Awesome 6 Brands" !important;
 
-  font-weight: 400 !important;
+
+font-family:
+
+"Font Awesome 6 Brands" !important;
+
+
+
+font-weight: 400 !important;
+
+
 
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME ICON ELEMENT
+
+FONT AWESOME ICON ELEMENT
+
 ===================================================== */
+
+
 
 i[class^="fa-"],
+
 i[class*=" fa-"] {
 
-  display: inline-block;
 
-  line-height: 1;
 
-  text-rendering: auto;
+display: inline-block;
 
-  -webkit-font-smoothing: antialiased;
+
+
+line-height: 1;
+
+
+
+text-rendering: auto;
+
+
+
+-webkit-font-smoothing: antialiased;
+
+
 
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME INSIDE BUTTON
+
+FONT AWESOME INSIDE BUTTON
+
 ===================================================== */
+
+
 
 button .fa,
+
 button .fas,
+
 button .far,
+
 button .fab,
+
 button .fa-solid,
+
 button .fa-regular,
+
 button .fa-brands {
 
-  font-family:
-    "Font Awesome 6 Free" !important;
+
+
+font-family:
+
+"Font Awesome 6 Free" !important;
+
+
 
 }
 
 
+
+
+
 /* =====================================================
-   FONT AWESOME BRANDS INSIDE BUTTON
+
+FONT AWESOME BRANDS INSIDE BUTTON
+
 ===================================================== */
+
+
 
 button .fa-brands,
+
 button .fab,
+
 a .fa-brands,
+
 a .fab {
 
-  font-family:
-    "Font Awesome 6 Brands" !important;
+
+
+font-family:
+
+"Font Awesome 6 Brands" !important;
+
+
 
 }
+
+
+
 
 
 /* =====================================================
-   ICON + TEXT
 
-   ตัวอย่าง:
+ICON + TEXT
 
-   <i class="fa-solid fa-plus"></i>
-   เพิ่มข้อมูล
 
-   ICON = Font Awesome
-   TEXT = Prompt
+
+ตัวอย่าง:
+
+
+
+<i class="fa-solid fa-plus"></i>
+
+เพิ่มข้อมูล
+
+
+
+ICON = Font Awesome
+
+TEXT = Prompt
+
 ===================================================== */
 
+
+
 i[class^="fa-"],
+
 i[class*=" fa-"] {
 
-  font-family:
-    "Font Awesome 6 Free" !important;
+
+
+font-family:
+
+"Font Awesome 6 Free" !important;
+
+
 
 }
 
+
+
 i.fa-brands,
+
 i.fab {
 
-  font-family:
-    "Font Awesome 6 Brands" !important;
 
+
+font-family:
+
+"Font Awesome 6 Brands" !important;
+
+
+
+}
+
+
+
+/* =====================================================
+   SIDEBAR MENU ALIGNMENT FIX
+   All menu icons occupy the same fixed column.
+===================================================== */
+.layout > .sidebar .menu {
+  list-style: none;
+}
+
+.layout > .sidebar .menu > li {
+  margin: 4px 0;
+  min-width: 0;
+}
+
+/* Links and group buttons share the exact same 3-column layout:
+   icon | label | optional chevron */
+.layout > .sidebar .menu > li > a,
+.layout > .sidebar .menu > li > .menu-group-toggle {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 12px;
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px 12px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #d9f0ef;
+  font-family: "Prompt", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.layout > .sidebar .menu > li > a > .menu-icon,
+.layout > .sidebar .menu > li > .menu-group-toggle > .menu-icon,
+.layout > .sidebar .menu > li > a > i,
+.layout > .sidebar .menu > li > a > .fa,
+.layout > .sidebar .menu > li > a > .fas {
+  grid-column: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1;
+  font-size: 16px;
+}
+
+.layout > .sidebar .menu > li > a > span:not(.menu-icon),
+.layout > .sidebar .menu > li > .menu-group-toggle > span:not(.menu-icon) {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.layout > .sidebar .menu > li > .menu-group-toggle > .menu-chevron {
+  grid-column: 3;
+  justify-self: end;
+  margin: 0;
+  padding: 0;
+  font-size: 10px;
+  transition: transform .18s ease;
+}
+
+.layout > .sidebar .menu > li > .menu-group-toggle[aria-expanded="false"] > .menu-chevron {
+  transform: rotate(-90deg);
+}
+
+.layout > .sidebar .menu > li > a:hover,
+.layout > .sidebar .menu > li > .menu-group-toggle:hover {
+  background: rgba(255, 255, 255, .09);
+  border-color: rgba(255, 255, 255, .10);
+  color: #ffffff;
+}
+
+.layout > .sidebar .menu > li > a.active,
+.layout > .sidebar .menu > li.active > a,
+.layout > .sidebar .menu > li.is-active > .menu-group-toggle {
+  background: rgba(94, 234, 212, .14);
+  border-color: rgba(94, 234, 212, .25);
+  color: #ffffff;
+  font-weight: 500;
+  box-shadow: inset 3px 0 #5eead4;
+}
+
+/* Nested links use the same fixed icon column, just slightly smaller. */
+.layout > .sidebar .menu > .menu-group > .submenu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 8px 22px;
+  padding: 3px 0 3px 10px;
+  border-left: 1px solid rgba(178, 217, 216, .28);
+}
+
+.layout > .sidebar .menu > .menu-group > .submenu[hidden],
+.layout > .sidebar .menu > .menu-group > .menu-group-toggle[aria-expanded="false"] + .submenu {
+  display: none !important;
+}
+
+.layout > .sidebar .submenu > li {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.layout > .sidebar .submenu > li > a {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 9px;
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #c5e3e1;
+  font-family: "Prompt", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.layout > .sidebar .submenu > li > a > .submenu-marker {
+  grid-column: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1;
+  font-size: 14px;
+}
+
+.layout > .sidebar .submenu > li > a > span:not(.submenu-marker) {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.layout > .sidebar .submenu > li > a:hover,
+.layout > .sidebar .submenu > li.active > a,
+.layout > .sidebar .submenu > li > a.active {
+  background: rgba(255, 255, 255, .09);
+  border-color: rgba(255, 255, 255, .10);
+  color: #ffffff;
+}
+
+.layout.sidebar-collapsed > .sidebar .menu > li > a,
+.layout.sidebar-collapsed > .sidebar .menu > li > .menu-group-toggle {
+  grid-template-columns: 22px 0 0;
+  justify-content: center;
+  column-gap: 0;
+  padding: 10px 6px;
+  font-size: 0;
+}
+
+.layout.sidebar-collapsed > .sidebar .menu > li > a > span:not(.menu-icon),
+.layout.sidebar-collapsed > .sidebar .menu > li > .menu-group-toggle > span:not(.menu-icon),
+.layout.sidebar-collapsed > .sidebar .menu > li > .menu-group-toggle > .menu-chevron,
+.layout.sidebar-collapsed > .sidebar .menu > .menu-group > .submenu {
+  display: none !important;
+}
+
+.layout.sidebar-collapsed > .sidebar .menu > li > a > .menu-icon,
+.layout.sidebar-collapsed > .sidebar .menu > li > .menu-group-toggle > .menu-icon {
+  grid-column: 1;
+  font-size: 18px;
+}
+
+.layout > .sidebar .menu a:focus-visible,
+.layout > .sidebar .menu button:focus-visible {
+  outline: 2px solid #5eead4;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .layout > .sidebar .menu > li > a,
+  .layout > .sidebar .menu > li > .menu-group-toggle {
+    font-size: 13px;
+  }
 }
 
 </style>
 
+
+
 </head>
+
+
+
 
 
 <body>
 
 
-<div class="layout">
 
+<div id="auth-screen" role="main" aria-labelledby="auth-login-title">
 
-  <!-- =====================================================
-       SIDEBAR
-  ====================================================== -->
+<section class="auth-card">
 
-  <aside class="sidebar">
+<div class="auth-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
 
+<h1 class="auth-title" id="auth-login-title">E-ServiceofPharmacy</h1>
 
-    <!-- =================================================
-         BRAND
-    ================================================== -->
+<p class="auth-subtitle">เข้าสู่ระบบเพื่อใช้งาน Emergency Checklist</p>
 
-    <div class="brand">
+<form id="auth-login-form" autocomplete="on">
 
-      <div class="brand-logo">
+<div id="auth-login-error" class="auth-error" role="alert" hidden></div>
 
-        <!-- ยังคง emoji เดิม -->
+<label class="auth-field" for="auth-username">ชื่อผู้ใช้ (Username)</label>
 
-        💊
+<div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input class="auth-input" id="auth-username" name="username" type="text" autocomplete="username" required maxlength="50" autocapitalize="none"></div>
 
-      </div>
+<label class="auth-field" for="auth-password">รหัสผ่าน (Password)</label>
 
+<div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input class="auth-input" id="auth-password" name="password" type="password" autocomplete="current-password" required></div>
 
-      <div>
+<button id="auth-login-submit" type="submit"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ</button>
 
-        <h2>
-          Smart Stock
-        </h2>
+</form>
 
-        <p>
-          Management System
-        </p>
+<div class="auth-login-divider"><span>หรือ</span></div>
 
-      </div>
+<a id="auth-line-login-button" class="auth-line-login-button" href="/api/auth/line/authorize"><i class="fa-brands fa-line"></i> เข้าสู่ระบบด้วย LINE (สแกน QR Code)</a>
 
-    </div>
+<p class="auth-line-login-help">เปิดหน้าล็อกอิน LINE เพื่อสแกน QR Code ด้วยแอป LINE</p>
 
+<button id="auth-register-open" class="auth-register-open" type="button"><i class="fa-solid fa-user-plus"></i> สมัครสมาชิก</button>
 
-    <!-- =================================================
-         MENU
-    ================================================== -->
+<div id="auth-register-choice" class="auth-register-choice" hidden>
 
-    <ul class="menu">
+<div id="auth-register-choice-error" class="auth-error" role="alert" hidden></div>
 
+<div class="auth-register-choice-intro">เลือกวิธีสมัครสมาชิก</div>
 
-      <!-- =================================================
-           DASHBOARD
-      ================================================== -->
+<button id="auth-register-manual-choice" class="auth-register-choice-button" type="button"><i class="fa-solid fa-rectangle-list"></i><span><strong>สมัครโดยกรอกข้อมูล</strong><small>กรอกข้อมูลส่วนตัวและตั้ง Username / Password</small></span><i class="fa-solid fa-chevron-right"></i></button>
 
-      <li>
+<button id="auth-register-line-choice" class="auth-register-choice-button auth-register-choice-line" type="button"><i class="fa-brands fa-line"></i><span><strong>สมัครผ่าน LINE</strong><small>ยืนยันตัวตนผ่าน LINE ก่อนกรอกรายละเอียด</small></span><i class="fa-solid fa-chevron-right"></i></button>
 
-        <a
-          href="#"
-          data-route="dashboard"
-        >
+<button id="auth-register-choice-back" class="auth-register-back" type="button">กลับไปหน้า Login</button>
 
-          <!-- Emoji เดิม -->
+</div>
 
-          📊
+<form id="auth-register-form" autocomplete="off" hidden>
 
-          <span>
-            Dashboard
-          </span>
+<div id="auth-register-error" class="auth-error" role="alert" hidden></div>
 
-        </a>
+<p class="auth-register-note">บัญชีใหม่จะมีสถานะรออนุมัติ และ Admin ต้องกำหนดสาขาก่อนเข้าใช้งาน</p>
 
-      </li>
+<div id="auth-register-line-status" class="auth-register-line-status" hidden>ยังไม่ได้ยืนยัน LINE</div>
 
+<button id="auth-register-line" class="auth-register-line" type="button" hidden><i class="fa-brands fa-line"></i> ยืนยันตัวตนด้วย LINE</button>
 
-      <!-- =================================================
-           CONTROLLED DRUG
-      
+<input id="auth-reg-line-token" type="hidden" value="">
 
-      <li>
+<label class="auth-field" for="auth-reg-full-th">ชื่อ–นามสกุลภาษาไทย</label>
 
-        <a
-          href="#"
-          data-route="controlled-drug"
-        >
+<input class="auth-input auth-reg-input" id="auth-reg-full-th" required maxlength="120">
 
-         
+<label class="auth-field" for="auth-reg-full-en">ชื่อ–นามสกุลภาษาอังกฤษ</label>
 
-          💊
+<input class="auth-input auth-reg-input" id="auth-reg-full-en" required maxlength="120" autocomplete="name">
 
-          <span>
-            Smart Controlled Drug
-          </span>
+<label class="auth-field" for="auth-reg-position">ตำแหน่ง</label>
 
-        </a>
+<select class="auth-input auth-reg-input" id="auth-reg-position" required>
 
-      </li>
-      ================================================== -->
+<option value="">-- เลือกตำแหน่ง --</option><option value="Register Nurse">Register Nurse</option><option value="Public Health">Public Health</option>
 
+</select>
 
-      <!-- =================================================
-           EMERGENCY CHECKLIST
-      ================================================== -->
+<label class="auth-field" for="auth-reg-employment">ประเภทการจ้างงาน</label>
 
-      <li>
+<select class="auth-input auth-reg-input" id="auth-reg-employment" required>
 
-        <a
-          href="#"
-          data-route="emergency-checklist"
-        >
+<option value="">-- เลือกประเภท --</option><option value="Full-Time">Full-Time</option><option value="Part-Time">Part-Time</option>
 
-          <!-- Emoji เดิม -->
+</select>
 
-          🚑
+<label class="auth-field" for="auth-reg-username">Username</label>
 
-          <span>
-            Emergency Checklist
-          </span>
+<input class="auth-input auth-reg-input" id="auth-reg-username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" autocomplete="username">
 
-        </a>
+<label class="auth-field" for="auth-reg-phone">เบอร์โทรศัพท์</label>
 
-      </li>
+<input class="auth-input auth-reg-input" id="auth-reg-phone" type="tel" required maxlength="30" autocomplete="tel">
 
-      <!-- =================================================
-          Immunization Services
-      ================================================== -->
+<label class="auth-field" for="auth-reg-email">Email</label>
 
-      <li>
+<input class="auth-input auth-reg-input" id="auth-reg-email" type="email" required maxlength="160" autocomplete="email">
 
-        <a
-          href="#"
-          data-route="vaccine-management"
-        >
+<label class="auth-field" for="auth-reg-password">Password</label>
 
-          💉
+<input class="auth-input auth-reg-input" id="auth-reg-password" type="password" required minlength="8" autocomplete="new-password">
 
-          <span>
-            IMMUNIZATION SERVICES
-          </span>
+<label class="auth-field" for="auth-reg-confirm">Confirm Password</label>
 
-        </a>
+<input class="auth-input auth-reg-input" id="auth-reg-confirm" type="password" required minlength="8" autocomplete="new-password">
 
-      </li>
+<button id="auth-register-submit" class="auth-register-submit" type="submit">สมัครสมาชิก</button>
 
+<button id="auth-register-back" class="auth-register-back" type="button">กลับไปเลือกวิธีสมัคร</button>
 
-      <!-- =================================================
-           REPORT
-      ================================================== -->
+</form>
 
-      <li>
+<p class="auth-footnote" id="auth-login-footnote">บัญชีใหม่ต้องได้รับอนุมัติจากผู้ดูแลก่อนเข้าใช้งาน</p>
 
-        <a href="#">
+</section>
 
-          <!-- Emoji เดิม -->
+</div>
 
-          📄
 
-          <span>
-            Report
-          </span>
 
-        </a>
+<div id="branch-select-screen" class="branch-select-screen" hidden role="dialog" aria-modal="true" aria-labelledby="branch-select-title">
 
-      </li>
+<section class="branch-select-card">
 
+<div class="auth-brand-icon"><i class="fa-solid fa-code-branch"></i></div>
 
-      <!-- =================================================
-           SETTINGS
-      ================================================== -->
+<h2 id="branch-select-title">เลือกสาขาที่ปฏิบัติงาน</h2>
 
-      <li>
+<p id="branch-select-subtitle">ระบบจะจำสาขาล่าสุดของคุณ</p>
 
-        <a href="#">
+<div id="branch-select-error" class="auth-error" role="alert" hidden></div>
 
-          <!-- Emoji เดิม -->
+<div id="branch-select-options" class="branch-select-options"></div>
 
-          🛠️
+<button id="branch-select-confirm" type="button" disabled><i class="fa-solid fa-arrow-right"></i> เข้าสู่ระบบ</button>
 
-          <span>
-            Settings
-          </span>
+<button id="branch-select-cancel" type="button" class="branch-select-cancel" hidden>ยกเลิก</button>
 
-        </a>
+</section>
 
-      </li>
+</div>
 
 
-    </ul>
 
-  </aside>
+<div class="layout" style="display:none">
 
 
-  <!-- =====================================================
-       MAIN
-  ====================================================== -->
 
-  <main class="main">
 
-    <div id="app"></div>
 
-  </main>
+<!-- =====================================================
+
+SIDEBAR
+
+====================================================== -->
+
+
+
+<aside class="sidebar">
+
+
+
+
+
+<!-- =================================================
+
+BRAND
+
+================================================== -->
+
+
+
+<div class="brand">
+
+<div class="brand-logo">💊</div>
+
+<div class="brand-copy">
+
+<h2>Smart Stock</h2>
+
+<p>Management System</p>
+
+</div>
+
+<button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="พับหรือขยายเมนู" aria-expanded="true" title="พับหรือขยายเมนู">
+
+<i class="fa-solid fa-angles-left"></i>
+
+</button>
+
+</div>
+
+
+
+<!-- =================================================
+
+MENU
+
+================================================== -->
+
+
+
+<ul class="menu">
+
+<!-- DASHBOARD -->
+
+<li>
+
+<a href="#" data-route="dashboard">
+
+<span class="menu-icon">📊</span>
+
+<span>Dashboard</span>
+
+</a>
+
+</li>
+
+
+
+<!-- NURSE DAILY CHECKLIST -->
+
+<li class="menu-group">
+
+<button class="menu-group-toggle" type="button" aria-expanded="true" aria-controls="submenu-nurse-daily">
+
+<span class="menu-icon">📋</span>
+
+<span>Nurse Daily Checklist</span>
+
+<i class="fa-solid fa-chevron-down menu-chevron" aria-hidden="true"></i>
+
+</button>
+
+<ul class="submenu" id="submenu-nurse-daily">
+
+<li>
+
+<a href="#" data-route="emergency-checklist">
+
+<span class="submenu-marker">🚑</span>
+
+<span>Emergency</span>
+
+</a>
+
+</li>
+
+</ul>
+
+</li>
+
+
+
+<!-- NURSE SERVICES -->
+
+<li class="menu-group">
+
+<button class="menu-group-toggle" type="button" aria-expanded="true" aria-controls="submenu-nurse-services">
+
+<span class="menu-icon">🩺</span>
+
+<span>Nurse SERVICES</span>
+
+<i class="fa-solid fa-chevron-down menu-chevron" aria-hidden="true"></i>
+
+</button>
+
+<ul class="submenu" id="submenu-nurse-services">
+
+<li>
+
+<a href="#" data-route="vaccine-management">
+
+<span class="submenu-marker">💉</span>
+
+<span>IMMUNIZATION</span>
+
+</a>
+
+</li>
+
+</ul>
+
+</li>
+
+
+
+<!-- USER MANAGEMENT (ADMIN) -->
+
+<li id="auth-admin-menu" hidden>
+
+<a href="#" data-route="user-management">
+
+<i class="fa-solid fa-users-gear"></i>
+
+<span>จัดการผู้ใช้งาน</span>
+
+</a>
+
+</li>
+
+<li id="auth-admin-branch-menu" hidden>
+
+<a href="#" data-route="branch-management">
+
+<i class="fa-solid fa-code-branch"></i>
+
+<span>จัดการสาขา</span>
+
+</a>
+
+</li>
+
+
+
+<!-- REPORT -->
+
+<li>
+
+<a href="#">
+
+<span class="menu-icon">📄</span>
+
+<span>Report</span>
+
+</a>
+
+</li>
+
+
+
+<!-- SETTINGS -->
+
+<li>
+
+<a href="#">
+
+<span class="menu-icon">🛠️</span>
+
+<span>Settings</span>
+
+</a>
+
+</li>
+
+</ul>
+
+
+
+</aside>
+
+
+
+
+
+<!-- =====================================================
+
+MAIN
+
+====================================================== -->
+
+
+
+<main class="main">
+
+<div class="app-topbar">
+
+<div class="app-topbar-context">
+
+<span class="app-topbar-label">E-ServiceofPharmacy</span>
+
+<span class="app-topbar-subtitle">Pharmacy Management</span>
+
+</div>
+
+<div class="app-user-menu">
+
+<button id="app-user-menu-toggle" class="app-user-menu-toggle" type="button" aria-expanded="false" aria-controls="auth-user-panel">
+
+<span class="app-user-avatar"><i class="fa-solid fa-user-nurse"></i></span>
+
+<span class="app-user-menu-copy"><strong id="app-user-display-name">ผู้ใช้งานระบบ</strong><small id="app-user-display-branch">บัญชีและสาขา</small></span>
+
+<i class="fa-solid fa-chevron-down app-user-chevron"></i>
+
+</button>
+
+<div id="auth-user-panel" class="app-user-panel" hidden>
+
+<div class="app-user-details">
+
+<div id="auth-current-name"></div>
+
+<div id="auth-current-role"></div>
+
+<div id="auth-current-branch" class="auth-current-branch" hidden></div>
+
+</div>
+
+<button id="auth-switch-branch-button" type="button"><i class="fa-solid fa-code-branch"></i> เปลี่ยนสาขา</button>
+
+<div id="auth-line-link-status" class="auth-line-link-status">กำลังตรวจสอบสถานะ LINE...</div>
+
+<button id="auth-link-line-button" class="auth-link-line-button" type="button"><i class="fa-brands fa-line"></i> ผูกบัญชี LINE กับบัญชีเดิม</button>
+
+<button id="auth-logout-button" type="button"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="app"></div>
+
+</main>
+
+
+
 
 
 </div>
 
 
+
+
+
 <!-- =====================================================
-     MODAL ROOT
+
+MODAL ROOT
+
 ====================================================== -->
+
+
 
 <div id="modal-root"></div>
 
 
-<!-- =====================================================
-     SWEET ALERT
-====================================================== -->
 
-<script
-  src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-</script>
 
 
 <!-- =====================================================
-     TOM SELECT
+
+SWEET ALERT
+
 ====================================================== -->
 
+
+
 <script
-  src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js">
+
+src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+
 </script>
+
+
+
 
 
 <!-- =====================================================
-     MODAL
+
+TOM SELECT
+
 ====================================================== -->
 
+
+
 <script
-  src="/assets/js/modal.js">
+
+src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js">
+
 </script>
+
+
+
 
 
 <!-- =====================================================
-     APPLICATION
+
+MODAL
+
 ====================================================== -->
 
+
+
 <script
-  type="module"
-  src="/assets/js/app.js">
+
+src="/assets/js/modal.js">
+
 </script>
+
+
+
+<!-- Global autocomplete from this user's previously entered values -->
+
+<script src="/assets/js/input-history.js"></script>
+
+
+
+<!-- LINE LIFF SDK for shared account registration -->
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<script src="/assets/js/auth.register.js"></script>
+
+<script src="/assets/js/auth.link-line.js"></script>
+
+
+
+<!-- =====================================================
+
+APPLICATION
+
+====================================================== -->
+
+
+
+<script
+
+type="module"
+
+src="/assets/js/app.js">
+
+</script>
+
+
+
+
+
+
+
+<script>
+
+(() => {
+
+const layout = document.querySelector('.layout');
+
+const sidebarToggle = document.getElementById('sidebar-toggle');
+
+const userToggle = document.getElementById('app-user-menu-toggle');
+
+const userPanel = document.getElementById('auth-user-panel');
+
+const userName = document.getElementById('auth-current-name');
+
+const userBranch = document.getElementById('auth-current-branch');
+
+const displayName = document.getElementById('app-user-display-name');
+
+const displayBranch = document.getElementById('app-user-display-branch');
+
+
+
+sidebarToggle?.addEventListener('click', () => {
+
+const collapsed = layout.classList.toggle('sidebar-collapsed');
+
+sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+
+sidebarToggle.title = collapsed ? 'ขยายเมนู' : 'พับเมนู';
+
+sidebarToggle.innerHTML = collapsed
+
+? '<i class="fa-solid fa-angles-right"></i>'
+
+: '<i class="fa-solid fa-angles-left"></i>';
+
+});
+
+
+
+// Expand/collapse the two nested Sidebar groups.
+
+document.querySelectorAll('.menu-group-toggle').forEach((button) => {
+
+button.addEventListener('click', () => {
+
+const expanded = button.getAttribute('aria-expanded') === 'true';
+
+const submenuId = button.getAttribute('aria-controls');
+
+const submenu = submenuId ? document.getElementById(submenuId) : null;
+
+button.setAttribute('aria-expanded', String(!expanded));
+
+if (submenu) submenu.hidden = expanded;
+
+});
+
+});
+
+
+
+userToggle?.addEventListener('click', () => {
+
+if (!userPanel || userPanel.hidden) return;
+
+const opening = userPanel.classList.toggle('is-open');
+
+userToggle.setAttribute('aria-expanded', String(opening));
+
+});
+
+
+
+document.addEventListener('click', (event) => {
+
+const menu = document.querySelector('.app-user-menu');
+
+if (menu && !menu.contains(event.target)) {
+
+userPanel?.classList.remove('is-open');
+
+userToggle?.setAttribute('aria-expanded', 'false');
+
+}
+
+});
+
+
+
+const syncUserSummary = () => {
+
+const name = userName?.textContent?.trim();
+
+const branch = userBranch?.textContent?.trim();
+
+if (name) displayName.textContent = name;
+
+if (branch) displayBranch.textContent = branch;
+
+};
+
+if (userName) new MutationObserver(syncUserSummary).observe(userName, { childList: true, subtree: true, characterData: true });
+
+if (userBranch) new MutationObserver(syncUserSummary).observe(userBranch, { childList: true, subtree: true, characterData: true });
+
+syncUserSummary();
+
+})();
+
+</script>
+
 
 
 </body>
+
+
 
 </html>

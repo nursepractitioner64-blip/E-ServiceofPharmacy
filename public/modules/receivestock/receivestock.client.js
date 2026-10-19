@@ -264,6 +264,40 @@ async function loadRefNo() {
 }
 
 /* =========================
+   AUTHENTICATED BRANCH CONTEXT
+   BRANCH_ID and LOCATION are filled from the server session.
+   ========================= */
+async function loadReceiveBranchContext() {
+  const branchInput = document.getElementById("rsmBranchId");
+  const locationInput = document.getElementById("rsmLocation");
+  const userInput = document.getElementById("rsmUser");
+
+  try {
+    const res = await fetch("/api/receivestock/context", {
+      method: "GET",
+      headers: { "Accept": "application/json" },
+      credentials: "same-origin"
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json.ok !== true || !json.data) {
+      throw new Error(json.message || "ไม่พบสาขาที่ปฏิบัติงาน กรุณาเลือกสาขาก่อนรับสินค้า");
+    }
+
+    if (branchInput) branchInput.value = String(json.data.branchId || "");
+    if (locationInput) locationInput.value = String(json.data.location || "");
+    if (userInput && json.data.user) userInput.value = String(json.data.user);
+
+    return true;
+  } catch (err) {
+    console.error("❌ RECEIVE BRANCH CONTEXT:", err);
+    if (branchInput) branchInput.value = "";
+    if (locationInput) locationInput.value = "";
+    return false;
+  }
+}
+
+/* =========================
    DRUG SELECT
    ========================= */
 function bindDrugSelect() {
@@ -524,6 +558,18 @@ function bindModal() {
         }
       });
 
+      /* Resolve branch/location from authenticated server session. */
+      const branchReady = await loadReceiveBranchContext();
+      if (!branchReady) {
+        modalClose();
+        await Swal.fire({
+          icon: "warning",
+          title: "ยังไม่ได้เลือกสาขาปฏิบัติงาน",
+          text: "กรุณาเลือกสาขาที่คุณได้รับอนุญาตก่อนรับสินค้าเข้า"
+        });
+        return;
+      }
+
       /* Current date */
       const dateInput =
         document.getElementById("rsmDateIn");
@@ -667,6 +713,9 @@ function getReceivePayload(form) {
   const payload = Object.fromEntries(fd.entries());
 
   return {
+    // Required warehouse identity fields; these must reach the API.
+    branchId: String(payload.branchId || "").trim(),
+    location: String(payload.location || "").trim(),
     dateIn: payload.dateIn || "",
     code: payload.code || "",
     name: payload.name || "",
@@ -677,8 +726,7 @@ function getReceivePayload(form) {
     supplier: payload.supplier || "",
     user: payload.user || "",
     receivestockNo: payload.receivestockNo || "",
-    remark: payload.remark || "",
-    location: payload.location || ""
+    remark: payload.remark || ""
   };
 }
 
@@ -690,12 +738,13 @@ async function saveReceiveStock(form) {
 
   console.log("📤 SAVE RECEIVE PAYLOAD =", payload);
 
-  if (!payload.code || !payload.name || !payload.qty ||
+  if (!payload.branchId || !payload.location ||
+      !payload.code || !payload.name || !payload.qty ||
       !payload.lot || !payload.exp || !payload.supplier || !payload.user) {
     await Swal.fire({
       icon: "warning",
       title: "ข้อมูลไม่ครบ",
-      text: "กรุณาตรวจสอบ รหัสยา ชื่อยา จำนวน LOT EXP Supplier และ User"
+      text: "กรุณาตรวจสอบ BRANCH_ID, LOCATION, รหัสยา ชื่อยา จำนวน LOT EXP Supplier และ User"
     });
     return;
   }
@@ -852,6 +901,7 @@ export async function init() {
   bindStickerButton();
 
   await loadDrugDropdown();
+  await loadReceiveBranchContext();
   await loadReceiveStock();
   await loadRefNo();
 

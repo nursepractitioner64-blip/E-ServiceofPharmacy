@@ -1,7 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const { getBangkokDateParts } = require("../../utils/running/bangkok-date");
+const { nextAnnualSheetNumber } = require("../../utils/running/annual-sheet-number");
 
 const { getSheets } = require("../../config/google");
+const { requireAuth, requireBranch } = require("../auth/auth.middleware");
+const { getBranchInventoryList } = require("../branchinventorylist/branchinventorylist.service");
+
+// Daily Check API requires a valid server-side session.
+router.use(requireAuth);
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
@@ -10,41 +17,12 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID;
    HELPER
 ===================================================== */
 
-function generateSessionId() {
-
-  const now = new Date();
-
-  const pad = (n, len = 2) =>
-    String(n).padStart(len, "0");
-
-  const yyyy = now.getFullYear();
-  const mm = pad(now.getMonth() + 1);
-  const dd = pad(now.getDate());
-  const hh = pad(now.getHours());
-  const mi = pad(now.getMinutes());
-  const ss = pad(now.getSeconds());
-  const ms = String(now.getMilliseconds()).padStart(3, "0");
-
-  return `DCS-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${ms}`;
+async function generateSessionId() {
+  return nextAnnualSheetNumber({ sheet: "COUNT_SESSION", column: "A", prefix: "DCS" });
 }
 
-
-function generateMovementId() {
-
-  const now = new Date();
-
-  const pad = (n, len = 2) =>
-    String(n).padStart(len, "0");
-
-  const yyyy = now.getFullYear();
-  const mm = pad(now.getMonth() + 1);
-  const dd = pad(now.getDate());
-  const hh = pad(now.getHours());
-  const mi = pad(now.getMinutes());
-  const ss = pad(now.getSeconds());
-  const ms = String(now.getMilliseconds()).padStart(3, "0");
-
-  return `DCM-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${ms}`;
+async function generateMovementId() {
+  return nextAnnualSheetNumber({ sheet: "COUNT_SESSION", column: "B", prefix: "DCM" });
 }
 
 
@@ -183,7 +161,7 @@ function parseDate(value) {
    GET /api/dailycheck?month=9&year=2026
 ===================================================== */
 
-router.get("/", async (req, res) => {
+router.get("/", requireBranch, async (req, res) => {
 
   try {
 
@@ -293,14 +271,21 @@ router.get("/", async (req, res) => {
         data: [],
 
         recorders: {},
+        branchId: req.authBranchId,
 
       });
 
     }
 
 
-    const masterRows =
-      masterValues.slice(1);
+    const masterRowsRaw = masterValues.slice(1);
+    const branchInventoryItems = await getBranchInventoryList(req.authBranchId);
+    const branchInventoryByCode = new Map(
+      branchInventoryItems.filter(item => item.enabled).map(item => [item.code, item])
+    );
+    // Daily Check only displays items enabled for the selected branch. Required
+    // EMER001-EMER078 are enforced by the branch inventory service; EMER079 is optional.
+    const masterRows = masterRowsRaw.filter(row => branchInventoryByCode.has(String(row[0] || "").trim().toUpperCase()));
 
 
     // =================================================
@@ -322,7 +307,7 @@ router.get("/", async (req, res) => {
           SHEET_ID,
 
         range:
-          "COUNT_SESSION!A:G",
+          "COUNT_SESSION!A:H",
 
       });
 
@@ -352,7 +337,19 @@ router.get("/", async (req, res) => {
     // READ COUNT SESSION
     // =================================================
 
+    const currentBranchId = String(req.authBranchId || "").trim();
+
     countRows.forEach((row) => {
+
+      // -----------------------------------------------
+      // H = BRANCH_ID
+      // รายการเก่าที่ไม่มี BRANCH_ID จะไม่ถูกนำไปแสดง
+      // ในสาขาปัจจุบัน เพื่อไม่เดาสาขาของข้อมูลย้อนหลัง
+      // -----------------------------------------------
+      const rowBranchId = String(row[7] || "").trim();
+      if (!currentBranchId || rowBranchId !== currentBranchId) {
+        return;
+      }
 
       // -----------------------------------------------
       // C = CODE
@@ -552,10 +549,8 @@ router.get("/", async (req, res) => {
         );
 
 
-      const required =
-        Number(
-          row[3] || 0
-        );
+      const branchItem = branchInventoryByCode.get(code.toUpperCase());
+      const required = branchItem ? Number(branchItem.required) : Number(row[3] || 0);
 
 
       const obj = {
@@ -629,6 +624,7 @@ router.get("/", async (req, res) => {
       {
         month,
         year,
+        branchId: currentBranchId,
         rows:
           output.length,
         recorders:
@@ -651,6 +647,8 @@ router.get("/", async (req, res) => {
 
       year:
         year,
+
+      branchId: currentBranchId,
 
       data:
         output,
@@ -701,6 +699,7 @@ router.get("/", async (req, res) => {
 
 router.post(
   "/check",
+  requireBranch,
   async (req, res) => {
 
     try {
@@ -708,7 +707,6 @@ router.post(
       const {
         code,
         balance,
-        user,
       } =
         req.body || {};
 
@@ -737,6 +735,11 @@ router.post(
 
       }
 
+      const branchInventoryItems = await getBranchInventoryList(req.authBranchId);
+      const branchItem = branchInventoryItems.find(item => item.code === cleanCode.toUpperCase() && item.enabled);
+      if (!branchItem) {
+        return res.status(403).json({ ok: false, message: `รายการ ${cleanCode} ไม่ได้อยู่ใน Inventory List ของสาขาที่เลือก` });
+      }
 
       // =================================================
       // BALANCE
@@ -786,13 +789,14 @@ router.post(
       // USER
       // =================================================
 
-      const cleanUser =
-        String(
-          user ||
-          req.user?.name ||
-          req.user?.username ||
-          "system"
-        ).trim();
+      // ใช้ตัวตนจาก Session ที่ Server ตรวจสอบแล้วเท่านั้น
+      const cleanUser = String(
+        req.authUser?.fullName || req.authUser?.username || ""
+      ).trim();
+
+      if (!cleanUser) {
+        return res.status(401).json({ ok: false, message: "ไม่พบตัวตนผู้ใช้งาน กรุณาเข้าสู่ระบบใหม่" });
+      }
 
 
       // =================================================
@@ -864,9 +868,7 @@ router.post(
               ),
 
             REQUIRED:
-              Number(
-                row[3] || 0
-              ),
+              Number(branchItem.required),
 
           };
 
@@ -910,11 +912,11 @@ router.post(
       // =================================================
 
       const sessionId =
-        generateSessionId();
+        await generateSessionId();
 
 
       const movementId =
-        generateMovementId();
+        await generateMovementId();
 
 
       // =================================================
@@ -929,23 +931,12 @@ router.post(
       // G TIME
       // =================================================
 
-      const newRow = [
-
-        sessionId,
-
-        movementId,
-
-        item.CODE,
-
-        item.NAME,
-
-        qty,
-
-        cleanUser,
-
-        isoTime,
-
-      ];
+      // Keep historical rows unchanged; new records carry BRANCH_ID in column H.
+      const branchHeader = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "COUNT_SESSION!H1" });
+      if (!branchHeader.data.values?.[0]?.[0]) {
+        await sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range: "COUNT_SESSION!H1", valueInputOption: "RAW", requestBody: { values: [["BRANCH_ID"]] } });
+      }
+      const newRow = [sessionId, movementId, item.CODE, item.NAME, qty, cleanUser, isoTime, req.authBranchId];
 
 
       // =================================================
@@ -958,7 +949,7 @@ router.post(
           SHEET_ID,
 
         range:
-          "COUNT_SESSION!A:G",
+          "COUNT_SESSION!A:H",
 
         valueInputOption:
           "USER_ENTERED",
@@ -991,6 +982,8 @@ router.post(
           qty,
           user:
             cleanUser,
+          branchId:
+            req.authBranchId,
           time:
             isoTime,
         }

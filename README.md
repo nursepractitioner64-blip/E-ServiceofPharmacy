@@ -319,3 +319,14 @@ Symbols
 | 📋   | **Nursing Documentation** | บันทึกทางการพยาบาล       | บันทึกการปฏิบัติงานและข้อมูลทางการพยาบาล |
 | 📄   | **Reports & Analytics**   | รายงานและวิเคราะห์ข้อมูล | รายงาน สถิติ และการวิเคราะห์             |
 | 🛠️  | **System Settings**       | ตั้งค่าระบบ              | ผู้ใช้ สิทธิ์ และการตั้งค่าระบบ          |
+
+
+## สมัครสมาชิกผ่าน LINE (ใช้บัญชีร่วมกับ E-StockScan)
+
+- ตั้งค่า `LINE_CHANNEL_ID` เป็น LINE Login channel ID เดียวกับ E-StockScan
+- ตั้งค่า `LINE_LIFF_ID` เป็น LIFF app ID ที่ endpoint URL ชี้มาที่ deployment ของ E-ServiceofPharmacy
+- LIFF ต้องเปิด scope `openid` และ `profile`
+- ตั้งค่า `GOOGLE_SHEET_ID` ให้ตรงกับ E-StockScan และใช้ชีต `USERS` เดียวกัน
+- การสมัครใหม่จะถูกบันทึกเป็น `STATUS=PENDING`, `ROLE=USER`, `BRANCH_IDS` ว่าง จนกว่า Admin จะอนุมัติและกำหนดสิทธิ์
+- LINE identity ได้จาก ID Token ที่เซิร์ฟเวอร์ตรวจสอบกับ LINE เท่านั้น
+- รหัสผ่านใช้ scrypt และรองรับรูปแบบ hash เดิมร่วมกับ E-StockScan

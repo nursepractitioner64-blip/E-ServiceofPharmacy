@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const { getBangkokDateParts } = require("../../../utils/running/bangkok-date");
+const { nextAnnualSheetNumber } = require("../../../utils/running/annual-sheet-number");
 
 const { getSheets } = require("../../config/google");
 
@@ -10,41 +12,12 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID;
    HELPER
 ===================================================== */
 
-function generateSessionId() {
-
-  const now = new Date();
-
-  const pad = (n, len = 2) =>
-    String(n).padStart(len, "0");
-
-  const yyyy = now.getFullYear();
-  const mm = pad(now.getMonth() + 1);
-  const dd = pad(now.getDate());
-  const hh = pad(now.getHours());
-  const mi = pad(now.getMinutes());
-  const ss = pad(now.getSeconds());
-  const ms = String(now.getMilliseconds()).padStart(3, "0");
-
-  return `DCS-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${ms}`;
+async function generateSessionId() {
+  return nextAnnualSheetNumber({ sheet: "COUNT_SESSION", column: "A", prefix: "DCS" });
 }
 
-
-function generateMovementId() {
-
-  const now = new Date();
-
-  const pad = (n, len = 2) =>
-    String(n).padStart(len, "0");
-
-  const yyyy = now.getFullYear();
-  const mm = pad(now.getMonth() + 1);
-  const dd = pad(now.getDate());
-  const hh = pad(now.getHours());
-  const mi = pad(now.getMinutes());
-  const ss = pad(now.getSeconds());
-  const ms = String(now.getMilliseconds()).padStart(3, "0");
-
-  return `DCM-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${ms}`;
+async function generateMovementId() {
+  return nextAnnualSheetNumber({ sheet: "COUNT_SESSION", column: "B", prefix: "DCM" });
 }
 
 
@@ -909,11 +882,11 @@ router.post(
       // =================================================
 
       const sessionId =
-        generateSessionId();
+        await generateSessionId();
 
 
       const movementId =
-        generateMovementId();
+        await generateMovementId();
 
 
       // =================================================

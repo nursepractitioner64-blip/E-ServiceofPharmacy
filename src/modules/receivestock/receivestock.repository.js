@@ -5,6 +5,9 @@ const {
 
 const SHEET = "INVENTORY_MOVEMENT";
 const MASTER_SHEET = "INVENTORY_MASTER";
+const { withSequenceLock } = require("../../utils/running/sequence-lock");
+const { getBangkokDateParts } = require("../../utils/running/bangkok-date");
+const { maxAnnualSequence, formatAnnualNumber } = require("../../utils/running/annual-number-format");
 
 /* =====================================================
    CLEAN
@@ -163,125 +166,40 @@ async function getAllReceiveStock() {
    NEXT MOVEMENT ID
 ===================================================== */
 async function getNextMovementId() {
-
   const rows = await readRows(SHEET);
-
-  let max = 0;
-
-  const year = new Date().getFullYear();
-
-  for (const row of rows || []) {
-
-    const id = clean(
-      row.MOVEMENT_ID ??
-      row.movement_id
-    );
-
-    const match =
-      id.match(/^MOVID(\d{4})-(\d{5})$/);
-
-    if (
-      match &&
-      Number(match[1]) === year
-    ) {
-      max = Math.max(
-        max,
-        Number(match[2])
-      );
-    }
-  }
-
-  return `MOVID${year}-${String(max + 1).padStart(5, "0")}`;
+  const now = new Date();
+  const { yyyy: year } = getBangkokDateParts(now);
+  const values = (rows || []).map(row => clean(row.MOVEMENT_ID ?? row.movement_id));
+  const next = maxAnnualSequence(values, "MOVID", year) + 1;
+  return formatAnnualNumber("MOVID", next, now);
 }
 
 /* =====================================================
    NEXT RECEIVE REF NO
-   Format:
-   RCINYYYYMM-00001
+   Format: RCINYYYYMM-XXXXX; sequence resets only on year change.
+   Reads all existing records from the current year, regardless of month.
 ===================================================== */
 async function getNextRefNoValue() {
-
   const rows = await readRows(SHEET);
-
   const now = new Date();
-
-  const year =
-    now.getFullYear();
-
-  const month =
-    String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
-
-  const prefix =
-    `RCIN${year}${month}-`;
-
-  let max = 0;
-
-  for (const row of rows || []) {
-
-    const ref = clean(
-      row.REF_NO ??
-      row.refNo
-    );
-
-    if (
-      !ref.startsWith(prefix)
-    ) {
-      continue;
-    }
-
-    const numberPart =
-      Number(
-        ref.substring(
-          prefix.length
-        )
-      );
-
-    if (
-      Number.isFinite(numberPart)
-    ) {
-      max = Math.max(
-        max,
-        numberPart
-      );
-    }
-  }
-
-  return `${prefix}${String(max + 1).padStart(5, "0")}`;
+  const { yyyy: year } = getBangkokDateParts(now);
+  const values = (rows || []).map(row => clean(row.REF_NO ?? row.refNo));
+  const next = maxAnnualSequence(values, "RCIN", year) + 1;
+  return formatAnnualNumber("RCIN", next, now);
 }
 
 /* =====================================================
    NEXT CONTAINER ID
-   Format:
-   CONTAINER-00001
+   Format: CONTAINERYYYYMM-XXXXX; sequence resets annually.
+   Legacy IDs are read to avoid restarting the sequence mid-year.
 ===================================================== */
 async function getNextContainerId() {
-
   const rows = await readRows(SHEET);
-
-  let max = 0;
-
-  for (const row of rows || []) {
-
-    const id = clean(
-      row.CONTAINER_ID ??
-      row.containerId
-    );
-
-    const match =
-      id.match(/^CONTAINER-(\d{5})$/);
-
-    if (match) {
-
-      max = Math.max(
-        max,
-        Number(match[1])
-      );
-    }
-  }
-
-  return `CONTAINER-${String(max + 1).padStart(5, "0")}`;
+  const now = new Date();
+  const { yyyy: year } = getBangkokDateParts(now);
+  const values = (rows || []).map(row => clean(row.CONTAINER_ID ?? row.containerId));
+  const next = maxAnnualSequence(values, "CONTAINER", year) + 1;
+  return formatAnnualNumber("CONTAINER", next, now);
 }
 
 /* =====================================================
@@ -562,7 +480,7 @@ function createQrCode(value) {
 /* =====================================================
    INSERT RECEIVE STOCK
 ===================================================== */
-async function insertReceiveStock(
+async function insertReceiveStockUnlocked(
   data = {}
 ) {
 
@@ -573,9 +491,9 @@ async function insertReceiveStock(
   const movementId =
     await getNextMovementId();
 
-  const refNo =
-    clean(data.refNo) ||
-    await getNextRefNoValue();
+  // The submitted preview may be stale if another user received stock first.
+  // Generate the final REF_NO from the latest sheet rows at save time.
+  const refNo = await getNextRefNoValue();
 
   const now =
     new Date().toISOString();
@@ -831,6 +749,12 @@ async function insertReceiveStock(
 /* =====================================================
    EXPORT
 ===================================================== */
+async function insertReceiveStock(data = {}) {
+  // Serialize ID generation and the append so concurrent requests in this server
+  // process cannot receive the same running numbers.
+  return withSequenceLock("INVENTORY_MOVEMENT:receive", () => insertReceiveStockUnlocked(data));
+}
+
 module.exports = {
 
   getInventoryMaster,

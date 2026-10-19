@@ -1,3 +1,4 @@
+
 /* =========================================================
    VACCINE MANAGEMENT — STOCK CARD
    File: public/modules/vaccinemanagement/vaccinemanagement.client.js
@@ -13,6 +14,7 @@
    - แสดงยอดคงเหลือรวมทุก LOT หลังแต่ละรายการ
    - แสดงยอดแยก LOT / EXP ในหมายเหตุ
    - คำนวณตามลำดับเวลา แล้วแสดงรายการล่าสุดก่อน
+   - แก้การอ่านวันที่เฉพาะรหัส 6FLUQU0001B$
    - ไม่เขียนหรือแก้ไขข้อมูลใน Stock Movement
 ========================================================= */
 
@@ -262,7 +264,8 @@ function normalizeMovement(row, index) {
 }
 
 /* =========================================================
-   DATE HELPERS
+   ORIGINAL DATE PARSER
+   คงพฤติกรรมเดิมสำหรับวัคซีนรายการอื่น
 ========================================================= */
 
 function parseDateTime(dateValue, timeValue = "") {
@@ -350,6 +353,125 @@ function parseDateTime(dateValue, timeValue = "") {
   return date.getTime();
 }
 
+/* =========================================================
+   DATE PARSER — SPECIFIC VACCINE ONLY
+
+   รหัส 6FLUQU0001B$:
+   - วันที่รูปแบบ MM/DD/YYYY อ่านเป็น เดือน/วัน/ปี
+   - วันที่ ISO ยังคงอ่านตามรูปแบบ ISO
+   - วัคซีนรหัสอื่นใช้ parseDateTime() เดิม
+========================================================= */
+
+function parseStockCardDateTime(row) {
+  if (clean(row?.code) === "6FLUQU0001B$") {
+    const raw = clean(row.date);
+
+    // ISO format: YYYY-MM-DD หรือ ISO datetime
+    const isoMatch = raw.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?/
+    );
+
+    if (isoMatch) {
+      let year = Number(isoMatch[1]);
+
+      if (year > 2400) {
+        year -= 543;
+      }
+
+      const month = Number(isoMatch[2]);
+      const day = Number(isoMatch[3]);
+      const hour = Number(isoMatch[4] || 0);
+      const minute = Number(isoMatch[5] || 0);
+      const second = Number(isoMatch[6] || 0);
+
+      const date = new Date(
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        second
+      );
+
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        console.warn(
+          "[Stock Card] Invalid ISO date:",
+          raw
+        );
+
+        return 0;
+      }
+
+      return date.getTime();
+    }
+
+    // Slash date: MM/DD/YYYY
+    const match = raw.match(
+      /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/
+    );
+
+    if (match) {
+      const month = Number(match[1]);
+      const day = Number(match[2]);
+      let year = Number(match[3]);
+
+      if (year > 2400) {
+        year -= 543;
+      }
+
+      let hour = 0;
+      let minute = 0;
+      let second = 0;
+
+      const timeMatch = clean(row.time).match(
+        /^(\d{1,2}):(\d{2})(?::(\d{2}))?/
+      );
+
+      if (timeMatch) {
+        hour = Number(timeMatch[1]);
+        minute = Number(timeMatch[2]);
+        second = Number(timeMatch[3] || 0);
+      }
+
+      const date = new Date(
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        second
+      );
+
+      // ตรวจสอบไม่ให้ JavaScript ปรับวันที่ผิดให้อัตโนมัติ
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        console.warn(
+          "[Stock Card] Invalid flu vaccine date:",
+          raw
+        );
+
+        return 0;
+      }
+
+      return date.getTime();
+    }
+  }
+
+  // วัคซีนรายการอื่นใช้ฟังก์ชันเดิมทั้งหมด
+  return parseDateTime(row.date, row.time);
+}
+
+/* =========================================================
+   FORMAT DATE
+========================================================= */
+
 function formatDate(value) {
   const raw = clean(value);
 
@@ -382,12 +504,6 @@ function ensureMarkup() {
   if (!state.root) return;
 
   state.root.innerHTML = `
-    <section
-      class="vm-stock-card"
-      aria-labelledby="vmStockHeading"
-    >
-
-
 <div class="vm-stock-toolbar vm-stock-toolbar-select">
 
   <label class="vm-vaccine-select-wrap">
@@ -412,64 +528,62 @@ function ensureMarkup() {
         </option>
       </select>
 
-      <i class="bi bi-chevron-down vm-vaccine-select-chevron"
-         aria-hidden="true"></i>
+      <i
+        class="bi bi-chevron-down vm-vaccine-select-chevron"
+        aria-hidden="true"
+      ></i>
     </span>
 
   </label>
 
 </div>
 
-        <div
-          class="vm-stock-count"
-          data-vm-count
-        >
+<div
+  class="vm-stock-count"
+  data-vm-count
+>
+  กำลังโหลดข้อมูล...
+</div>
+
+<div class="vm-stock-table-wrap">
+
+  <table class="vm-stock-table vm-stock-card-table">
+
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">รายการ</th>
+        <th scope="col" class="vm-number">รับ</th>
+        <th scope="col" class="vm-number">จ่าย</th>
+        <th scope="col" class="vm-number">คงเหลือ</th>
+        <th scope="col">หมายเหตุ</th>
+      </tr>
+    </thead>
+
+    <tbody data-vm-tbody>
+      <tr>
+        <td colspan="6" class="vm-state-cell">
           กำลังโหลดข้อมูล...
-        </div>
+        </td>
+      </tr>
+    </tbody>
 
-      </div>
+  </table>
 
-      <div class="vm-stock-table-wrap">
+</div>
 
-        <table class="vm-stock-table vm-stock-card-table">
+<div class="vm-stock-footnote">
+  คงเหลือเป็นยอดรวมทุก LOT หลังแต่ละรายการ
+  ส่วนหมายเหตุแสดงยอดแยก LOT/EXP ณ เวลาของรายการ
+  โดยคำนวณตามลำดับเวลาและแสดงรายการล่าสุดก่อน
+</div>
 
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">รายการ</th>
-              <th scope="col" class="vm-number">รับ</th>
-              <th scope="col" class="vm-number">จ่าย</th>
-              <th scope="col" class="vm-number">คงเหลือ</th>
-              <th scope="col">หมายเหตุ</th>
-            </tr>
-          </thead>
-
-          <tbody data-vm-tbody>
-            <tr>
-              <td colspan="6" class="vm-state-cell">
-                กำลังโหลดข้อมูล...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-      <div class="vm-stock-footnote">
-        คงเหลือเป็นยอดรวมทุก LOT หลังแต่ละรายการ
-        ส่วนหมายเหตุแสดงยอดแยก LOT/EXP ณ เวลาของรายการ
-        โดยคำนวณตามลำดับเวลาและแสดงรายการล่าสุดก่อน
-      </div>
-
-      <div
-        class="vm-stock-error"
-        data-vm-error
-        role="alert"
-        hidden
-      ></div>
-
-    </section>
+<div
+  class="vm-stock-error"
+  data-vm-error
+  role="alert"
+  hidden
+></div>
   `;
 }
 
@@ -508,7 +622,9 @@ function renderVaccineOptions() {
 
   if (
     previousCode &&
-    state.vaccines.some(vaccine => vaccine.code === previousCode)
+    state.vaccines.some(
+      vaccine => vaccine.code === previousCode
+    )
   ) {
     select.value = previousCode;
   } else {
@@ -532,15 +648,20 @@ function buildStockCardRows(code) {
     .filter(row => row.code === code)
     .map(row => ({
       ...row,
-      _sortTime: parseDateTime(row.date, row.time)
+
+      // ใช้ parser เฉพาะวัคซีนที่มีปัญหา
+      _sortTime: parseStockCardDateTime(row)
     }))
     .sort((a, b) => {
-      const dateDifference = a._sortTime - b._sortTime;
+      // คำนวณจากวันที่เก่าไปใหม่ก่อน
+      const dateDifference =
+        a._sortTime - b._sortTime;
 
       if (dateDifference !== 0) {
         return dateDifference;
       }
 
+      // กรณีวันเวลาเดียวกัน ใช้ MOVEMENT_ID เดิม
       const idDifference = a.id.localeCompare(
         b.id,
         "en",
@@ -589,6 +710,7 @@ function buildStockCardRows(code) {
       lotBalance.quantity -= quantity;
     }
 
+    // ยอดรวมทุก LOT หลังรายการเคลื่อนไหวนี้
     const totalBalance = [
       ...lotBalances.values()
     ].reduce(
@@ -596,10 +718,13 @@ function buildStockCardRows(code) {
       0
     );
 
+    // Snapshot ยอดแต่ละ LOT ณ เวลาของรายการ
     const lotSnapshot = [
       ...lotBalances.values()
     ]
-      .filter(item => Math.abs(item.quantity) > 0.0000001)
+      .filter(
+        item => Math.abs(item.quantity) > 0.0000001
+      )
       .sort((a, b) => {
         const lotCompare = String(a.lot).localeCompare(
           String(b.lot),
@@ -626,7 +751,8 @@ function buildStockCardRows(code) {
   }
 
   /*
-   * Calculate chronologically first, then display newest first.
+   * คำนวณเก่าไปใหม่ก่อน
+   * แล้วแสดงรายการใหม่ไปเก่า
    */
 
   return calculatedRows.reverse();
@@ -820,30 +946,38 @@ async function loadData() {
     state.movements = movementRows.map(
       normalizeMovement
     );
-    console.log("[Vaccine Management] Master rows:", masterRows.length);
-console.log("[Vaccine Management] Movement rows:", movementRows.length);
 
-console.table(
-  state.vaccines
-    .filter(v => v.code.includes("6FLUQU"))
-    .map(v => ({
-      code: JSON.stringify(v.code),
-      name: v.name
-    }))
-);
+    console.log(
+      "[Vaccine Management] Master rows:",
+      masterRows.length
+    );
 
-console.table(
-  state.movements
-    .filter(m => m.code.includes("6FLUQU"))
-    .map(m => ({
-      code: JSON.stringify(m.code),
-      type: m.type,
-      date: m.date,
-      qty: m.qty,
-      lot: m.lot,
-      refNo: m.refNo
-    }))
-);
+    console.log(
+      "[Vaccine Management] Movement rows:",
+      movementRows.length
+    );
+
+    console.table(
+      state.vaccines
+        .filter(v => v.code.includes("6FLUQU"))
+        .map(v => ({
+          code: JSON.stringify(v.code),
+          name: v.name
+        }))
+    );
+
+    console.table(
+      state.movements
+        .filter(m => m.code.includes("6FLUQU"))
+        .map(m => ({
+          code: JSON.stringify(m.code),
+          type: m.type,
+          date: m.date,
+          qty: m.qty,
+          lot: m.lot,
+          refNo: m.refNo
+        }))
+    );
 
     renderVaccineOptions();
     renderTable();

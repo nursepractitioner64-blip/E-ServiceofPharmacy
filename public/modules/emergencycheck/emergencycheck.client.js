@@ -1,3 +1,4 @@
+
 /*********************************************************
 FILE:
 modules/emergencycheck/emergencycheck.client.js

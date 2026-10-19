@@ -1,0 +1,10 @@
+<section class="auth-admin-page" id="branch-management-page">
+  <div class="auth-admin-head">
+    <div><h2 class="auth-admin-title"><i class="fa-solid fa-code-branch me-2"></i>จัดการสาขา</h2><p class="auth-admin-subtitle">เพิ่มสาขา แก้ไขชื่อ และเปิด/ปิดการใช้งานสาขา</p></div>
+    <button class="auth-admin-primary" id="branch-add"><i class="fa-solid fa-plus me-1"></i> เพิ่มสาขา</button>
+  </div>
+  <div class="auth-admin-info">การปิดใช้งานสาขาจะไม่ลบข้อมูลตรวจเดิม และไม่ลบการกำหนดสาขาของผู้ใช้</div>
+  <div id="branch-message" class="auth-admin-message" hidden></div>
+  <div class="auth-admin-table-card"><div class="auth-admin-table-wrap"><table class="auth-admin-table"><thead><tr><th>รหัสสาขา</th><th>ชื่อสาขา</th><th>สถานะ</th><th>อัปเดตล่าสุด</th><th class="text-end">จัดการ</th></tr></thead><tbody id="branch-rows"><tr><td colspan="5" class="text-center py-4">กำลังโหลด...</td></tr></tbody></table></div></div>
+</section>
+<dialog id="branch-modal" class="auth-user-dialog"><form id="branch-form"><div class="auth-dialog-header"><h5 id="branch-modal-title">เพิ่มสาขา</h5><button type="button" class="auth-dialog-close" id="branch-close">×</button></div><div class="auth-dialog-body"><label class="auth-form-label" for="branch-id-code">รหัสสาขา (Admin แก้ไขได้)</label><input class="auth-form-control mb-3" id="branch-id-code" required maxlength="60" placeholder="เช่น BR-3868C33D419D" autocomplete="off"><div class="form-text mb-3">ใช้รหัสจริงของหน่วยงาน ต้องไม่ซ้ำกับสาขาอื่น หากแก้รหัสเดิม ระบบจะปรับการอ้างอิงสาขาในบัญชีผู้ใช้และประวัติการตรวจที่มีคอลัมน์ BRANCH_ID ให้ด้วย โดยไม่แก้ชีตวัคซีน</div><label class="auth-form-label" for="branch-name">ชื่อสาขา</label><input class="auth-form-control" id="branch-name" required minlength="2" maxlength="120"><input id="branch-id" type="hidden"></div><div class="auth-dialog-footer"><button type="button" class="auth-admin-secondary" id="branch-cancel">ยกเลิก</button><button type="submit" class="auth-admin-primary" id="branch-save">บันทึก</button></div></form></dialog>

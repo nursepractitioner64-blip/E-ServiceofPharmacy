@@ -4,13 +4,19 @@ const repository = require("./receivestock.repository");
    RECEIVE STOCK SERVICE
 ===================================================== */
 
-async function getAll() {
+async function getAll(branchId) {
+  const allowedBranchId = String(branchId || "").trim();
+  if (!allowedBranchId || allowedBranchId === "ALL") {
+    throw new Error("กรุณาเลือกสาขาที่ปฏิบัติงานก่อนดูรายการรับเข้า");
+  }
+
   const rows = await repository.getAllReceiveStock();
 
   return (rows || [])
     .filter(
       r =>
-        String(r.type || "").toUpperCase() === "IN"
+        String(r.type || "").toUpperCase() === "IN" &&
+        String(r.branchId || "").trim() === allowedBranchId
     )
     .sort(
       (a, b) =>
@@ -23,10 +29,11 @@ async function getAll() {
    CREATE RECEIVE STOCK
 ===================================================== */
 
-async function create(data = {}) {
+async function create(data = {}, trustedContext = {}) {
 
+  // Never trust BRANCH_ID / LOCATION sent by browser form.
   const branchId =
-    String(data.branchId || "").trim();
+    String(trustedContext.branchId || "").trim();
 
   const code =
     String(data.code || "").trim();
@@ -47,10 +54,10 @@ async function create(data = {}) {
     String(data.supplier || "").trim();
 
   const user =
-    String(data.user || "").trim();
+    String(trustedContext.user || data.user || "").trim();
 
   const location =
-    String(data.location || "").trim();
+    String(trustedContext.location || "").trim();
 
 
   /* ===================================================

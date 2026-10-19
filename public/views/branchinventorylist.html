@@ -1,0 +1,22 @@
+<section class="branch-inventory-page container-fluid py-3">
+  <style>
+    .branch-inventory-page{font-family:Prompt, sans-serif;color:#17324d}.bil-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}.bil-title{font-weight:750;margin:0}.bil-sub{color:#64748b;margin:5px 0 0}.bil-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 6px 20px #0f172a0a;overflow:hidden}.bil-toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;padding:16px;border-bottom:1px solid #e2e8f0}.bil-field{display:flex;flex-direction:column;gap:6px;min-width:240px}.bil-field label{font-size:13px;font-weight:650;color:#475569}.bil-field select{border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:white;min-height:42px}.bil-info{margin:14px 16px;padding:12px 14px;border-radius:10px;background:#eff6ff;color:#1e40af;font-size:13px}.bil-warn{margin:14px 16px;padding:12px 14px;border-radius:10px;background:#fff7ed;color:#9a3412;font-size:13px}.bil-message{display:none;margin:14px 16px;padding:12px 14px;border-radius:10px}.bil-message.ok{display:block;background:#dcfce7;color:#166534}.bil-message.err{display:block;background:#fee2e2;color:#991b1b}.bil-table-wrap{overflow:auto;max-height:calc(100vh - 330px)}.bil-table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}.bil-table th{position:sticky;top:0;z-index:1;background:#f8fafc;color:#475569;font-size:12px;text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;white-space:nowrap}.bil-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}.bil-table tbody tr:hover{background:#f8fafc}.bil-code{font-weight:700;color:#0f766e;white-space:nowrap}.bil-name{min-width:300px}.bil-qty{width:100px;border:1px solid #cbd5e1;border-radius:8px;padding:7px 9px}.bil-switch{display:flex;align-items:center;gap:8px;white-space:nowrap}.bil-switch input{width:17px;height:17px;accent-color:#0f766e}.bil-lock{font-size:12px;color:#047857;background:#d1fae5;border-radius:999px;padding:4px 8px;white-space:nowrap}.bil-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}.bil-btn{border:0;border-radius:10px;padding:10px 16px;font-weight:650;cursor:pointer}.bil-btn:disabled{opacity:.55;cursor:wait}.bil-btn-primary{background:#0f766e;color:#fff}.bil-btn-light{background:#f1f5f9;color:#334155}.bil-count{color:#64748b;font-size:13px}
+  </style>
+  <div class="bil-head">
+    <div><h2 class="bil-title"><i class="fa-solid fa-list-check me-2" style="color:#0f766e"></i>ตั้งค่า Inventory List รายสาขา</h2><p class="bil-sub">กำหนดรายการและจำนวนขั้นต่ำที่ใช้ตรวจ Emergency Checklist ของแต่ละสาขา</p></div>
+    <button class="bil-btn bil-btn-light bil-admin-only" type="button" data-route="branch-management" hidden><i class="fa-solid fa-code-branch me-1"></i> จัดการสาขา</button>
+  </div>
+  <div class="bil-card">
+    <div class="bil-toolbar">
+      <div class="bil-field"><label for="bil-branch">สาขาที่ต้องการตั้งค่า</label><select id="bil-branch"><option value="">กำลังโหลดสาขา...</option></select></div>
+      <button class="bil-btn bil-btn-light" type="button" id="bil-reload"><i class="fa-solid fa-rotate me-1"></i> โหลดใหม่</button>
+      <span class="bil-count" id="bil-count">ยังไม่ได้เลือกสาขา</span>
+    </div>
+    <div class="bil-info" id="bil-scope-help">Staff สามารถตั้งค่าได้เฉพาะสาขาที่ Admin มอบหมายให้บัญชีนี้</div>
+    <div class="bil-info"><strong>รายการบังคับ:</strong> EMER001–EMER078 ต้องอยู่ใน Inventory List ทุกสาขา ไม่สามารถปิดรายการได้ แต่ Admin ปรับจำนวน REQUIRED ได้ตามนโยบายของสาขา<br><strong>รายการเสริม:</strong> รายการอื่นทั้งหมดใน INVENTORY_MASTER นอกเหนือจาก EMER001–EMER078 เลือกเพิ่มหรือไม่เพิ่มแยกตามสาขาได้ รวมถึง EMER079 Aspirin 325 mg</div>
+    <div id="bil-message" class="bil-message" role="status"></div>
+    <div id="bil-missing" class="bil-warn" hidden></div>
+    <div class="bil-table-wrap"><table class="bil-table"><thead><tr><th>CODE</th><th>NAME</th><th>UNIT</th><th>REQUIRED</th><th>การตั้งค่า</th></tr></thead><tbody id="bil-rows"><tr><td colspan="5" style="text-align:center;padding:30px;color:#64748b">กรุณาเลือกสาขา</td></tr></tbody></table></div>
+    <div class="bil-footer"><span class="bil-count">รายการ ชื่อ และหน่วยดึงจาก INVENTORY_MASTER ทั้งหมด</span><button class="bil-btn bil-btn-primary" type="button" id="bil-save" disabled><i class="fa-solid fa-floppy-disk me-1"></i> บันทึก Inventory List</button></div>
+  </div>
+</section>

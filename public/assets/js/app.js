@@ -1,3 +1,5 @@
+import * as Auth from "./auth.client.js";
+
 /* =========================================================
    SMART PHARMACY MANAGEMENT SYSTEM
    APP.JS
@@ -146,6 +148,24 @@ const routes = {
     view: "/views/dailycheck.html",
     script: "/modules/dailycheck/dailycheck.client.js",
     system: "controlled"
+  },
+
+  "user-management": {
+    view: "/views/usermanagement.html",
+    script: "/modules/auth/users.client.js",
+    system: "admin"
+  },
+
+  "branch-management": {
+    view: "/views/branchmanagement.html",
+    script: "/modules/branches/branches.client.js",
+    system: "admin"
+  },
+
+  "branch-inventory-list": {
+    view: "/views/branchinventorylist.html",
+    script: "/modules/branchinventorylist/branchinventorylist.client.js",
+    system: "emergency"
   }
 
 };
@@ -868,6 +888,10 @@ async function navigate(route) {
 
   }
 
+  if (["user-management", "branch-management"].includes(normalized) && Auth.getCurrentUser()?.role !== "ADMIN") {
+    await navigateWithoutHistory("dashboard");
+    return;
+  }
 
   const config =
     routes[normalized];
@@ -1164,7 +1188,7 @@ async function navigateWithoutHistory(
   route
 ) {
 
-  const normalized =
+  let normalized =
     normalizeRoute(route);
 
 
@@ -1172,6 +1196,9 @@ async function navigateWithoutHistory(
     return;
   }
 
+  if (["user-management", "branch-management"].includes(normalized) && Auth.getCurrentUser()?.role !== "ADMIN") {
+    normalized = "dashboard";
+  }
 
   const config =
     routes[normalized];
@@ -1288,7 +1315,7 @@ async function navigateWithoutHistory(
    INITIAL ROUTE
 ========================================================= */
 
-async function boot() {
+async function startApplication() {
 
   bindNavigation();
 
@@ -1360,6 +1387,26 @@ async function boot() {
 
   }
 
+}
+
+
+async function boot() {
+  Auth.initUserPanel();
+  Auth.setLoginHandler(async (user) => {
+    Auth.showApp(user);
+    Auth.initUserPanel();
+    history.replaceState({ route: "dashboard" }, "", "#dashboard");
+    await startApplication();
+  });
+
+  const user = await Auth.checkSession();
+  if (!user) {
+    Auth.showLogin();
+    return;
+  }
+
+  Auth.showApp(user);
+  await startApplication();
 }
 
 
