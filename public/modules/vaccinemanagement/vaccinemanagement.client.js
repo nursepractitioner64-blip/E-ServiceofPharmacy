@@ -303,9 +303,9 @@ function parseDateTime(dateValue, timeValue = "") {
     );
   } else {
     /*
-     * Thai/local date:
-     * DD/MM/YYYY
-     * DD-MM-YYYY
+     * Slash date is MM/DD/YYYY throughout the application.
+     * Example: 10/20/2026 = October 20, 2026.
+     * ISO YYYY-MM-DD remains handled by the branch above.
      */
 
     match = raw.match(
@@ -313,17 +313,25 @@ function parseDateTime(dateValue, timeValue = "") {
     );
 
     if (match) {
+      const month = Number(match[1]);
+      const day = Number(match[2]);
       let year = Number(match[3]);
 
       if (year > 2400) {
         year -= 543;
       }
 
-      date = new Date(
-        year,
-        Number(match[2]) - 1,
-        Number(match[1])
-      );
+      date = new Date(year, month - 1, day);
+
+      // Reject invalid dates instead of allowing JavaScript to roll them over.
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        console.warn("[Stock Card] Invalid MM/DD/YYYY date:", raw);
+        return 0;
+      }
     } else {
       date = new Date(raw);
     }
