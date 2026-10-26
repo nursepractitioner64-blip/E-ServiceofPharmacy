@@ -592,7 +592,7 @@ async function loadVaccineDispenseHistory() {
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="11" class="text-center">
+      <td colspan="7" class="text-center">
         กำลังโหลดประวัติการจ่ายวัคซีน...
       </td>
     </tr>
@@ -608,6 +608,7 @@ async function loadVaccineDispenseHistory() {
       const type = clean(row.type ?? row.TYPE).toUpperCase();
       return type === "OUT";
     });
+    window.__vrHistoryRows = rows;
 
     if (countEl) {
       countEl.textContent = formatNumber(rows.length);
@@ -616,7 +617,7 @@ async function loadVaccineDispenseHistory() {
     if (!rows.length) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="11" class="text-center">
+          <td colspan="7" class="text-center">
             ยังไม่มีประวัติการจ่ายวัคซีน
           </td>
         </tr>
@@ -637,19 +638,22 @@ async function loadVaccineDispenseHistory() {
       const user = row.user ?? row.USER;
       const location = row.location ?? row.Location ?? row.LOCATION;
 
+      const index = rows.indexOf(row);
       return `
         <tr>
           <td>${esc(displayDate(date))}</td>
-          <td>${esc(refNo || "-")}</td>
           <td>${esc(code || "-")}</td>
-          <td>${esc(name || "-")}</td>
-          <td>${esc(lot || "-")}</td>
-          <td>${esc(displayDate(exp))}</td>
+          <td class="vr-vaccine-name-cell">${esc(name || "-")}</td>
           <td class="text-end">${esc(formatNumber(qty))}</td>
           <td>${esc(unit || "-")}</td>
           <td>${esc(target || "-")}</td>
-          <td>${esc(user || "-")}</td>
-          <td>${esc(location || "-")}</td>
+          <td>
+            <div class="vr-action-group">
+              <button type="button" class="vr-action-btn view" data-vr-action="details" data-vr-index="${index}">👁 รายละเอียด</button>
+              <button type="button" class="vr-action-btn edit" data-vr-action="edit" data-vr-index="${index}" title="แก้ไขรายการ">✏️</button>
+              <button type="button" class="vr-action-btn delete" data-vr-action="delete" data-vr-index="${index}" title="ลบรายการ">🗑️</button>
+            </div>
+          </td>
         </tr>
       `;
     }).join("");
@@ -666,7 +670,7 @@ async function loadVaccineDispenseHistory() {
 
     tbody.innerHTML = `
       <tr>
-        <td colspan="11" class="text-center text-danger">
+        <td colspan="7" class="text-center text-danger">
           โหลดประวัติไม่สำเร็จ: ${esc(error.message)}
         </td>
       </tr>
@@ -676,16 +680,84 @@ async function loadVaccineDispenseHistory() {
 
 
 /* =====================================================
+   MOVEMENT DETAILS / ROW ACTIONS
+===================================================== */
+function openMovementDetails(row = {}) {
+  const modal = $("vrMovementDetailsModal");
+  const content = $("vrMovementDetailsContent");
+  if (!modal || !content) return;
+
+  const fields = [
+    ["วันที่", displayDate(row.date ?? row.DATE)],
+    ["เลขที่เอกสาร", row.refNo ?? row.REF_NO ?? row.REFNO],
+    ["รหัสวัคซีน", row.code ?? row.CODE],
+    ["ชื่อวัคซีน", row.name ?? row.NAME],
+    ["LOT", row.lot ?? row.LOT],
+    ["วันหมดอายุ (EXP)", displayDate(row.exp ?? row.EXP)],
+    ["จำนวน", formatNumber(row.qty ?? row.QTY)],
+    ["หน่วย", row.unit ?? row.UNIT],
+    ["จ่ายให้", row.target ?? row.TARGET],
+    ["ผู้บันทึก", row.user ?? row.USER],
+    ["Location", row.location ?? row.Location ?? row.LOCATION],
+    ["หมายเหตุ", row.remark ?? row.REMARK]
+  ];
+
+  content.innerHTML = fields.map(([label, value]) => `
+    <div class="vr-detail-item">
+      <div class="vr-detail-label">${esc(label)}</div>
+      <div class="vr-detail-value">${esc(clean(value) || "-")}</div>
+    </div>
+  `).join("");
+
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMovementDetails() {
+  const modal = $("vrMovementDetailsModal");
+  if (!modal) return;
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+  if ($("vaccineDispenseModal")?.hidden !== false) {
+    document.body.style.overflow = "";
+  }
+}
+
+function onHistoryAction(event) {
+  const button = event.target.closest("[data-vr-action]");
+  if (!button) return;
+  const index = Number(button.dataset.vrIndex);
+  const rows = Array.isArray(window.__vrHistoryRows) ? window.__vrHistoryRows : [];
+  const row = rows[index];
+  if (!row) return;
+
+  if (button.dataset.vrAction === "details") {
+    openMovementDetails(row);
+    return;
+  }
+
+  if (button.dataset.vrAction === "edit") {
+    window.alert("ขณะนี้ API ของระบบรองรับการดูประวัติและบันทึกรายการใหม่เท่านั้น ยังไม่มี API แก้ไขรายการจ่ายย้อนหลัง จึงยังไม่เปิดให้แก้ไขเพื่อป้องกันยอดสต็อกคลาดเคลื่อน");
+    return;
+  }
+
+  if (button.dataset.vrAction === "delete") {
+    window.alert("ยังไม่เปิดให้ลบรายการจ่ายย้อนหลัง เนื่องจาก API ลบรายการยังไม่รองรับการย้อนปรับยอดสต็อกอย่างปลอดภัย");
+  }
+}
+
+/* =====================================================
    KEYBOARD
 ===================================================== */
 
 function onKeydown(event) {
-  if (
-    event.key === "Escape" &&
-    !$("vaccineDispenseModal")?.hidden
-  ) {
-    closeModal();
+  if (event.key !== "Escape") return;
+  if (!$("vrMovementDetailsModal")?.hidden) {
+    closeMovementDetails();
+    return;
   }
+  if (!$("vaccineDispenseModal")?.hidden) closeModal();
 }
 
 /* =====================================================
@@ -765,7 +837,13 @@ export async function init() {
   );
 
   
-  // รีเฟรชประวัติการจ่ายวัคซีน
+
+  listen($("vrDispenseHistoryBody"), "click", onHistoryAction);
+  listen($("closeVrMovementDetailsBtn"), "click", closeMovementDetails);
+  listen($("closeVrMovementDetailsFooterBtn"), "click", closeMovementDetails);
+  listen($("closeVrMovementDetailsOverlay"), "click", closeMovementDetails);
+
+    // รีเฟรชประวัติการจ่ายวัคซีน
   listen(
     $("refreshVaccineDispenseHistoryBtn"),
     "click",
@@ -788,9 +866,8 @@ export function destroy() {
 
   listeners.length = 0;
 
-  if (!$("vaccineDispenseModal")?.hidden) {
-    closeModal();
-  }
+  if (!$("vaccineDispenseModal")?.hidden) closeModal();
+  if (!$("vrMovementDetailsModal")?.hidden) closeMovementDetails();
 
   busy = false;
 }

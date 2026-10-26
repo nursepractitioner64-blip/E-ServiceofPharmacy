@@ -52,22 +52,18 @@
             <thead>
               <tr>
                 <th>วันที่</th>
-                <th>เลขที่เอกสาร</th>
                 <th>รหัส</th>
                 <th>ชื่อวัคซีน</th>
-                <th>LOT</th>
-                <th>EXP</th>
                 <th>จำนวน</th>
                 <th>หน่วย</th>
                 <th>จ่ายให้</th>
-                <th>ผู้บันทึก</th>
-                <th>Location</th>
+                <th>การจัดการ</th>
               </tr>
             </thead>
 
             <tbody id="vrDispenseHistoryBody">
               <tr>
-                <td colspan="11" class="vr-history-empty">
+                <td colspan="7" class="vr-history-empty">
                   กำลังโหลดข้อมูล...
                 </td>
               </tr>
@@ -80,6 +76,26 @@
   </main>
 </section>
 
+
+<!-- =====================================================
+     VACCINE MOVEMENT DETAILS MODAL
+===================================================== -->
+<div class="vr-dispense-modal" id="vrMovementDetailsModal" aria-hidden="true" hidden>
+  <div class="vr-modal-overlay" id="closeVrMovementDetailsOverlay"></div>
+  <div class="vr-modal-box vr-details-box" role="dialog" aria-modal="true" aria-labelledby="vrMovementDetailsTitle">
+    <div class="vr-modal-header">
+      <div>
+        <h2 id="vrMovementDetailsTitle">รายละเอียดการจ่ายวัคซีน</h2>
+        <p>ข้อมูลทั้งหมดของรายการที่เลือก</p>
+      </div>
+      <button type="button" class="vr-close-btn" id="closeVrMovementDetailsBtn" aria-label="ปิด">✖</button>
+    </div>
+    <div id="vrMovementDetailsContent" class="vr-details-grid"></div>
+    <div class="vr-modal-footer vr-details-footer">
+      <button type="button" class="vr-btn vr-btn-light" id="closeVrMovementDetailsFooterBtn">ปิด</button>
+    </div>
+  </div>
+</div>
 
 <!-- =====================================================
      DISPENSE VACCINE MODAL
@@ -236,7 +252,8 @@
 
   .vr-history-table {
     width: 100%;
-    min-width: 1150px;
+    min-width: 760px;
+    table-layout: auto;
     border-collapse: separate;
     border-spacing: 0;
     font-family: "Prompt", sans-serif;
@@ -315,4 +332,59 @@
   .vr-btn-primary{background:#087f8c;color:#fff}
   .vr-btn-primary:hover{background:#066874}
   @media(max-width:560px){.vr-modal-box{max-height:95vh}.vr-modal-header,#vaccineDispenseForm{padding:16px}.vr-form-grid{grid-template-columns:1fr}.vr-span-2{grid-column:auto}.vr-modal-footer{flex-wrap:wrap}.vr-form-message{flex-basis:100%;order:0}}
+
+  .vr-action-group{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .vr-action-btn{border:1px solid #dbe4ea;border-radius:7px;padding:6px 8px;background:#fff;color:#234252;font:12px "Prompt",sans-serif;cursor:pointer}
+  .vr-action-btn:hover{background:#edf8fa;border-color:#9dcbd3}
+  .vr-action-btn.view{color:#087f8c}
+  .vr-action-btn.edit{color:#946200}
+  .vr-action-btn.delete{color:#b42318}
+  .vr-details-box{width:min(780px,100%)}
+  .vr-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:20px 24px}
+  .vr-detail-item{padding:11px 12px;border:1px solid #e5edf1;border-radius:9px;min-width:0;background:#fbfdfe}
+  .vr-detail-label{font-size:11px;color:#718096;margin-bottom:4px}
+  .vr-detail-value{font-size:13px;color:#203b4b;font-weight:600;overflow-wrap:anywhere;white-space:pre-wrap}
+  .vr-details-footer{justify-content:flex-end;padding:0 24px 20px;margin-top:0;border-top:0}
+  @media(max-width:560px){.vr-details-grid{grid-template-columns:1fr;padding:16px}.vr-details-footer{padding:0 16px 16px}.vr-action-group{flex-wrap:wrap}}
+
+
+  /* Vaccine Record: keep the page inside the available workspace like other system pages */
+  #invPage,
+  #invPage .psc-app,
+  #invPage .psc-page,
+  #invPage .psc-card,
+  #invPage .vr-history-card {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  #invPage { overflow-x: clip; }
+  #invPage .psc-app { padding-left: 0; padding-right: 0; }
+  #invPage .psc-page { padding-left: 0; padding-right: 0; }
+  #invPage .vr-history-card { padding: clamp(12px, 1.4vw, 20px); }
+  #invPage .vr-history-table-wrap { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; }
+  #invPage .vr-history-table { width: 100%; min-width: 0; table-layout: fixed; }
+  #invPage .vr-history-table th,
+  #invPage .vr-history-table td { box-sizing: border-box; overflow-wrap: anywhere; white-space: normal; }
+  #invPage .vr-history-table th:nth-child(1), #invPage .vr-history-table td:nth-child(1) { width: 10%; }
+  #invPage .vr-history-table th:nth-child(2), #invPage .vr-history-table td:nth-child(2) { width: 14%; }
+  #invPage .vr-history-table th:nth-child(3), #invPage .vr-history-table td:nth-child(3) { width: 25%; }
+  #invPage .vr-history-table th:nth-child(4), #invPage .vr-history-table td:nth-child(4) { width: 7%; }
+  #invPage .vr-history-table th:nth-child(5), #invPage .vr-history-table td:nth-child(5) { width: 7%; }
+  #invPage .vr-history-table th:nth-child(6), #invPage .vr-history-table td:nth-child(6) { width: 17%; }
+  #invPage .vr-history-table th:nth-child(7), #invPage .vr-history-table td:nth-child(7) { width: 20%; }
+  #invPage .vr-action-group { display: flex; flex-wrap: wrap; gap: 4px; white-space: normal; }
+  #invPage .vr-action-btn { max-width: 100%; }
+  @media (max-width: 900px) {
+    #invPage .psc-stock-header { flex-wrap: wrap; gap: 12px; }
+    #invPage .dsc-dispense-action-bar { display: flex; flex-wrap: wrap; max-width: 100%; }
+    #invPage .vr-history-table { font-size: 11px; }
+    #invPage .vr-history-table th, #invPage .vr-history-table td { padding: 8px 6px; }
+  }
+  @media (max-width: 620px) {
+    #invPage .vr-history-table { min-width: 620px; }
+    #invPage .vr-history-table-wrap { overflow-x: auto; }
+  }
+
 </style>
