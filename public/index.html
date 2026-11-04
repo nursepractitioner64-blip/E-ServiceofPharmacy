@@ -1,676 +1,204 @@
 <!DOCTYPE html>
-
 <html lang="th">
-
-
-
 <head>
-
-<meta name="referrer" content="no-referrer">
-
-
-
-<meta charset="UTF-8">
-
-
-
-<meta
-
-name="viewport"
-
-content="width=device-width, initial-scale=1.0"
-
->
-
-
-
-<title>Smart Pharmacy Management System</title>
-
-
-
-
+  <meta name="referrer" content="no-referrer">
+  <meta charset="UTF-8">
+  <meta name="viewport"content="width=device-width, initial-scale=1.0">
+  <title>eNursing Smart Care System</title>
 
 <!-- =====================================================
-
-GOOGLE FONT
-
-PROMPT
-
+GOOGLE FONT PROMPT
 ====================================================== -->
 
-
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-
-
-<link
-
-rel="preconnect"
-
-href="https://fonts.gstatic.com"
-
-crossorigin
-
->
-
-
-
-<link
-
-href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"
-
-rel="stylesheet"
-
->
-
-
-
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- =====================================================
-
-FONT AWESOME
-
-โหลดครั้งเดียวทั้งระบบ
-
+FONT AWESOME โหลดครั้งเดียวทั้งระบบ
 ====================================================== -->
 
-
-
-<link
-
-rel="stylesheet"
-
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-
->
-
-
-
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <!-- =====================================================
-
 CSS
-
 ====================================================== -->
 
-
-
-<link rel="stylesheet" href="/assets/css/auth.css">
-
-<link rel="stylesheet" href="/assets/css/dashboard.css">
-
-<link rel="stylesheet" href="/assets/css/pharmacy.css">
-
-<link rel="stylesheet" href="/assets/css/dispense.css">
-
-<link rel="stylesheet" href="/assets/css/emergency.css">
-
-<link rel="stylesheet" href="/assets/css/inventory.css">
-
-<link rel="stylesheet" href="/assets/css/receivestock.css">
-
-<link rel="stylesheet" href="/assets/css/stock-balance.css">
-
-<link rel="stylesheet" href="/assets/css/summarydb.css">
-
-<link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css">
-
-<link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.css">
-
-<link rel="stylesheet"href="/modules/vaccinemasterstock/vaccinemasterstock.css">
-
-<link rel="stylesheet"href="/modules/vaccinemanagement/vaccinemanagement.style.css">
-
-
-
-
-
-
-
-
-
-
+  <link rel="stylesheet" href="/assets/css/auth.css">
+  <link rel="stylesheet" href="/assets/css/dashboard.css">
+  <link rel="stylesheet" href="/assets/css/pharmacy.css">
+  <link rel="stylesheet" href="/assets/css/dispense.css">
+  <link rel="stylesheet" href="/assets/css/emergency.css">
+  <link rel="stylesheet" href="/assets/css/inventory.css">
+  <link rel="stylesheet" href="/assets/css/receivestock.css">
+  <link rel="stylesheet" href="/assets/css/stock-balance.css">
+  <link rel="stylesheet" href="/assets/css/summarydb.css">
+  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.style.css">
+  <link rel="stylesheet" href="/modules/vaccinemaster/vaccinemaster.css">
+  <link rel="stylesheet"href="/modules/vaccinemasterstock/vaccinemasterstock.css">
+  <link rel="stylesheet"href="/modules/vaccinemanagement/vaccinemanagement.style.css">
 
 <!-- =====================================================
-
 TOM SELECT
-
 ====================================================== -->
 
-
-
-<link
-
-rel="stylesheet"
-
-href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
-
->
-
-
-
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
 
 <!-- =====================================================
-
-GLOBAL FONT CONTROL
-
-
-
-TEXT = PROMPT
-
-ICON = FONT AWESOME
-
+GLOBAL FONT CONTROL TEXT = PROMPT ICON = FONT AWESOME
 ====================================================== -->
-
-
 
 <style>
 
-
-
 /* =====================================================
-
-GLOBAL FONT
-
-TEXT ทั้งระบบ = PROMPT
-
+GLOBAL FONT TEXT ทั้งระบบ = PROMPT
 ===================================================== */
 
-
-
-:root {
-
---app-font-family: "Prompt", sans-serif;
-
-}
-
-
-
-html,
-
-body {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-body,
-
-body * {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+:root {--app-font-family: "Prompt", sans-serif;} html,
+body {font-family: "Prompt", sans-serif !important;} body,
+body * {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
 FORM ELEMENTS
-
 ===================================================== */
-
-
 
 button,
-
 input,
-
 textarea,
-
 select,
-
-option {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+option {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
 TABLE
-
 ===================================================== */
-
-
 
 table,
-
 thead,
-
 tbody,
-
 tfoot,
-
 tr,
-
 th,
-
-td {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+td {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
 LINKS
-
 ===================================================== */
-
-
 
 a,
-
-a * {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+a * {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
 MODAL
-
 ===================================================== */
-
-
 
 .modal,
-
 .modal *,
-
 #modal-root,
-
-#modal-root * {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+#modal-root * {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
 TOM SELECT
-
 ===================================================== */
-
-
 
 .ts-control,
-
 .ts-control *,
-
 .ts-dropdown,
-
-.ts-dropdown * {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+.ts-dropdown * {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
 SWEET ALERT
-
 ===================================================== */
-
-
 
 .swal2-container,
-
 .swal2-container *,
-
 .swal2-popup,
-
-.swal2-popup * {
-
-font-family: "Prompt", sans-serif !important;
-
-}
-
-
-
-
+.swal2-popup * {font-family: "Prompt", sans-serif !important;}
 
 /* =====================================================
-
-FONT AWESOME
-
-ICON = FONT AWESOME
-
+FONT AWESOME ICON = FONT AWESOME
 ===================================================== */
-
-
 
 .fa,
-
 .fas,
-
 .far,
-
 .fal,
-
 .fab,
-
 .fad,
-
 .fa-solid,
-
 .fa-regular,
-
 .fa-light,
-
 .fa-thin,
-
 .fa-duotone,
-
-.fa-brands {
-
-
-
-font-style: normal;
-
-line-height: 1;
-
-
-
-}
-
-
-
-
+.fa-brands {font-style: normal;line-height: 1;}
 
 /* =====================================================
-
 FONT AWESOME SOLID
-
 ===================================================== */
-
-
 
 .fa-solid,
-
-.fas {
-
-
-
-font-family:
-
-"Font Awesome 6 Free" !important;
-
-
-
-font-weight: 900 !important;
-
-
-
-}
-
-
-
-
+.fas {font-family:"Font Awesome 6 Free" !important; font-weight: 900 !important;}
 
 /* =====================================================
-
 FONT AWESOME REGULAR
-
 ===================================================== */
-
-
 
 .fa-regular,
-
-.far {
-
-
-
-font-family:
-
-"Font Awesome 6 Free" !important;
-
-
-
-font-weight: 400 !important;
-
-
-
-}
-
-
-
-
+.far {font-family:"Font Awesome 6 Free" !important;font-weight: 400 !important;}
 
 /* =====================================================
-
 FONT AWESOME BRANDS
-
 ===================================================== */
-
-
 
 .fa-brands,
-
-.fab {
-
-
-
-font-family:
-
-"Font Awesome 6 Brands" !important;
-
-
-
-font-weight: 400 !important;
-
-
-
-}
-
-
-
-
+.fab {font-family:"Font Awesome 6 Brands" !important;font-weight: 400 !important;}
 
 /* =====================================================
-
 FONT AWESOME ICON ELEMENT
-
 ===================================================== */
-
-
 
 i[class^="fa-"],
-
-i[class*=" fa-"] {
-
-
-
-display: inline-block;
-
-
-
-line-height: 1;
-
-
-
-text-rendering: auto;
-
-
-
--webkit-font-smoothing: antialiased;
-
-
-
-}
-
-
-
-
+i[class*=" fa-"] {display: inline-block;line-height: 1;text-rendering: auto;-webkit-font-smoothing: antialiased;}
 
 /* =====================================================
-
 FONT AWESOME INSIDE BUTTON
-
 ===================================================== */
-
-
 
 button .fa,
-
 button .fas,
-
 button .far,
-
 button .fab,
-
 button .fa-solid,
-
 button .fa-regular,
-
-button .fa-brands {
-
-
-
-font-family:
-
-"Font Awesome 6 Free" !important;
-
-
-
-}
-
-
-
-
+button .fa-brands {font-family:"Font Awesome 6 Free" !important;}
 
 /* =====================================================
-
 FONT AWESOME BRANDS INSIDE BUTTON
-
 ===================================================== */
-
-
 
 button .fa-brands,
-
 button .fab,
-
 a .fa-brands,
-
-a .fab {
-
-
-
-font-family:
-
-"Font Awesome 6 Brands" !important;
-
-
-
-}
-
-
-
-
+a .fab {font-family:"Font Awesome 6 Brands" !important;}
 
 /* =====================================================
-
-ICON + TEXT
-
-
-
-ตัวอย่าง:
-
-
-
-<i class="fa-solid fa-plus"></i>
-
-เพิ่มข้อมูล
-
-
-
-ICON = Font Awesome
-
-TEXT = Prompt
-
+ICON + TEXT  ตัวอย่าง: <i class="fa-solid fa-plus"></i> เพิ่มข้อมูล ICON = Font Awesome TEXT = Prompt
 ===================================================== */
-
-
 
 i[class^="fa-"],
-
-i[class*=" fa-"] {
-
-
-
-font-family:
-
-"Font Awesome 6 Free" !important;
-
-
-
-}
-
-
-
+i[class*=" fa-"] {font-family:"Font Awesome 6 Free" !important;}
 i.fa-brands,
-
-i.fab {
-
-
-
-font-family:
-
-"Font Awesome 6 Brands" !important;
-
-
-
-}
-
-
+i.fab {font-family:"Font Awesome 6 Brands" !important;}
 
 /* =====================================================
-   SIDEBAR MENU ALIGNMENT FIX
-   All menu icons occupy the same fixed column.
+   SIDEBAR MENU ALIGNMENT FIX All menu icons occupy the same fixed column.
 ===================================================== */
-.layout > .sidebar .menu {
-  list-style: none;
-}
 
-.layout > .sidebar .menu > li {
-  margin: 4px 0;
-  min-width: 0;
-}
+.layout > .sidebar .menu {list-style: none;}
+.layout > .sidebar .menu > li {margin: 4px 0;min-width: 0;}
 
 /* Links and group buttons share the exact same 3-column layout:
    icon | label | optional chevron */
+
 .layout > .sidebar .menu > li > a,
 .layout > .sidebar .menu > li > .menu-group-toggle {
   box-sizing: border-box;
@@ -860,45 +388,72 @@ font-family:
   }
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.brand-copy h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.brand-copy p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.auth-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f766e;
+  text-align: center;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
 </style>
-
-
 
 </head>
 
-
-
-
-
 <body>
 
-
-
 <div id="auth-screen" role="main" aria-labelledby="auth-login-title">
-
 <section class="auth-card">
-
-<div class="auth-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
-
-<h1 class="auth-title" id="auth-login-title">E-ServiceofPharmacy</h1>
-
-<p class="auth-subtitle">เข้าสู่ระบบเพื่อใช้งาน Emergency Checklist</p>
-
-<form id="auth-login-form" autocomplete="on">
-
-<div id="auth-login-error" class="auth-error" role="alert" hidden></div>
-
-<label class="auth-field" for="auth-username">ชื่อผู้ใช้ (Username)</label>
-
-<div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input class="auth-input" id="auth-username" name="username" type="text" autocomplete="username" required maxlength="50" autocapitalize="none"></div>
-
-<label class="auth-field" for="auth-password">รหัสผ่าน (Password)</label>
-
-<div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input class="auth-input" id="auth-password" name="password" type="password" autocomplete="current-password" required></div>
-
-<button id="auth-login-submit" type="submit"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ</button>
-
-</form>
+  <div class="auth-brand-icon">
+    <img src="/assets/images/LOGO.png"alt="MithMitree Clinic Logo"class="auth-logo">
+  </div>
+  <h4 class="auth-title" id="auth-login-title">eNursing Smart Care System</h4>
+  <h5 class="auth-subtitle" style="font-size: 16px; text-align: center;">ระบบบริหารจัดการและบริการทางการพยาบาล</h5>
+    <form id="auth-login-form" autocomplete="on">
+      <div id="auth-login-error" class="auth-error" role="alert" hidden></div>
+        <label class="auth-field" for="auth-username">ชื่อผู้ใช้ (Username)</label>
+      <div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input class="auth-input" id="auth-username" name="username" type="text" autocomplete="username" required maxlength="50" autocapitalize="none"></div>
+        <label class="auth-field" for="auth-password">รหัสผ่าน (Password)</label>
+      <div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input class="auth-input" id="auth-password" name="password" type="password" autocomplete="current-password" required></div>
+        <button id="auth-login-submit" type="submit"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ</button>
+    </form>
 
 <div class="auth-login-divider"><span>หรือ</span></div>
 
@@ -1046,117 +601,72 @@ BRAND
 
 <div class="brand">
 
-<div class="brand-logo">💊</div>
+  <div class="brand-logo">
+    <img src="/assets/images/LOGO.png" alt="MitrMitree Clinic Logo">
+  </div>
 
-<div class="brand-copy">
+  <div class="brand-copy">
+    <h3 style="font-size: 18px !important;">eNursing</h3>
+    <p>Smart Care System</p>
+  </div>
 
-<h2>Smart Stock</h2>
-
-<p>Management System</p>
-
-</div>
-
-<button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="พับหรือขยายเมนู" aria-expanded="true" title="พับหรือขยายเมนู">
-
-<i class="fa-solid fa-angles-left"></i>
-
-</button>
+  <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="พับหรือขยายเมนู" aria-expanded="true" title="พับหรือขยายเมนู">
+    <i class="fa-solid fa-angles-left"></i>
+  </button>
 
 </div>
-
-
 
 <!-- =================================================
-
 MENU
-
 ================================================== -->
-
-
 
 <ul class="menu">
 
 <!-- DASHBOARD -->
 
-<li>
-
-<a href="#" data-route="dashboard">
-
-<span class="menu-icon">📊</span>
-
-<span>Dashboard</span>
-
-</a>
-
-</li>
-
-
+  <li><a href="#" data-route="dashboard"><span class="menu-icon">📊</span><span>Dashboard</span></a></li>
 
 <!-- NURSE DAILY CHECKLIST -->
 
-<li class="menu-group">
+  <li class="menu-group">
+    <button class="menu-group-toggle" type="button" aria-expanded="true" aria-controls="submenu-nurse-daily">
+      <span class="menu-icon">📋</span><span>Nurse Daily Checklist</span><i class="fa-solid fa-chevron-down menu-chevron" aria-hidden="true"></i>
+    </button>
 
-<button class="menu-group-toggle" type="button" aria-expanded="true" aria-controls="submenu-nurse-daily">
+    <ul class="submenu" id="submenu-nurse-daily">
 
-<span class="menu-icon">📋</span>
-
-<span>Nurse Daily Checklist</span>
-
-<i class="fa-solid fa-chevron-down menu-chevron" aria-hidden="true"></i>
-
-</button>
-
-<ul class="submenu" id="submenu-nurse-daily">
-
+      <li>
+        <a href="#" data-route="emergency-checklist"><span class="submenu-marker">🚑</span><span>Emergency Check</span></a>
+      </li>
 <li>
-
-<a href="#" data-route="emergency-checklist">
-
-<span class="submenu-marker">🚑</span>
-
-<span>Emergency</span>
-
-</a>
-
+  <a href="#" data-route="temperature-checklist">
+    <span class="submenu-marker">🌡️</span>
+    <span>Temperature Check</span>
+  </a>
 </li>
 
-</ul>
+    </ul>
 
-</li>
+  </li>
 
 
 
 <!-- NURSE SERVICES -->
 
-<li class="menu-group">
+  <li class="menu-group">
+    <button class="menu-group-toggle" type="button" aria-expanded="true" aria-controls="submenu-nurse-services">
+      <span class="menu-icon">🩺</span><span>Nurse Services</span><i class="fa-solid fa-chevron-down menu-chevron" aria-hidden="true"></i>
+    </button>
 
-<button class="menu-group-toggle" type="button" aria-expanded="true" aria-controls="submenu-nurse-services">
+    <ul class="submenu" id="submenu-nurse-services">
 
-<span class="menu-icon">🩺</span>
+      <li>
+        <a href="#" data-route="vaccine-management"><span class="submenu-marker">💉</span><span>Immunization</span></a>
+      </li>
 
-<span>Nurse SERVICES</span>
+  </ul>
 
-<i class="fa-solid fa-chevron-down menu-chevron" aria-hidden="true"></i>
-
-</button>
-
-<ul class="submenu" id="submenu-nurse-services">
-
-<li>
-
-<a href="#" data-route="vaccine-management">
-
-<span class="submenu-marker">💉</span>
-
-<span>IMMUNIZATION</span>
-
-</a>
-
-</li>
-
-</ul>
-
-</li>
+  </li>
 
 
 
@@ -1242,9 +752,9 @@ MAIN
 
 <div class="app-topbar-context">
 
-<span class="app-topbar-label">E-ServiceofPharmacy</span>
+<span class="app-topbar-label">ระบบบริหารจัดการและบริการทางการพยาบาล</span>
 
-<span class="app-topbar-subtitle">Pharmacy Management</span>
+<span class="app-topbar-subtitle">มิตรไมตรีคลินิกเวชกรรม เขตพื้นที่จังหวัดชลบุรี-ระยอง</span>
 
 </div>
 

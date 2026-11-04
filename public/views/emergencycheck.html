@@ -5,12 +5,10 @@
 <!-- ======================================
      HEADER — MODERN HEALTHCARE STYLE
 ======================================= -->
-<div class="card-header stock-header">
-  <div class="stock-header-left">
-    <div class="stock-header-copy">
-      <h3>Emergency Checklist</h3>
-      <p>ระบบตรวจสอบอุปกรณ์ฉุกเฉิน เวชภัณฑ์ และวันหมดอายุ</p>
-    </div>
+<div class="psc-stock-header">
+  <div class="psc-stock-title">
+    <h1>Emergency Checklist</h1>
+    <p>ระบบตรวจสอบอุปกรณ์ฉุกเฉิน เวชภัณฑ์ และวันหมดอายุ</p>
   </div>
 </div>
 
@@ -18,22 +16,22 @@
 <section class="ems-check-menu" aria-label="Emergency Checklist Navigation">
   <button type="button" class="ems-check-menu-btn" data-route="inventory-master">
     <span class="ems-menu-icon" aria-hidden="true">📦</span>
-    <span class="ems-menu-text">Inventory Master</span>
+    <span class="ems-menu-text">Emergency Item Master</span>
   </button>
 
   <button type="button" class="ems-check-menu-btn" data-route="branch-inventory-list" id="branchInventoryListMenu">
     <span class="ems-menu-icon" aria-hidden="true">🧩</span>
-    <span class="ems-menu-text">Inventory List สาขา</span>
+    <span class="ems-menu-text">Emergency Item Branch</span>
   </button>
 
   <button type="button" class="ems-check-menu-btn" data-route="receive-stock">
     <span class="ems-menu-icon" aria-hidden="true">📥</span>
-    <span class="ems-menu-text">Inventory Stock</span>
+    <span class="ems-menu-text">Emergency Item Receive</span>
   </button>
 
   <button type="button" class="ems-check-menu-btn" data-route="inventorydispense">
     <span class="ems-menu-icon" aria-hidden="true">📤</span>
-    <span class="ems-menu-text">Inventory Dispense</span>
+    <span class="ems-menu-text">Emergency Item Dispense</span>
   </button>
 
   <button type="button" class="ems-check-menu-btn" data-route="dashboard">
@@ -45,56 +43,33 @@
   <!-- ================= DAILY CHECK ================= -->
 
 <section class="ems-check-daily">
-
   <div class="ems-daily-card">
-
     <div class="ems-daily-header">
-
       <div class="ems-daily-title">
-
-        <div class="ems-daily-icon">
-          📅
-        </div>
-
-        <div>
-
-          <h2>Daily Emergency Check</h2>
-
-          <span>
-            ตารางตรวจสอบอุปกรณ์ Emergency ประจำวัน
-          </span>
-
+        <div class="ems-daily-icon">📅</div>
+          <div><h2>Daily Emergency Report</h2>
+          <span>ตารางสรุปการตรวจสอบอุปกรณ์รถฉุกเฉินประจำวัน</span>
         </div>
 
       </div>
 
       <div class="ems-daily-filter">
-
         <label>เดือน</label>
-
         <select id="monthSelect"></select>
-
         <label>ปี</label>
-
         <select id="yearSelect"></select>
-
       </div>
 
     </div>
 
     <div class="ems-daily-table-wrapper">
-
       <table id="dailyTable">
-
         <thead>
-
           <tr>
-
             <th style="width: 100px;">CODE</th>
             <th style="width: 250px;">NAME</th>
             <th style="width: 50px;">UNIT</th>
             <th style="width: 50px;">REQ</th>
-
             <th>1</th>
             <th>2</th>
             <th>3</th>
@@ -126,11 +101,9 @@
             <th>29</th>
             <th>30</th>
             <th>31</th>
-
           </tr>
-
         </thead>
-
+        
         <tbody id="tbody"></tbody>
 
       </table>

@@ -22,7 +22,7 @@
   function setScreenTitle(isRegister, subtitle) {
     const title = $("auth-login-title");
     const sub = document.querySelector(".auth-subtitle");
-    if (title) title.textContent = isRegister ? "สมัครสมาชิก" : "E-ServiceofPharmacy";
+    if (title) title.textContent = isRegister ? "สมัครสมาชิก" : "eNursing Smart Care System";
     if (sub) sub.textContent = isRegister ? subtitle : "เข้าสู่ระบบเพื่อใช้งาน Emergency Checklist";
   }
 

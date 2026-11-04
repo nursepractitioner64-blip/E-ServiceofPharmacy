@@ -2,110 +2,57 @@
      INVENTORY MASTER PAGE
 ===================================================== -->
 
-<section
-  class="inv-page"
-  id="invPage"
->
-
+<section class="inv-page" id="invPage">
   <main class="psc-app">
-
     <section class="psc-page">
-
       <div class="psc-card psc-stock-card">
-
 
         <!-- ======================================
              HEADER
         ======================================= -->
 
         <div class="psc-stock-header">
-
           <div class="psc-stock-title">
-
-            <h1>
-              Inventory Master List
-            </h1>
-
-            <p>
-              จัดการข้อมูลเวชภัณฑ์ ยา และอุปกรณ์ทั้งหมด
-            </p>
-
+            <h1>Inventory Master List</h1>
+            <p>จัดการข้อมูลเวชภัณฑ์ ยา และอุปกรณ์ทั้งหมด</p>
           </div>
-
 
           <div class="dsc-dispense-action-bar">
 
-                        <!-- BACK HOME -->
-<button
-  type="button"
-  class="btn btn-back-home"
-  id="backEmergencyHomeBtn"
->
-  🏠
-  หน้าแรก
-</button>
+            <!-- BACK HOME -->
+            <button type="button" class="btn btn-back-home" id="backEmergencyHomeBtn">
+              🏠หน้าแรก
+            </button>
 
-<button
-  type="button"
-  class="btn btn-refresh"
-  id="openAddInventoryModal"
->
-  📝
-  เพิ่มรายการ
-</button>
-            
-                        
+            <button type="button" class="btn btn-refresh" id="openAddInventoryModal">
+              📝เพิ่มรายการ
+            </button>
 
           </div>
 
         </div>
 
-
         <!-- ======================================
              TABLE
         ======================================= -->
 
-        <div class="psc-table-wrap">
-
+        <div class="psc-table-container">
           <table class="psc-table">
-
             <thead>
-
               <tr>
-
-                <th>
-                  CODE
-                </th>
-
-                <th>
-                  NAME
-                </th>
-
-                <th>
-                  UNIT
-                </th>
-
-                <th>
-                  REQUIRED
-                </th>
-
-                <th>
-                  จัดการ
-                </th>
-
+                <th>CODE</th>
+                <th>NAME</th>
+                <th>UNIT</th>
+                <th>REQUIRED</th>
+                <th>จัดการ</th>
               </tr>
-
             </thead>
-
 
             <tbody id="inventoryMasterTable">
 
               <tr>
 
-                <td
-                  colspan="5"
-                  class="text-center py-4"
-                >
+                <td colspan="5" class="text-center py-4">
                   กำลังโหลดข้อมูล...
                 </td>
 

@@ -238,16 +238,18 @@
       <!-- LOT -->
       <div class="psc-field">
 
-        <label for="lot">
+        <label for="lotSelect">
           Lot
         </label>
 
-        <input
-          name="lot"
-          id="lot"
-          autocomplete="off"
+        <select
+          id="lotSelect"
           required
-        />
+          disabled
+        >
+          <option value="">-- เลือก CODE ก่อน --</option>
+        </select>
+        <input type="hidden" name="lot" id="lot" />
 
       </div>
 

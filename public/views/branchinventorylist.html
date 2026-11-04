@@ -1,22 +1,806 @@
-<section class="branch-inventory-page container-fluid py-3">
+<section class="branch-inventory-page container-fluid py-4">
   <style>
-    .branch-inventory-page{font-family:Prompt, sans-serif;color:#17324d}.bil-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}.bil-title{font-weight:750;margin:0}.bil-sub{color:#64748b;margin:5px 0 0}.bil-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 6px 20px #0f172a0a;overflow:hidden}.bil-toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;padding:16px;border-bottom:1px solid #e2e8f0}.bil-field{display:flex;flex-direction:column;gap:6px;min-width:240px}.bil-field label{font-size:13px;font-weight:650;color:#475569}.bil-field select{border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:white;min-height:42px}.bil-info{margin:14px 16px;padding:12px 14px;border-radius:10px;background:#eff6ff;color:#1e40af;font-size:13px}.bil-warn{margin:14px 16px;padding:12px 14px;border-radius:10px;background:#fff7ed;color:#9a3412;font-size:13px}.bil-message{display:none;margin:14px 16px;padding:12px 14px;border-radius:10px}.bil-message.ok{display:block;background:#dcfce7;color:#166534}.bil-message.err{display:block;background:#fee2e2;color:#991b1b}.bil-table-wrap{overflow:auto;max-height:calc(100vh - 330px)}.bil-table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}.bil-table th{position:sticky;top:0;z-index:1;background:#f8fafc;color:#475569;font-size:12px;text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;white-space:nowrap}.bil-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}.bil-table tbody tr:hover{background:#f8fafc}.bil-code{font-weight:700;color:#0f766e;white-space:nowrap}.bil-name{min-width:300px}.bil-qty{width:100px;border:1px solid #cbd5e1;border-radius:8px;padding:7px 9px}.bil-switch{display:flex;align-items:center;gap:8px;white-space:nowrap}.bil-switch input{width:17px;height:17px;accent-color:#0f766e}.bil-lock{font-size:12px;color:#047857;background:#d1fae5;border-radius:999px;padding:4px 8px;white-space:nowrap}.bil-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}.bil-btn{border:0;border-radius:10px;padding:10px 16px;font-weight:650;cursor:pointer}.bil-btn:disabled{opacity:.55;cursor:wait}.bil-btn-primary{background:#0f766e;color:#fff}.bil-btn-light{background:#f1f5f9;color:#334155}.bil-count{color:#64748b;font-size:13px}
+    .branch-inventory-page {
+      --bil-primary: #0f766e;
+      --bil-primary-dark: #115e59;
+      --bil-mint: #ccfbf1;
+      --bil-bg: #f4f8fb;
+      --bil-border: #e2e8f0;
+      --bil-text: #17324d;
+      --bil-muted: #64748b;
+      font-family: "Prompt", sans-serif;
+      color: var(--bil-text);
+    }
+
+    .branch-inventory-page * {
+      box-sizing: border-box;
+    }
+
+    /* Header */
+    .branch-inventory-page .bil-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .branch-inventory-page .bil-heading {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .branch-inventory-page .bil-heading-icon {
+      width: 58px;
+      height: 58px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      color: #fff;
+      font-size: 25px;
+      background: linear-gradient(135deg, #0f766e, #2dd4bf);
+      box-shadow: 0 8px 20px #0f766e26;
+    }
+
+    .branch-inventory-page .bil-title {
+      margin: 0;
+      font-size: clamp(21px, 2vw, 27px);
+      font-weight: 750;
+      letter-spacing: -.4px;
+      color: #16334a;
+    }
+
+    .branch-inventory-page .bil-sub {
+      margin: 6px 0 0;
+      color: var(--bil-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* Main card */
+    .branch-inventory-page .bil-card {
+      background: #fff;
+      border: 1px solid var(--bil-border);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, .045);
+      overflow: hidden;
+    }
+
+    /* Toolbar */
+    .branch-inventory-page .bil-toolbar {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 22px 24px;
+      background: linear-gradient(120deg, #ffffff 0%, #f0fdfa 100%);
+      border-bottom: 1px solid var(--bil-border);
+    }
+
+    .branch-inventory-page .bil-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 260px;
+      max-width: 100%;
+    }
+
+    .branch-inventory-page .bil-field label {
+      font-size: 13px;
+      font-weight: 650;
+      color: #334155;
+    }
+
+    .branch-inventory-page .bil-field select {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 40px 10px 14px;
+      color: #17324d;
+      background-color: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .branch-inventory-page .bil-field select:focus {
+      border-color: #14b8a6;
+      box-shadow: 0 0 0 4px rgba(20, 184, 166, .12);
+    }
+
+    /* Buttons */
+    .branch-inventory-page .bil-btn {
+      min-height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 17px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: all .2s ease;
+      white-space: nowrap;
+    }
+
+    .branch-inventory-page .bil-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .branch-inventory-page .bil-btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #0f766e, #0d9488);
+      box-shadow: 0 5px 12px rgba(15, 118, 110, .16);
+    }
+
+    .branch-inventory-page .bil-btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #115e59, #0f766e);
+      box-shadow: 0 7px 18px rgba(15, 118, 110, .24);
+      transform: translateY(-1px);
+    }
+
+    .branch-inventory-page .bil-btn-light {
+      color: #334155;
+      background: #fff;
+      border-color: #dbe4ec;
+    }
+
+    .branch-inventory-page .bil-btn-light:hover:not(:disabled) {
+      color: var(--bil-primary);
+      background: #f0fdfa;
+      border-color: #99f6e4;
+    }
+
+    .branch-inventory-page .bil-btn-light i {
+      color: var(--bil-primary);
+    }
+
+    /* Summary */
+    .branch-inventory-page .bil-summary {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-left: auto;
+      min-height: 42px;
+      padding: 9px 14px;
+      border: 1px solid #ccfbf1;
+      border-radius: 12px;
+      background: #f0fdfa;
+      color: #0f766e;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .branch-inventory-page .bil-summary i {
+      font-size: 16px;
+    }
+
+    .branch-inventory-page .bil-count {
+      color: var(--bil-muted);
+      font-size: 12px;
+    }
+
+    /* Information panels */
+    .branch-inventory-page .bil-guides {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      padding: 20px 24px 10px;
+    }
+
+    .branch-inventory-page .bil-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      background: #eff6ff;
+      color: #1e40af;
+      font-size: 12px;
+      line-height: 1.85;
+    }
+
+    .branch-inventory-page .bil-info-icon {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: #dbeafe;
+      font-size: 15px;
+    }
+
+    .branch-inventory-page .bil-info strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .branch-inventory-page .bil-info-required {
+      background: #f0fdfa;
+      color: #115e59;
+      border-color: #99f6e4;
+    }
+
+    .branch-inventory-page .bil-info-required .bil-info-icon {
+      background: #ccfbf1;
+    }
+
+    .branch-inventory-page .bil-info-extra {
+      background: #f8fafc;
+      color: #475569;
+      border-color: #e2e8f0;
+    }
+
+    .branch-inventory-page .bil-info-extra .bil-info-icon {
+      background: #e2e8f0;
+    }
+
+    /* Messages */
+    .branch-inventory-page .bil-message {
+      display: none;
+      margin: 12px 24px;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .branch-inventory-page .bil-message.ok {
+      display: block;
+      color: #166534;
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+    }
+
+    .branch-inventory-page .bil-message.err {
+      display: block;
+      color: #991b1b;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+    }
+
+    .branch-inventory-page .bil-warn {
+      margin: 12px 24px;
+      padding: 13px 16px;
+      border: 1px solid #fed7aa;
+      border-radius: 12px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* Table */
+    .branch-inventory-page .bil-table-section {
+      padding: 14px 24px 0;
+    }
+
+    .branch-inventory-page .bil-table-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .branch-inventory-page .bil-table-heading h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #17324d;
+    }
+
+    .branch-inventory-page .bil-table-heading p {
+      margin: 4px 0 0;
+      color: var(--bil-muted);
+      font-size: 12px;
+    }
+
+    .branch-inventory-page .bil-table-wrap {
+      overflow: auto;
+      max-height: calc(100vh - 390px);
+      min-height: 180px;
+      border: 1px solid var(--bil-border);
+      border-radius: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f8fafc;
+    }
+
+    .branch-inventory-page .bil-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
+
+    .branch-inventory-page .bil-table th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 15px 16px;
+      background: #f1f5f9;
+      color: #475569;
+      border-bottom: 1px solid #dbe4ec;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .45px;
+      white-space: nowrap;
+    }
+
+    .branch-inventory-page .bil-table th:first-child {
+      padding-left: 20px;
+    }
+
+    .branch-inventory-page .bil-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
+      background: #fff;
+      transition: background .15s;
+    }
+
+    .branch-inventory-page .bil-table td:first-child {
+      padding-left: 20px;
+    }
+
+    .branch-inventory-page .bil-table tbody tr:hover td {
+      background: #f0fdfa;
+    }
+
+    .branch-inventory-page .bil-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .branch-inventory-page .bil-code {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border: 1px solid #ccfbf1;
+      border-radius: 7px;
+      background: #f0fdfa;
+      color: #0f766e;
+      font-weight: 750;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .branch-inventory-page .bil-name {
+      min-width: 300px;
+      color: #334155;
+      font-weight: 550;
+    }
+
+    .branch-inventory-page .bil-qty {
+      width: 100px;
+      min-height: 37px;
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      background: #fff;
+      color: #17324d;
+      font: inherit;
+      font-weight: 650;
+      text-align: center;
+      outline: none;
+      transition: all .2s;
+    }
+
+    .branch-inventory-page .bil-qty:focus {
+      border-color: #14b8a6;
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, .12);
+    }
+
+    .branch-inventory-page .bil-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      white-space: nowrap;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 550;
+    }
+
+    .branch-inventory-page .bil-switch input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #0f766e;
+      cursor: pointer;
+    }
+
+    .branch-inventory-page .bil-lock {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border: 1px solid #a7f3d0;
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: #047857;
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    /* Footer */
+    .branch-inventory-page .bil-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 19px 24px;
+      margin-top: 16px;
+      background: #f8fafc;
+      border-top: 1px solid var(--bil-border);
+    }
+
+    .branch-inventory-page .bil-footer-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .branch-inventory-page .bil-footer-note i {
+      margin-top: 3px;
+      color: #0f766e;
+    }
+
+    .branch-inventory-page #bil-save {
+      min-height: 46px;
+      padding: 12px 22px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .branch-inventory-page {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .branch-inventory-page .bil-head {
+        align-items: flex-start;
+      }
+
+      .branch-inventory-page .bil-heading-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        font-size: 21px;
+      }
+
+      .branch-inventory-page .bil-title {
+        font-size: 20px;
+      }
+
+      .branch-inventory-page .bil-toolbar {
+        padding: 16px;
+      }
+
+      .branch-inventory-page .bil-field {
+        width: 100%;
+        min-width: 100%;
+      }
+
+      .branch-inventory-page .bil-toolbar > .bil-btn {
+        flex: 1;
+      }
+
+      .branch-inventory-page .bil-summary {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .branch-inventory-page .bil-guides {
+        grid-template-columns: 1fr;
+        padding: 14px 16px 6px;
+      }
+
+      .branch-inventory-page .bil-table-section {
+        padding: 14px 12px 0;
+      }
+
+      .branch-inventory-page .bil-table-wrap {
+        max-height: 60vh;
+      }
+
+      .branch-inventory-page .bil-message,
+      .branch-inventory-page .bil-warn {
+        margin-left: 12px;
+        margin-right: 12px;
+      }
+
+      .branch-inventory-page .bil-footer {
+        padding: 16px;
+      }
+
+      .branch-inventory-page #bil-save {
+        width: 100%;
+      }
+    }
+
+  .branch-inventory-page .bil-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .branch-inventory-page .btn-back-home {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 10px 19px;
+    border: 1px solid #99f6e4;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+    color: #0f766e;
+    font-family: "Prompt", sans-serif;
+    font-size: 13px;
+    font-weight: 650;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.07);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .branch-inventory-page .btn-back-home i {
+    font-size: 15px;
+  }
+
+  .branch-inventory-page .btn-back-home:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    border-color: #0f766e;
+    box-shadow: 0 6px 16px rgba(15, 118, 110, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .branch-inventory-page .btn-back-home:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .branch-inventory-page .bil-head {
+      align-items: flex-start;
+    }
+
+    .branch-inventory-page .bil-header-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .branch-inventory-page .btn-back-home {
+      min-height: 42px;
+    }
+  }
   </style>
-  <div class="bil-head">
-    <div><h2 class="bil-title"><i class="fa-solid fa-list-check me-2" style="color:#0f766e"></i>ตั้งค่า Inventory List รายสาขา</h2><p class="bil-sub">กำหนดรายการและจำนวนขั้นต่ำที่ใช้ตรวจ Emergency Checklist ของแต่ละสาขา</p></div>
-    <button class="bil-btn bil-btn-light bil-admin-only" type="button" data-route="branch-management" hidden><i class="fa-solid fa-code-branch me-1"></i> จัดการสาขา</button>
-  </div>
-  <div class="bil-card">
-    <div class="bil-toolbar">
-      <div class="bil-field"><label for="bil-branch">สาขาที่ต้องการตั้งค่า</label><select id="bil-branch"><option value="">กำลังโหลดสาขา...</option></select></div>
-      <button class="bil-btn bil-btn-light" type="button" id="bil-reload"><i class="fa-solid fa-rotate me-1"></i> โหลดใหม่</button>
-      <span class="bil-count" id="bil-count">ยังไม่ได้เลือกสาขา</span>
+
+  html
+<!-- PAGE HEADER -->
+<div class="bil-head">
+
+  <!-- TITLE -->
+  <div class="bil-heading">
+    <div class="bil-heading-icon">
+      <i class="fa-solid fa-list-check"></i>
     </div>
-    <div class="bil-info" id="bil-scope-help">Staff สามารถตั้งค่าได้เฉพาะสาขาที่ Admin มอบหมายให้บัญชีนี้</div>
-    <div class="bil-info"><strong>รายการบังคับ:</strong> EMER001–EMER078 ต้องอยู่ใน Inventory List ทุกสาขา ไม่สามารถปิดรายการได้ แต่ Admin ปรับจำนวน REQUIRED ได้ตามนโยบายของสาขา<br><strong>รายการเสริม:</strong> รายการอื่นทั้งหมดใน INVENTORY_MASTER นอกเหนือจาก EMER001–EMER078 เลือกเพิ่มหรือไม่เพิ่มแยกตามสาขาได้ รวมถึง EMER079 Aspirin 325 mg</div>
+
+    <div>
+      <h2 class="bil-title">ตั้งค่า Inventory List รายสาขา</h2>
+      <p class="bil-sub">
+        จัดการรายการเวชภัณฑ์และกำหนดจำนวนขั้นต่ำสำหรับ Emergency Checklist
+        ของแต่ละสาขา
+      </p>
+    </div>
+  </div>
+
+  <!-- HEADER ACTIONS -->
+  <div class="bil-header-actions">
+
+    <!-- BACK HOME -->
+
+<button
+  type="button"
+  class="btn-back-home"
+  id="backEmergencyHomeBtn"
+  data-route="emergency-checklist"
+>
+  <i class="fa-solid fa-house"></i>
+  <span>หน้าแรก</span>
+</button>
+
+
+
+    <!-- BRANCH MANAGEMENT -->
+    <button
+      class="bil-btn bil-btn-light bil-admin-only"
+      type="button"
+      data-route="branch-management"
+      hidden
+    >
+      <i class="fa-solid fa-code-branch"></i>
+      จัดการสาขา
+    </button>
+
+  </div>
+
+</div>
+
+
+
+
+  <!-- MAIN CARD -->
+  <div class="bil-card">
+
+    <!-- BRANCH TOOLBAR -->
+    <div class="bil-toolbar">
+      <div class="bil-field">
+        <label for="bil-branch">
+          <i class="fa-solid fa-hospital me-1"></i>
+          สาขาที่ต้องการตั้งค่า
+        </label>
+
+        <select id="bil-branch">
+          <option value="">กำลังโหลดสาขา...</option>
+        </select>
+      </div>
+
+      <button
+        class="bil-btn bil-btn-light"
+        type="button"
+        id="bil-reload"
+      >
+        <i class="fa-solid fa-rotate"></i>
+        โหลดใหม่
+      </button>
+
+      <div class="bil-summary">
+        <i class="fa-solid fa-shield-heart"></i>
+        <span id="bil-count">ยังไม่ได้เลือกสาขา</span>
+      </div>
+    </div>
+
+    <!-- INFORMATION PANELS -->
+    <div class="bil-guides">
+
+      <div class="bil-info bil-info-required">
+        <div class="bil-info-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <div>
+          <strong>รายการบังคับ EMER001–EMER078</strong>
+          รายการฉุกเฉินที่ต้องมีใน Inventory List ทุกสาขา
+          ไม่สามารถปิดรายการได้ แต่ Admin สามารถปรับจำนวน REQUIRED
+          ให้เหมาะสมกับนโยบายของแต่ละสาขา
+        </div>
+      </div>
+
+      <div class="bil-info bil-info-extra">
+        <div class="bil-info-icon">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+
+        <div>
+          <strong>รายการเสริมและการตั้งค่าเฉพาะสาขา</strong>
+          รายการอื่นใน INVENTORY_MASTER สามารถเลือกเพิ่มหรือไม่เพิ่ม
+          แยกตามสาขาได้ รวมถึง EMER079 Aspirin 325 mg
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ACCESS SCOPE -->
+    <div class="bil-info" id="bil-scope-help" style="margin: 10px 24px;">
+      <div class="bil-info-icon">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+
+      <div>
+        <strong>สิทธิ์การจัดการข้อมูล</strong>
+        Staff สามารถตั้งค่าได้เฉพาะสาขาที่ Admin มอบหมายให้บัญชีนี้
+      </div>
+    </div>
+
+    <!-- STATUS MESSAGE -->
     <div id="bil-message" class="bil-message" role="status"></div>
+
+    <!-- WARNING -->
     <div id="bil-missing" class="bil-warn" hidden></div>
-    <div class="bil-table-wrap"><table class="bil-table"><thead><tr><th>CODE</th><th>NAME</th><th>UNIT</th><th>REQUIRED</th><th>การตั้งค่า</th></tr></thead><tbody id="bil-rows"><tr><td colspan="5" style="text-align:center;padding:30px;color:#64748b">กรุณาเลือกสาขา</td></tr></tbody></table></div>
-    <div class="bil-footer"><span class="bil-count">รายการ ชื่อ และหน่วยดึงจาก INVENTORY_MASTER ทั้งหมด</span><button class="bil-btn bil-btn-primary" type="button" id="bil-save" disabled><i class="fa-solid fa-floppy-disk me-1"></i> บันทึก Inventory List</button></div>
+
+    <!-- TABLE -->
+    <div class="bil-table-section">
+
+      <div class="bil-table-heading">
+        <div>
+          <h3>
+            <i class="fa-solid fa-table-list me-2" style="color:#0f766e;"></i>
+            รายการ Inventory Master
+          </h3>
+
+          <p>
+            ตรวจสอบรายการและกำหนดจำนวนขั้นต่ำที่ต้องมีในแต่ละสาขา
+          </p>
+        </div>
+      </div>
+
+      <div class="bil-table">
+        <table class="bil-table">
+          <thead>
+            <tr>
+              <th>CODE</th>
+              <th>NAME</th>
+              <th>UNIT</th>
+              <th>REQUIRED</th>
+              <th>การตั้งค่า</th>
+            </tr>
+          </thead>
+
+          <tbody id="bil-rows">
+            <tr>
+              <td
+                colspan="5"
+                style="text-align:center;padding:45px 20px;color:#64748b;"
+              >
+                <i
+                  class="fa-solid fa-hospital-user"
+                  style="display:block;font-size:28px;color:#94a3b8;margin-bottom:12px;"
+                ></i>
+
+                กรุณาเลือกสาขาที่ต้องการตั้งค่า
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="bil-footer">
+
+      <div class="bil-footer-note">
+        <i class="fa-solid fa-circle-info"></i>
+
+        <span>
+          รายการ ชื่อ และหน่วยดึงจาก INVENTORY_MASTER<br>
+          โปรดตรวจสอบข้อมูลก่อนบันทึกการตั้งค่าของแต่ละสาขา
+        </span>
+      </div>
+
+      <button
+        class="bil-btn bil-btn-primary"
+        type="button"
+        id="bil-save"
+        disabled
+      >
+        <i class="fa-solid fa-floppy-disk"></i>
+        บันทึก Inventory List
+      </button>
+
+    </div>
+
   </div>
 </section>

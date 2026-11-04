@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-test('E-ServiceofPharmacy LINE link endpoints require authentication', () => {
+test('eNursing Smart Care System LINE link endpoints require authentication', () => {
   const routes = fs.readFileSync(path.join(root, 'src/modules/auth/auth.routes.js'), 'utf8');
   assert.match(routes, /router\.post\('\/line\/link', requireAuth/);
   assert.match(routes, /router\.get\('\/line\/status', requireAuth/);

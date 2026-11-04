@@ -1,5 +1,15 @@
 const service = require("./dispense.service");
 const running = require("./dispense.running");
+const branchService = require("../branches/branches.service");
+
+async function getCurrentBranch(req) {
+  const branchId = String(req.authBranchId || "").trim();
+  if (!branchId || branchId === "ALL") throw new Error("กรุณาเลือกสาขาที่ปฏิบัติงานก่อนจำหน่ายยา");
+  const branches = await branchService.listBranches({ includeInactive: false });
+  const branch = (branches || []).find(item => String(item.BRANCH_ID || "").trim() === branchId);
+  if (!branch) throw new Error("ไม่พบสาขาที่ปฏิบัติงาน หรือสาขาปิดใช้งานแล้ว");
+  return { branchId, location: String(branch.BRANCH_NAME || "").trim(), user: String(req.authUser?.fullName || req.authUser?.username || "").trim() };
+}
 
 // =====================
 // UPLOAD
@@ -124,7 +134,8 @@ exports.getList = async (req, res) => {
 
     console.log("🔥 HIT /api/dispense");
 
-    const data = await service.getList();
+    const branch = await getCurrentBranch(req);
+    const data = (await service.getList()).filter(row => String(row.BRANCH_ID || row.branchId || "").trim() === branch.branchId);
 
     res.json({
       ok: true,
@@ -146,8 +157,8 @@ exports.getByRefNo = async (req, res) => {
 
   try {
 
-    const data =
-      await service.getByRefNo(req.params.refNo);
+    const branch = await getCurrentBranch(req);
+    const data = await service.getByRefNo(req.params.refNo, branch);
 
     if (!data) {
 
@@ -180,7 +191,8 @@ exports.getStockMovement = async (req, res) => {
 
   try {
 
-    const data = await service.getList();
+    const branch = await getCurrentBranch(req);
+    const data = (await service.getList()).filter(row => String(row.BRANCH_ID || row.branchId || "").trim() === branch.branchId);
 
     res.json({
       ok: true,
@@ -204,10 +216,8 @@ exports.createDispense = async (req, res) => {
 
   try {
 
-    const data =
-      await service.createDispense(
-        req.body
-      );
+    const branch = await getCurrentBranch(req);
+    const data = await service.createDispense(req.body || {}, branch);
 
     return res.json({
       ok: true,
@@ -231,11 +241,8 @@ exports.updateDispense = async (req, res) => {
 
   try {
 
-    const data =
-      await service.updateDispense(
-        req.params.refNo,
-        req.body
-      );
+    const branch = await getCurrentBranch(req);
+    const data = await service.updateDispense(req.params.refNo, req.body || {}, branch);
 
     return res.json({
       ok: true,
@@ -259,9 +266,8 @@ exports.deleteDispense = async (req, res) => {
 
   try {
 
-    await service.deleteDispense(
-      req.params.refNo
-    );
+    const branch = await getCurrentBranch(req);
+    await service.deleteDispense(req.params.refNo, branch);
 
     return res.json({
       ok: true

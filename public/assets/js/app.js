@@ -78,6 +78,13 @@ const routes = {
     system: "emergency"
   },
 
+  "temperature-checklist": {
+    view: "/views/temperature-checklist.html",
+    script: "/modules/temperaturecheck/temperaturecheck.client.js",
+    style: "/modules/temperaturecheck/temperaturecheck.style.css",
+    system: "emergency"
+  },
+
 
   /* ===================================================
      CONTROLLED DRUG

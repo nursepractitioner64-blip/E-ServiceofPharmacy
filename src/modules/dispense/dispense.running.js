@@ -7,10 +7,10 @@ async function getMovementId() {
   return withSequenceLock("STOCK_MOVEMENT:MOVEMENT_ID", async () => {
     const now = new Date();
     const { yyyy: year } = getBangkokDateParts(now);
-    const rows = await repository.getStockMovements();
-    const values = (rows || []).map(row => row.movementId);
+    const rows = await repository.getInventoryMovements();
+    const values = (rows || []).map(row => row.MOVEMENT_ID || row.movementId);
     const next = maxAnnualSequence(values, "MOV", year) + 1;
-    return formatAnnualNumber("MOV", next, now);
+    return formatAnnualNumber("MOVID", next, now);
   });
 }
 
@@ -18,8 +18,8 @@ async function getRefNo() {
   return withSequenceLock("STOCK_MOVEMENT:RCOUT", async () => {
     const now = new Date();
     const { yyyy: year } = getBangkokDateParts(now);
-    const rows = await repository.getStockMovements();
-    const values = (rows || []).map(row => row.refNo);
+    const rows = await repository.getInventoryMovements();
+    const values = (rows || []).map(row => row.REF_NO || row.refNo);
     const next = maxAnnualSequence(values, "RCOUT", year) + 1;
     return formatAnnualNumber("RCOUT", next, now);
   });

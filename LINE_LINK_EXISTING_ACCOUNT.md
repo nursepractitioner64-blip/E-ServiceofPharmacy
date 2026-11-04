@@ -1,7 +1,7 @@
-# ผูก LINE กับบัญชีเดิม — E-ServiceofPharmacy
+# ผูก LINE กับบัญชีเดิม — eNursing Smart Care System
 
 ## ขั้นตอนใช้งาน
-1. รัน E-ServiceofPharmacy ตามปกติ แต่หากจะผูก LINE ห้ามเปิดผ่าน `http://localhost:2003` โดยตรง
+1. รัน eNursing Smart Care System ตามปกติ แต่หากจะผูก LINE ห้ามเปิดผ่าน `http://localhost:2003` โดยตรง
 2. เปิด tunnel เช่น `ngrok http 2003` แล้วเข้าโปรแกรมผ่าน HTTPS URL ที่ ngrok แสดง
 3. ตั้ง URL HTTPS เดียวกันนี้เป็น LIFF Endpoint URL ใน LINE Developers และเปิด Scope `openid` กับ `profile`
 4. ตั้ง `LINE_LIFF_ID` เป็น LIFF ID ของ LIFF App นี้ และ `LINE_CHANNEL_ID` เป็น Channel ID ของ LINE Login Channel ที่เป็นเจ้าของ LIFF App (ไม่ใช่ Messaging API Channel ID)

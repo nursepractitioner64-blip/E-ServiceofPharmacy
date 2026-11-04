@@ -318,7 +318,7 @@ body{
 
 /* =========================================================
 
-   SIDEBAR REDESIGN - E-ServiceofPharmacy
+   SIDEBAR REDESIGN - eNursing Smart Care System
 
    White / Teal, compact layout, collapsible state
 
@@ -4839,7 +4839,7 @@ td{
 }
 
 /* =========================================================
-   SIDEBAR VISUAL POLISH — E-ServiceofPharmacy
+   SIDEBAR VISUAL POLISH — eNursing Smart Care System
    Professional healthcare teal / clear hierarchy / responsive
    Scope: sidebar only. Existing routes and page styles are preserved.
 ========================================================= */
@@ -5175,7 +5175,7 @@ td{
   }
 }
 
-/* SIDEBAR TYPOGRAPHY POLISH — E-ServiceofPharmacy */
+/* SIDEBAR TYPOGRAPHY POLISH — eNursing Smart Care System */
 .layout > .sidebar {
   font-family: "Prompt", "Kanit", "Noto Sans Thai", sans-serif;
   background: linear-gradient(180deg, #07585b 0%, #06494d 52%, #043e42 100%);
@@ -5218,3 +5218,22 @@ td{
 .layout > .sidebar .menu a:focus-visible, .layout > .sidebar .menu button:focus-visible { outline: 2px solid #7ff5e4; outline-offset: 2px; }
 .layout.sidebar-collapsed > .sidebar .menu > li > a, .layout.sidebar-collapsed > .sidebar .menu-group > .menu-group-toggle { justify-content: center; padding-right: 6px; padding-left: 6px; }
 @media (max-width: 768px) { .layout > .sidebar .menu > li > a, .layout > .sidebar .menu-group > .menu-group-toggle { min-height: 44px; font-size: 12.5px; } }
+.auth-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.auth-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 5px;
+}

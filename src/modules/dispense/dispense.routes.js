@@ -2,18 +2,20 @@ const router = require("express").Router();
 const controller = require("./dispense.controller");
 const multer = require("multer");
 
+const { requireAuth, requireBranch } = require("../auth/auth.middleware");
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }
 });
 
-router.get("/", controller.getList);
+router.get("/", requireAuth, requireBranch, controller.getList);
 
-router.get("/stock-movement", controller.getStockMovement);
+router.get("/stock-movement", requireAuth, requireBranch, controller.getStockMovement);
 
 router.get("/next-refno", controller.getNextRefNo);
 
-router.get("/:refNo", controller.getByRefNo);
+router.get("/:refNo", requireAuth, requireBranch, controller.getByRefNo);
 
 router.post(
   "/upload",
@@ -21,15 +23,19 @@ router.post(
   controller.uploadDispenseZip
 );
 
-router.post("/", controller.createDispense);
+router.post("/", requireAuth, requireBranch, controller.createDispense);
 
 router.put(
   "/:refNo",
+  requireAuth,
+  requireBranch,
   controller.updateDispense
 );
 
 router.delete(
   "/:refNo",
+  requireAuth,
+  requireBranch,
   controller.deleteDispense
 );
 

@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { requireAuth, requireBranch } = require("../modules/auth/auth.middleware");
 
 /* =====================================================
  * AUTHENTICATION
@@ -94,6 +95,14 @@ router.use(
   require("../modules/emergencycheck/emergencycheck.routes")
 );
 
+/* =====================================================
+ * TEMPERATURE CHECK
+ * ===================================================== */
+router.use(
+  "/temperature-check",
+  require("../modules/temperaturecheck/temperaturecheck.routes")
+);
+
 
 /* =====================================================
  * CONTROLLED DRUG
@@ -111,6 +120,8 @@ router.use(
 
 router.get(
   "/inventory-movement",
+  requireAuth,
+  requireBranch,
   async (req, res) => {
 
     try {
@@ -195,7 +206,8 @@ router.get(
             CONTAINER_QR:
               row[17] || ""
 
-          }));
+          }))
+          .filter(row => String(row.BRANCH_ID || "").trim() === String(req.authBranchId || "").trim());
 
       return res.json(rows);
 

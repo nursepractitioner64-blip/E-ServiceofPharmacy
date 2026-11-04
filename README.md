@@ -19,20 +19,20 @@ Get-NetTCPConnection -LocalPort 2003 -ErrorAction SilentlyContinue |
     Select-Object -ExpandProperty OwningProcess -Unique |
     ForEach-Object { Stop-Process -Id $_ -Force }
 
-cd "F:\STM\E-ServiceofPharmacy"
+cd "F:\STM\eNursing Smart Care System"
 
 git status
 
 git add .
 
-git commit -m "Update ServiceofPharmacy 20-10-69#2"
+git commit -m "Update E-StockScan 20-10-69#2"
 
 git push
 
 
 
 1. เข้าโฟลเดอร์โปรเจกต์
-cd "F:\STM\ชื่อโปรเจกต์ใหม่"
+cd "F:\STM\ชื่อโปรเจกต์ใหม่" ื่ 
 2. เริ่ม Git
 git init
 3. เพิ่มไฟล์
@@ -324,7 +324,7 @@ Symbols
 ## สมัครสมาชิกผ่าน LINE (ใช้บัญชีร่วมกับ E-StockScan)
 
 - ตั้งค่า `LINE_CHANNEL_ID` เป็น LINE Login channel ID เดียวกับ E-StockScan
-- ตั้งค่า `LINE_LIFF_ID` เป็น LIFF app ID ที่ endpoint URL ชี้มาที่ deployment ของ E-ServiceofPharmacy
+- ตั้งค่า `LINE_LIFF_ID` เป็น LIFF app ID ที่ endpoint URL ชี้มาที่ deployment ของ eNursing Smart Care System
 - LIFF ต้องเปิด scope `openid` และ `profile`
 - ตั้งค่า `GOOGLE_SHEET_ID` ให้ตรงกับ E-StockScan และใช้ชีต `USERS` เดียวกัน
 - การสมัครใหม่จะถูกบันทึกเป็น `STATUS=PENDING`, `ROLE=USER`, `BRANCH_IDS` ว่าง จนกว่า Admin จะอนุมัติและกำหนดสิทธิ์

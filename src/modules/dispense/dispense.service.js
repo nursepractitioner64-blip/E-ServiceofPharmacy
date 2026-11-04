@@ -248,23 +248,23 @@ async function uploadDrugOpd(buffer) {
 // =========================
 
 async function getList() {
-  return repository.getStockMovements();
+  return repository.getInventoryMovements();
 }
 
-async function getByRefNo(refNo) {
-  return repository.getByRefNo(refNo);
+async function getByRefNo(refNo, context = {}) {
+  return repository.getInventoryByRefNo(refNo, context.branchId || "");
 }
 
-async function createDispense(body) {
-  return repository.createDispense(body);
+async function createDispense(body, context) {
+  return repository.createInventoryDispense(body, context);
 }
 
-async function updateDispense(refNo, body) {
-  return repository.updateDispense(refNo, body);
+async function updateDispense(refNo, body, context) {
+  return repository.updateInventoryDispense(refNo, body, context);
 }
 
-async function deleteDispense(refNo) {
-  return repository.deleteDispense(refNo);
+async function deleteDispense(refNo, context) {
+  return repository.deleteInventoryDispense(refNo, context);
 }
 
 module.exports = {

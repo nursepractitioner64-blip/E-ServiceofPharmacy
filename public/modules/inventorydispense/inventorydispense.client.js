@@ -134,6 +134,13 @@ function bindEvents() {
     drugSelect.dataset.bound = "true";
   }
 
+  const lotSelect = document.getElementById("lotSelect");
+
+  if (lotSelect && !lotSelect.dataset.bound) {
+    lotSelect.addEventListener("change", handleLotChange);
+    lotSelect.dataset.bound = "true";
+  }
+
 
   const modal =
     document.getElementById("dispenseModal");
@@ -251,21 +258,11 @@ async function loadInventoryMovement() {
     }
 
 
-    inventoryRows =
-      rows.filter(row => {
-
-        const type =
-          String(
-            getField(
-              row,
-              "TYPE"
-            )
-          )
-            .trim()
-            .toUpperCase();
-
-        return type === "IN";
-      });
+    // Keep IN and OUT movements so each LOT balance matches Vaccine Stock logic.
+    inventoryRows = rows.filter(row => {
+      const type = String(getField(row, "TYPE") || "").trim().toUpperCase();
+      return type === "IN" || type === "OUT";
+    });
 
 
     console.log(
@@ -275,7 +272,7 @@ async function loadInventoryMovement() {
 
 
     console.log(
-      "📥 IN STOCK ROWS:",
+      "📦 BRANCH MOVEMENT ROWS:",
       inventoryRows.length
     );
 
@@ -299,6 +296,33 @@ async function loadInventoryMovement() {
 
 
 /* =====================================================
+   LOT BALANCE — SAME MOVEMENT RULE AS VACCINE STOCK
+   IN adds quantity; OUT subtracts quantity.
+   API is already restricted to the active branch.
+===================================================== */
+
+function calculateLotBalance(code, lot, exp) {
+  const wantedCode = String(code || "").trim().toUpperCase();
+  const wantedLot = String(lot || "").trim();
+  const wantedExp = normalizeDate(exp);
+
+  return inventoryRows.reduce((balance, row) => {
+    const rowCode = String(getField(row, "CODE") || "").trim().toUpperCase();
+    const rowLot = String(getField(row, "LOT") || "").trim();
+    const rowExp = normalizeDate(getField(row, "EXP") || "");
+    if (rowCode !== wantedCode || rowLot !== wantedLot || rowExp !== wantedExp) return balance;
+
+    const type = String(getField(row, "TYPE") || "").trim().toUpperCase();
+    const quantity = Math.abs(Number(getField(row, "QTY") || 0));
+    if (!Number.isFinite(quantity)) return balance;
+    if (type === "IN") return balance + quantity;
+    if (type === "OUT") return balance - quantity;
+    return balance;
+  }, 0);
+}
+
+
+/* =====================================================
    POPULATE DRUG SELECT
 
    ดึงจาก INVENTORY_MOVEMENT
@@ -309,325 +333,166 @@ async function loadInventoryMovement() {
 ===================================================== */
 
 function populateDrugSelect() {
-
-  const select =
-    document.getElementById(
-      "drugSelect"
-    );
-
-
+  const select = document.getElementById("drugSelect");
   if (!select) return;
 
-
-  select.innerHTML = `
-    <option value="">
-      -- เลือกยา --
-    </option>
-  `;
-
-
-  const uniqueRows = [];
-
-  const seen = new Set();
-
+  const previousCode = select.value;
+  const drugs = new Map();
 
   inventoryRows.forEach(row => {
+    const type = String(getField(row, "TYPE") || "").trim().toUpperCase();
+    if (type !== "IN") return;
 
-    const code =
-      String(
-        getField(
-          row,
-          "CODE"
-        )
-      ).trim();
-
-
-    const name =
-      String(
-        getField(
-          row,
-          "NAME"
-        )
-      ).trim();
-
-
-    const unit =
-      String(
-        getField(
-          row,
-          "UNIT"
-        )
-      ).trim();
-
-
-    const lot =
-      String(
-        getField(
-          row,
-          "LOT"
-        )
-      ).trim();
-
-
-    const exp =
-      String(
-        getField(
-          row,
-          "EXP"
-        )
-      ).trim();
-
-
+    const code = String(getField(row, "CODE") || "").trim();
     if (!code) return;
 
+    const name = String(getField(row, "NAME") || "").trim();
+    const unit = String(getField(row, "UNIT") || "").trim();
+    const key = code.toUpperCase();
 
-    const key =
-      [
-        code,
-        lot,
-        exp
-      ].join("|");
+    if (!drugs.has(key)) drugs.set(key, { code, name, unit });
+  });
 
+  const availableDrugs = [...drugs.values()].filter(drug =>
+    getAvailableLots(drug.code).length > 0
+  );
 
-    if (seen.has(key)) return;
+  select.innerHTML = '<option value="">-- เลือกรหัสยา / ชื่อยา --</option>';
 
-
-    seen.add(key);
-
-
-    uniqueRows.push({
-      code,
-      name,
-      unit,
-      lot,
-      exp,
-      row
+  availableDrugs
+    .sort((a, b) => a.code.localeCompare(b.code, "th", { numeric: true }))
+    .forEach(drug => {
+      const option = document.createElement("option");
+      option.value = drug.code;
+      option.textContent = `${drug.code} - ${drug.name}`;
+      option.dataset.name = drug.name;
+      option.dataset.unit = drug.unit;
+      select.appendChild(option);
     });
 
-  });
+  select.disabled = availableDrugs.length === 0;
 
+  if (previousCode && availableDrugs.some(item => item.code === previousCode)) {
+    select.value = previousCode;
+    handleDrugChange();
+  } else {
+    select.value = "";
+    clearDrugFields();
+  }
 
-  uniqueRows.forEach(item => {
-
-    const option =
-      document.createElement(
-        "option"
-      );
-
-
-    /*
-     * IMPORTANT
-     * ใช้ CODE|LOT|EXP เป็น value
-     * เพื่อรองรับยา CODE เดียวกันหลาย LOT
-     */
-    option.value =
-      [
-        item.code,
-        item.lot,
-        item.exp
-      ].join("|");
-
-
-    let label =
-      `${item.code} - ${item.name}`;
-
-
-    if (item.lot) {
-
-      label +=
-        ` | LOT: ${item.lot}`;
-    }
-
-
-    if (item.exp) {
-
-      label +=
-        ` | EXP: ${formatDate(item.exp)}`;
-    }
-
-
-    option.textContent =
-      label;
-
-
-    option.dataset.code =
-      item.code;
-
-
-    option.dataset.name =
-      item.name;
-
-
-    option.dataset.unit =
-      item.unit;
-
-
-    option.dataset.lot =
-      item.lot;
-
-
-    option.dataset.exp =
-      item.exp;
-
-
-    select.appendChild(
-      option
-    );
-
-  });
-
-
-  console.log(
-    "💊 DRUG OPTIONS:",
-    uniqueRows.length
-  );
+  console.log("💊 AVAILABLE DRUG CODES:", availableDrugs.length);
 }
 
+/* คืน LOT ที่มีคงเหลือจริงของ CODE ที่เลือก โดยแยก LOT + EXP */
+function getAvailableLots(code) {
+  const lots = new Map();
+  const wantedCode = String(code || "").trim().toUpperCase();
 
-/* =====================================================
-   DRUG CHANGE
+  inventoryRows.forEach(row => {
+    const rowCode = String(getField(row, "CODE") || "").trim().toUpperCase();
+    const type = String(getField(row, "TYPE") || "").trim().toUpperCase();
+    if (rowCode !== wantedCode || type !== "IN") return;
 
-   เมื่อเลือกยา
-   Fill:
-   CODE
-   NAME
-   UNIT
-   LOT
-   EXP
-===================================================== */
+    const lot = String(getField(row, "LOT") || "").trim();
+    const expRaw = getField(row, "EXP") || "";
+    const exp = normalizeDate(expRaw);
+    const key = `${lot}__${exp}`;
+    if (!lots.has(key)) {
+      lots.set(key, {
+        lot,
+        exp,
+        unit: String(getField(row, "UNIT") || "").trim(),
+        balance: calculateLotBalance(code, lot, exp) + (
+          editingRow &&
+          String(getField(editingRow, "CODE") || "").trim().toUpperCase() === wantedCode &&
+          String(getField(editingRow, "LOT") || "").trim() === lot &&
+          normalizeDate(getField(editingRow, "EXP") || "") === exp
+            ? Math.abs(Number(getField(editingRow, "QTY") || 0))
+            : 0
+        )
+      });
+    }
+  });
 
+  return [...lots.values()]
+    .filter(item => item.lot && item.balance > 0)
+    .sort((a, b) => {
+      const expCompare = String(a.exp).localeCompare(String(b.exp));
+      return expCompare || a.lot.localeCompare(b.lot, "th", { numeric: true });
+    });
+}
+
+/* เลือก CODE แล้วแสดงเฉพาะ LOT ที่มีคงเหลือของ CODE นั้น */
 function handleDrugChange() {
+  const select = document.getElementById("drugSelect");
+  const option = select?.selectedOptions?.[0];
+  const code = select?.value || "";
+  const lotSelect = document.getElementById("lotSelect");
 
-  const select =
-    document.getElementById(
-      "drugSelect"
-    );
-
-
-  if (!select) return;
-
-
-  const option =
-    select.options[
-      select.selectedIndex
-    ];
-
-
-  if (!option || !option.value) {
-
+  if (!code || !option) {
     clearDrugFields();
-
-    setValue(
-      "code",
-      ""
-    );
-
     return;
   }
 
+  setValue("code", code);
+  setValue("name", option.dataset.name || "");
+  setValue("unit", option.dataset.unit || "");
+  setValue("lot", "");
+  setValue("exp", "");
 
-  const code =
-    option.dataset.code ||
-    "";
+  if (lotSelect) {
+    lotSelect.innerHTML = '<option value="">-- เลือก LOT --</option>';
+    getAvailableLots(code).forEach((item, index) => {
+      const lotOption = document.createElement("option");
+      lotOption.value = `${index}`;
+      lotOption.textContent = `LOT: ${item.lot} | EXP: ${item.exp ? formatDate(item.exp) : "ไม่ระบุ"} | คงเหลือ: ${item.balance} ${item.unit || option.dataset.unit || ""}`;
+      lotOption.dataset.lot = item.lot;
+      lotOption.dataset.exp = item.exp;
+      lotOption.dataset.balance = String(item.balance);
+      lotOption.dataset.unit = item.unit || option.dataset.unit || "";
+      lotSelect.appendChild(lotOption);
+    });
+    lotSelect.disabled = lotSelect.options.length <= 1;
+    lotSelect.value = "";
+  }
 
-
-  const name =
-    option.dataset.name ||
-    "";
-
-
-  const unit =
-    option.dataset.unit ||
-    "";
-
-
-  const lot =
-    option.dataset.lot ||
-    "";
-
-
-  const exp =
-    option.dataset.exp ||
-    "";
-
-
-  setValue(
-    "code",
-    code
-  );
-
-
-  setValue(
-    "name",
-    name
-  );
-
-
-  setValue(
-    "unit",
-    unit
-  );
-
-
-  setValue(
-    "lot",
-    lot
-  );
-
-
-  setValue(
-    "exp",
-    normalizeDate(exp)
-  );
-
-
-  console.log(
-    "💊 DRUG SELECTED:",
-    {
-      code,
-      name,
-      unit,
-      lot,
-      exp
-    }
-  );
+  console.log("💊 CODE SELECTED:", { code, availableLots: getAvailableLots(code).length });
 }
 
+/* เลือก LOT แล้วจึงเติม LOT / EXP / UNIT ให้ฟอร์ม */
+function handleLotChange() {
+  const select = document.getElementById("lotSelect");
+  const option = select?.selectedOptions?.[0];
+  if (!option || option.value === "") {
+    setValue("lot", "");
+    setValue("exp", "");
+    return;
+  }
 
-/* =====================================================
-   CLEAR DRUG FIELDS
-===================================================== */
+  setValue("lot", option.dataset.lot || "");
+  setValue("exp", normalizeDate(option.dataset.exp || ""));
+  if (option.dataset.unit) setValue("unit", option.dataset.unit);
+
+  console.log("📦 LOT SELECTED:", {
+    code: document.getElementById("drugSelect")?.value || "",
+    lot: option.dataset.lot || "",
+    exp: option.dataset.exp || "",
+    balance: option.dataset.balance || ""
+  });
+}
 
 function clearDrugFields() {
+  setValue("code", "");
+  setValue("name", "");
+  setValue("unit", "");
+  setValue("lot", "");
+  setValue("exp", "");
 
-  setValue(
-    "code",
-    ""
-  );
-
-
-  setValue(
-    "name",
-    ""
-  );
-
-
-  setValue(
-    "unit",
-    ""
-  );
-
-
-  setValue(
-    "lot",
-    ""
-  );
-
-
-  setValue(
-    "exp",
-    ""
-  );
+  const lotSelect = document.getElementById("lotSelect");
+  if (lotSelect) {
+    lotSelect.innerHTML = '<option value="">-- เลือก CODE ก่อน --</option>';
+    lotSelect.disabled = true;
+  }
 }
 
 
@@ -755,7 +620,10 @@ function resetForm() {
 
 
   form.reset();
+  clearDrugFields();
 
+  const drugSelect = document.getElementById("drugSelect");
+  if (drugSelect) drugSelect.value = "";
 
   const type =
     form.querySelector(
@@ -1666,78 +1534,26 @@ function editDispense(row) {
   );
 
 
-  /*
-   * หา option จาก CODE + LOT + EXP
-   */
-  const select =
-    document.getElementById(
-      "drugSelect"
-    );
-
+  // เลือก CODE ก่อน แล้วจึงเลือก LOT ที่ตรงกับรายการเดิม
+  const select = document.getElementById("drugSelect");
+  const code = String(getField(row, "CODE") || "").trim();
+  const lot = String(getField(row, "LOT") || "").trim();
+  const exp = normalizeDate(getField(row, "EXP") || "");
 
   if (select) {
+    select.value = code;
+    handleDrugChange();
 
-    const code =
-      String(
-        getField(
-          row,
-          "CODE"
-        )
-      ).trim();
-
-
-    const lot =
-      String(
-        getField(
-          row,
-          "LOT"
-        )
-      ).trim();
-
-
-    const exp =
-      String(
-        getField(
-          row,
-          "EXP"
-        )
-      ).trim();
-
-
-    const option =
-      Array.from(
-        select.options
-      ).find(
-        item => {
-
-          return (
-            String(
-              item.dataset.code || ""
-            ).trim() === code &&
-
-            String(
-              item.dataset.lot || ""
-            ).trim() === lot &&
-
-            normalizeDate(
-              item.dataset.exp || ""
-            ) === normalizeDate(exp)
-          );
-        }
+    const lotSelect = document.getElementById("lotSelect");
+    if (lotSelect) {
+      const lotOption = Array.from(lotSelect.options).find(item =>
+        String(item.dataset.lot || "").trim() === lot &&
+        normalizeDate(item.dataset.exp || "") === exp
       );
-
-
-    if (option) {
-
-      select.value =
-        option.value;
-
-      handleDrugChange();
-
-    } else {
-
-      select.value = "";
-
+      if (lotOption) {
+        lotSelect.value = lotOption.value;
+        handleLotChange();
+      }
     }
   }
 
@@ -2056,165 +1872,35 @@ function setValue(
 ===================================================== */
 
 function normalizeDate(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
 
-  if (!value) return "";
-
-
-  const text =
-    String(value)
-      .trim();
-
-
-  if (
-    /^\d{4}-\d{2}-\d{2}$/
-      .test(text)
-  ) {
-
-    return text;
-  }
-
-
-  let match =
-    text.match(
-      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-    );
-
-
+  let match = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
   if (match) {
-
-    let day =
-      Number(
-        match[1]
-      );
-
-
-    let month =
-      Number(
-        match[2]
-      );
-
-
-    let year =
-      Number(
-        match[3]
-      );
-
-
-    if (year > 2400) {
-
-      year -= 543;
-    }
-
-
-    return [
-      year,
-      String(month)
-        .padStart(
-          2,
-          "0"
-        ),
-      String(day)
-        .padStart(
-          2,
-          "0"
-        )
-    ].join("-");
+    let year = Number(match[1]);
+    if (year > 2400) year -= 543;
+    return `${year}-${String(Number(match[2])).padStart(2, "0")}-${String(Number(match[3])).padStart(2, "0")}`;
   }
 
-
-  const isoMatch =
-    text.match(
-      /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/
-    );
-
-
-  if (isoMatch) {
-
-    let year =
-      Number(
-        isoMatch[1]
-      );
-
-
-    const month =
-      Number(
-        isoMatch[2]
-      );
-
-
-    const day =
-      Number(
-        isoMatch[3]
-      );
-
-
-    if (year > 2400) {
-
-      year -= 543;
-    }
-
-
-    return [
-      year,
-      String(month)
-        .padStart(
-          2,
-          "0"
-        ),
-      String(day)
-        .padStart(
-          2,
-          "0"
-        ),
-      ].join("-");
+  // Vaccine Stock convention: MM/DD/YYYY.
+  match = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+  if (match) {
+    const month = Number(match[1]);
+    const day = Number(match[2]);
+    let year = Number(match[3]);
+    if (year > 2400) year -= 543;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return raw;
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   }
 
-
-  const date =
-    new Date(text);
-
-
-  if (
-    !Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    let year =
-      date.getFullYear();
-
-
-    if (year > 2400) {
-
-      year -= 543;
-    }
-
-
-    return [
-      year,
-      String(
-        date.getMonth() + 1
-      ).padStart(
-        2,
-        "0"
-      ),
-      String(
-        date.getDate()
-      ).padStart(
-        2,
-        "0"
-      )
-    ].join("-");
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) {
+    let year = parsed.getFullYear();
+    if (year > 2400) year -= 543;
+    return `${year}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
   }
-
-
-  return "";
+  return raw;
 }
-
-
-/* =====================================================
-   FORMAT DATE
-===================================================== */
 
 function formatDate(value) {
 

@@ -1,0 +1,67 @@
+
+<section class="temperature-page container-fluid py-3">
+  <header class="tc-hero">
+    <div>
+      <div class="tc-eyebrow">QUALITY & SAFETY CONTROL</div>
+      <h1>Temperature Check</h1>
+      <p>ระบบบันทึกและติดตามอุณหภูมิตู้เย็น อุณหภูมิห้อง และความชื้น</p>
+    </div>
+    <div class="tc-hero-icon">🌡️</div>
+  </header>
+
+  <section class="tc-panel tc-input-panel">
+    <div class="tc-section-heading">
+      <div><h2>บันทึกข้อมูล</h2><p>เลือกบันทึกผ่านแบบฟอร์ม หรือส่งข้อมูลจากระบบ E-StockScan</p></div>
+      <span class="tc-live-badge"><i></i> Temperature Log</span>
+    </div>
+    <div class="tc-tabs" role="tablist">
+      <button class="tc-tab active" type="button" data-tc-tab="form">✍️ แบบฟอร์มบันทึก</button>
+    </div>
+
+    <div class="tc-tab-content" data-tc-pane="form">
+      <form id="temperatureForm" class="tc-form">
+        <div class="tc-field"><label for="tcDate">วันที่บันทึก</label><input id="tcDate" name="date" type="date" required></div>
+        <div class="tc-field"><label for="tcTime">รอบเวลา</label><select id="tcTime" name="time" required><option value="09:00">09:00 น.</option><option value="16:00">16:00 น.</option></select></div>
+        <div class="tc-field"><label for="tcType">ประเภทการตรวจ</label><select id="tcType" name="type" required>
+          <option value="freezer">ตู้เย็น — ช่องแช่แข็ง (°C)</option>
+          <option value="fridge">ตู้เย็น — ช่องธรรมดา (°C)</option>
+          <option value="room">อุณหภูมิห้อง (°C)</option>
+          <option value="humidity">ความชื้นสัมพัทธ์ (%)</option>
+        </select></div>
+        <div class="tc-field"><label for="tcValue">ค่าที่วัดได้</label><div class="tc-input-unit"><input id="tcValue" name="value" type="number" step="0.1" required placeholder="ระบุตัวเลข"><span id="tcUnit">°C</span></div></div>
+        <div class="tc-field tc-wide"><label for="tcRemark">หมายเหตุ / การดำเนินการเมื่อค่าเกินเกณฑ์</label><input id="tcRemark" name="remark" type="text" maxlength="500" placeholder="เช่น แจ้งผู้รับผิดชอบและตรวจสอบซ้ำ"></div>
+        <div class="tc-form-actions"><button class="tc-btn tc-btn-primary" type="submit" id="tcSaveBtn">บันทึกข้อมูล</button><button class="tc-btn tc-btn-quiet" type="reset">ล้างแบบฟอร์ม</button></div>
+      </form>
+      <div id="tcFormMessage" class="tc-message" role="status"></div>
+    </div>
+
+    <div class="tc-tab-content" data-tc-pane="scan" hidden>
+      <div class="tc-scan-box">
+        <div class="tc-scan-icon">📲</div><div>
+          <h3>รับข้อมูลจาก E-StockScan</h3>
+          <p>เมื่อสแกนจาก E-StockScan ให้ระบบต้นทางส่งค่าที่วัดได้มายัง API นี้ ระบบจะนำข้อมูลมาแสดงในรายงานเดือนเดียวกันโดยอัตโนมัติ</p>
+          <code>POST /api/temperature-check/records</code>
+          <p class="tc-scan-note">ข้อมูลที่ต้องส่ง: <b>date</b>, <b>time</b> (09:00 หรือ 16:00), <b>type</b> (freezer / fridge / room / humidity), <b>value</b> และส่ง <b>source: "E-StockScan"</b></p>
+        </div>
+      </div>
+      <div class="tc-api-example"><span>ตัวอย่าง JSON</span><pre>{"date":"2026-10-29","time":"09:00","type":"fridge","value":5.2,"source":"E-StockScan"}</pre></div>
+    </div>
+  </section>
+
+  <section class="tc-panel tc-report-panel">
+    <div class="tc-section-heading tc-report-heading">
+      <div><h2>รายงานการควบคุมอุณหภูมิและความชื้น</h2><p>รูปแบบรายงานรายเดือน อ้างอิงแบบบันทึก PDF แนบ</p></div>
+      <div class="tc-report-controls">
+        <label for="tcBranchLabel">สาขาที่ได้รับอนุญาต</label><select id="tcBranchLabel" aria-label="เลือกสาขาที่ได้รับอนุญาต"><option value="">กำลังโหลดสาขา...</option></select>
+        <label for="tcMonth">ประจำเดือน</label><input id="tcMonth" type="month">
+        <button class="tc-btn tc-btn-primary" id="tcReload" type="button">↻ แสดงรายงาน</button>
+        <button class="tc-btn tc-btn-print" id="tcPrint" type="button">⎙ พิมพ์ / PDF</button>
+      </div>
+    </div>
+    <div class="tc-legend"><span><i class="tc-dot tc-ok"></i> อยู่ในเกณฑ์</span><span><i class="tc-dot tc-alert"></i> เกินเกณฑ์ — แจ้งผู้รับผิดชอบ</span><span>บันทึกวันละ 2 ครั้ง: 09:00 และ 16:00 น.</span></div>
+    <div id="tcReport" class="tc-report">
+      <div class="tc-empty">กำลังโหลดรายงาน...</div>
+    </div>
+    <div id="tcReportMessage" class="tc-message" role="status"></div>
+  </section>
+</section>
