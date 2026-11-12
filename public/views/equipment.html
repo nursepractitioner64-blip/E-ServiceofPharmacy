@@ -1,0 +1,150 @@
+<link rel="stylesheet" href="/modules/equipment/equipment.style.css">
+
+<section class="eq-app">
+  <header class="eq-header">
+    <div class="eq-brand">
+      <div class="eq-brand-icon"><i class="fa-solid fa-qrcode"></i></div>
+      <div>
+        <h1>Equipment QR Inspection</h1>
+        <p>ระบบทะเบียนและตรวจสอบความพร้อมใช้งานของอุปกรณ์</p>
+      </div>
+    </div>
+    <div class="eq-branch-pill"><i class="fa-solid fa-code-branch"></i><span id="eqCurrentBranch">กำลังตรวจสอบสาขา...</span></div>
+  </header>
+
+  <nav class="eq-tabs" aria-label="เมนู Equipment">
+    <button type="button" class="eq-tab active" data-eq-tab="scan"><i class="fa-solid fa-camera"></i> สแกนตรวจ</button>
+    <button type="button" class="eq-tab" data-eq-tab="assets"><i class="fa-solid fa-laptop-medical"></i> อุปกรณ์ประจำสาขา</button>
+    <button type="button" class="eq-tab" data-eq-tab="report"><i class="fa-solid fa-table"></i> รายงานรายเดือน</button>
+    <button type="button" class="eq-tab eq-admin-only" data-eq-tab="master" hidden><i class="fa-solid fa-database"></i> Equipment Master</button>
+  </nav>
+
+  <section class="eq-panel active" data-eq-panel="scan">
+    <div class="eq-panel-heading">
+      <div><h2>สแกน QR เพื่อตรวจสอบอุปกรณ์</h2><p>สแกน QR ที่ติดอยู่บนเครื่อง ระบบจะแสดง Checklist ของอุปกรณ์นั้น</p></div>
+      <span class="eq-chip">QR Inspection</span>
+    </div>
+    <div class="eq-scan-layout">
+      <div class="eq-scan-card">
+        <div id="eqReader" class="eq-reader">
+          <div class="eq-reader-placeholder"><i class="fa-solid fa-camera"></i><strong>พร้อมสแกน QR Code</strong><span>กดปุ่มเปิดกล้องเพื่อเริ่มสแกน</span></div>
+        </div>
+        <div class="eq-scan-actions">
+          <button type="button" class="eq-btn eq-btn-primary" id="eqStartScanner"><i class="fa-solid fa-camera"></i> เปิดกล้องสแกน</button>
+          <button type="button" class="eq-btn eq-btn-light" id="eqStopScanner" disabled><i class="fa-solid fa-stop"></i> หยุดกล้อง</button>
+        </div>
+        <p class="eq-hint">ต้องอนุญาตให้เบราว์เซอร์เข้าถึงกล้อง และใช้งานผ่าน HTTPS หรือ localhost</p>
+        <div class="eq-inline-error" id="eqScanMessage" role="status"></div>
+      </div>
+      <div class="eq-scan-side">
+        <div class="eq-info-card">
+          <div class="eq-info-icon"><i class="fa-solid fa-qrcode"></i></div>
+          <h3>วิธีตรวจสอบ</h3>
+          <ol>
+            <li>เปิดกล้องและสแกน QR ประจำเครื่อง</li>
+            <li>ตรวจสอบชื่อและรหัสเครื่อง</li>
+            <li>ตอบ Checklist ให้ครบทุกข้อที่บังคับ</li>
+            <li>กดบันทึกและดูสรุปผล</li>
+            <li>กดสแกนเครื่องถัดไป</li>
+          </ol>
+        </div>
+        <div class="eq-info-card eq-muted-card">
+          <strong><i class="fa-solid fa-shield-halved"></i> การควบคุมสิทธิ์</strong>
+          <p>ระบบตรวจสอบสาขาจาก Session ที่เข้าสู่ระบบ QR ของสาขาอื่นจะไม่สามารถบันทึกผลในสาขาปัจจุบันได้</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="eq-check-card" id="eqCheckCard" hidden>
+      <div class="eq-device-heading">
+        <div><span class="eq-eyebrow">EQUIPMENT DETAILS</span><h3 id="eqDeviceName">-</h3><p id="eqDeviceMeta">-</p></div>
+        <span class="eq-chip" id="eqDeviceCode">-</span>
+      </div>
+      <form id="eqInspectionForm">
+        <div id="eqChecklistFields" class="eq-checklist-fields"></div>
+        <div class="eq-form-field"><label for="eqInspectionRemark">หมายเหตุเพิ่มเติม</label><textarea id="eqInspectionRemark" rows="2" maxlength="1000" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)"></textarea></div>
+        <div class="eq-form-actions">
+          <button type="submit" class="eq-btn eq-btn-primary" id="eqSaveInspection"><i class="fa-solid fa-floppy-disk"></i> บันทึกผลตรวจ</button>
+          <button type="button" class="eq-btn eq-btn-light" id="eqCancelInspection">ยกเลิก / สแกนใหม่</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="eq-result-card" id="eqResultCard" hidden>
+      <div class="eq-result-mark" id="eqResultMark">✓</div>
+      <div class="eq-result-copy"><span class="eq-eyebrow">INSPECTION RESULT</span><h3 id="eqResultTitle">บันทึกผลสำเร็จ</h3><p id="eqResultText"></p></div>
+      <button type="button" class="eq-btn eq-btn-primary" id="eqScanNext"><i class="fa-solid fa-qrcode"></i> สแกนเครื่องถัดไป</button>
+    </div>
+  </section>
+
+  <section class="eq-panel" data-eq-panel="assets">
+    <div class="eq-panel-heading"><div><h2>ทะเบียนอุปกรณ์ประจำสาขา</h2><p>เลือกประเภทจาก Master แล้วลงทะเบียนเครื่องจริงเพื่อสร้าง QR ประจำเครื่อง</p></div></div>
+    <form id="eqAssetForm" class="eq-form-card">
+      <input type="hidden" id="eqAssetId">
+      <div class="eq-form-grid">
+        <div class="eq-form-field"><label for="eqAssetMaster">ประเภทอุปกรณ์จาก Master *</label><select id="eqAssetMaster" required><option value="">กำลังโหลด Master...</option></select></div>
+        <div class="eq-form-field"><label for="eqAssetCode">รหัสสาขา *</label><input id="eqAssetCode" required maxlength="60" placeholder="เช่น MS-EQ-001"></div>
+        <div class="eq-form-field"><label for="eqBrand">ยี่ห้อ</label><input id="eqBrand" maxlength="100" placeholder="ระบุยี่ห้อ"></div>
+        <div class="eq-form-field"><label for="eqModel">รุ่น</label><input id="eqModel" maxlength="100" placeholder="ระบุรุ่น"></div>
+        <div class="eq-form-field"><label for="eqSerial">Serial Number</label><input id="eqSerial" maxlength="120" placeholder="หมายเลขเครื่อง"></div>
+        <div class="eq-form-field"><label for="eqLocation">สถานที่ติดตั้ง</label><input id="eqLocation" maxlength="160" placeholder="เช่น ห้องตรวจ 1"></div>
+        <div class="eq-form-field"><label for="eqInstallDate">วันที่เริ่มใช้งาน</label><input id="eqInstallDate" type="date"></div>
+        <div class="eq-form-field"><label for="eqPhotoUrl">ลิงก์รูปภาพ (ถ้ามี)</label><input id="eqPhotoUrl" type="url" maxlength="500" placeholder="https://..."></div>
+      </div>
+      <div class="eq-form-actions"><button class="eq-btn eq-btn-primary" type="submit" id="eqSaveAsset"><i class="fa-solid fa-plus"></i> ลงทะเบียนอุปกรณ์</button><button class="eq-btn eq-btn-light" type="button" id="eqResetAsset">ล้างข้อมูล</button></div>
+      <div class="eq-inline-error" id="eqAssetMessage" role="status"></div>
+    </form>
+    <div class="eq-list-card">
+      <div class="eq-list-heading"><h3>รายการอุปกรณ์ของสาขา</h3><button class="eq-btn eq-btn-light eq-btn-sm" id="eqReloadAssets" type="button"><i class="fa-solid fa-rotate"></i> โหลดใหม่</button></div>
+      <div class="eq-table-wrap"><table class="eq-table"><thead><tr><th>CODE</th><th>ชื่ออุปกรณ์</th><th>รหัสเครื่อง</th><th>ยี่ห้อ / รุ่น</th><th>Serial Number</th><th>สถานที่</th><th>QR</th></tr></thead><tbody id="eqAssetsBody"><tr><td colspan="7" class="eq-empty">กำลังโหลดข้อมูล...</td></tr></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="eq-panel" data-eq-panel="master">
+    <div class="eq-panel-heading"><div><h2>Equipment Master</h2><p>Admin ส่วนกลางกำหนดประเภทอุปกรณ์ รอบตรวจ และ Checklist กลาง</p></div></div>
+    <form id="eqMasterForm" class="eq-form-card">
+      <div class="eq-form-grid">
+        <div class="eq-form-field"><label for="eqMasterCode">MASTER CODE *</label><input id="eqMasterCode" required maxlength="30" placeholder="เช่น ABC001"></div>
+        <div class="eq-form-field"><label for="eqMasterName">ชื่ออุปกรณ์ *</label><input id="eqMasterName" required maxlength="160" placeholder="ชื่อประเภทอุปกรณ์"></div>
+        <div class="eq-form-field"><label for="eqMasterCategory">หมวดหมู่</label><input id="eqMasterCategory" maxlength="100" placeholder="เช่น อุปกรณ์การแพทย์"></div>
+        <div class="eq-form-field"><label for="eqMasterCycle">รอบตรวจ</label><select id="eqMasterCycle"><option value="DAILY">ทุกวัน</option><option value="WEEKLY">ทุกสัปดาห์</option><option value="MONTHLY">ทุกเดือน</option><option value="CUSTOM">กำหนดเอง</option></select></div>
+        <div class="eq-form-field"><label for="eqMasterInterval">จำนวนรอบ</label><input id="eqMasterInterval" type="number" min="1" max="365" value="1"></div>
+        <div class="eq-form-field"><label for="eqMasterCycleUnit">หน่วยรอบ (กำหนดเอง)</label><select id="eqMasterCycleUnit"><option value="DAY">วัน</option><option value="WEEK">สัปดาห์</option><option value="MONTH">เดือน</option></select></div>
+        <div class="eq-form-field eq-field-wide"><label for="eqMasterDescription">รายละเอียด</label><textarea id="eqMasterDescription" rows="2" maxlength="1000"></textarea></div>
+      </div>
+      <div class="eq-form-actions"><button class="eq-btn eq-btn-primary" type="submit" id="eqSaveMaster"><i class="fa-solid fa-plus"></i> เพิ่ม Master</button><button class="eq-btn eq-btn-light" type="button" id="eqResetMaster">ล้างข้อมูล</button></div>
+      <div class="eq-inline-error" id="eqMasterMessage" role="status"></div>
+    </form>
+    <div class="eq-list-card">
+      <div class="eq-list-heading"><h3>รายการ Master</h3><button class="eq-btn eq-btn-light eq-btn-sm" id="eqReloadMasters" type="button"><i class="fa-solid fa-rotate"></i> โหลดใหม่</button></div>
+      <div class="eq-table-wrap"><table class="eq-table"><thead><tr><th>CODE</th><th>ชื่ออุปกรณ์</th><th>รอบตรวจ</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="eqMastersBody"></tbody></table></div>
+    </div>
+    <div class="eq-list-card" id="eqChecklistEditor" hidden>
+      <div class="eq-list-heading"><div><h3 id="eqChecklistTitle">Checklist Master</h3><p>การบันทึกแบบตรวจใหม่จะสร้างเวอร์ชันใหม่ และเก็บประวัติแบบเดิมไว้</p></div></div>
+      <div id="eqChecklistItems"></div>
+      <div class="eq-form-actions"><button class="eq-btn eq-btn-light" type="button" id="eqAddChecklistItem"><i class="fa-solid fa-plus"></i> เพิ่มรายการตรวจ</button><button class="eq-btn eq-btn-primary" type="button" id="eqSaveChecklist"><i class="fa-solid fa-floppy-disk"></i> บันทึก Checklist เวอร์ชันใหม่</button></div>
+      <div class="eq-inline-error" id="eqChecklistMessage" role="status"></div>
+    </div>
+  </section>
+
+  <section class="eq-panel" data-eq-panel="report">
+    <div class="eq-panel-heading"><div><h2>Equipment Check Report</h2><p>รายงานผลตรวจรายเดือน รวมหนึ่งแถวต่อ Master CODE คลิกวันที่เพื่อดูผลแยกตามเครื่องจริง</p></div></div>
+    <div class="eq-report-filter">
+      <label>เดือน <select id="eqReportMonth"></select></label>
+      <label>ปี <select id="eqReportYear"></select></label>
+      <button type="button" class="eq-btn eq-btn-primary" id="eqLoadReport"><i class="fa-solid fa-magnifying-glass"></i> แสดงรายงาน</button>
+    </div>
+    <div class="eq-report-legend"><span><b class="eq-dot pass">✓</b> ผ่านทุกเครื่อง</span><span><b class="eq-dot fail">✕</b> มีเครื่องไม่ผ่าน</span><span><b class="eq-dot partial">◐</b> ตรวจไม่ครบ</span><span><b class="eq-dot none"> </b> ยังไม่ได้ตรวจ</span><span><b class="eq-alert-mini">7d</b> ไม่ผ่านต่อเนื่อง 7 วัน</span></div>
+    <div class="eq-report-table-wrap"><table class="eq-report-table" id="eqReportTable"><thead id="eqReportHead"></thead><tbody id="eqReportBody"><tr><td class="eq-empty">เลือกเดือนและปีเพื่อโหลดรายงาน</td></tr></tbody></table></div>
+    <p class="eq-report-note">✓ จะแสดงเมื่อเครื่องจริงทุกเครื่องใน Master CODE นั้นตรวจแล้วผ่าน · ◐ หมายถึงมีการตรวจบางเครื่องแต่ยังไม่ครบ · ช่องว่างหมายถึงยังไม่มีการตรวจ</p>
+  </section>
+</section>
+
+<div class="eq-modal" id="eqModal" hidden>
+  <div class="eq-modal-backdrop" data-eq-close></div>
+  <section class="eq-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="eqModalTitle">
+    <header class="eq-modal-header"><h3 id="eqModalTitle">รายละเอียด</h3><button type="button" class="eq-modal-x" data-eq-close aria-label="ปิด">×</button></header>
+    <div class="eq-modal-body" id="eqModalBody"></div>
+    <footer class="eq-modal-footer"><button type="button" class="eq-btn eq-btn-light" data-eq-close>ปิด</button></footer>
+  </section>
+</div>

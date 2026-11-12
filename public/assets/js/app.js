@@ -91,6 +91,16 @@ const routes = {
     system: "emergency"
   },
 
+  /* ===================================================
+     EQUIPMENT QR INSPECTION
+  =================================================== */
+  equipment: {
+    view: "/views/equipment.html",
+    script: "/modules/equipment/equipment.client.js",
+    style: "/modules/equipment/equipment.style.css",
+    system: "emergency"
+  },
+
   "temperature-checklist": {
     view: "/views/temperature-checklist.html",
     script: "/modules/temperaturecheck/temperaturecheck.client.js",
@@ -99,7 +109,7 @@ const routes = {
   },
 
   "temperature-entry": {
-    view: "/views/temperature-checklist.html",
+    view: "/views/temperature-entry.html",
     script: "/modules/temperaturecheck/temperaturecheck.client.js",
     style: "/modules/temperaturecheck/temperaturecheck.style.css",
     system: "emergency"

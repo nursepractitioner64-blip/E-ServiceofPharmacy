@@ -1,54 +1,27 @@
-.tc-tab-content[data-tc-pane="form"] {
-  --tc-ink: #173b43;
-  --tc-primary: #0f766e;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 22px;
-  color: var(--tc-ink);
-  background: #fff;
-  border: 1px solid #e1eeee;
-  border-radius: 18px;
-  box-shadow: 0 8px 26px #17434d0a;
-  font-family: "Prompt", "Kanit", sans-serif;
-}
-.tc-tab-content[data-tc-pane="form"] * { box-sizing: border-box; }
-.tc-form {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-.tc-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-.tc-field label { color: #527078; font-size: 12px; font-weight: 600; }
-.tc-field input, .tc-field select {
-  width: 100%; min-height: 42px; padding: 9px 11px;
-  border: 1px solid #d7e5e6; border-radius: 10px;
-  background: #fff; color: #24444b; font: inherit; font-size: 13px;
-  outline: none;
-}
-.tc-field input:focus, .tc-field select:focus {
-  border-color: var(--tc-primary); box-shadow: 0 0 0 3px #0f766e15;
-}
-.tc-wide { grid-column: span 2; }
-.tc-input-unit { display: flex; }
-.tc-input-unit input { border-radius: 10px 0 0 10px; }
-.tc-input-unit span {
-  display: grid; place-items: center; min-width: 48px;
-  border: 1px solid #d7e5e6; border-left: 0; border-radius: 0 10px 10px 0;
-  background: #edf7f6; font-size: 13px;
-}
-.tc-form-actions { grid-column: 1 / -1; display: flex; gap: 9px; margin-top: 3px; }
-.tc-btn { border: 0; border-radius: 10px; padding: 10px 15px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
-.tc-btn:disabled { opacity: .6; cursor: wait; }
-.tc-btn-primary { background: #0f766e; color: #fff; }
-.tc-btn-primary:hover { background: #115e59; }
-.tc-btn-quiet { background: #eff5f5; color: #526d72; }
-.tc-message { display: none; margin-top: 12px; font-size: 13px; color: #047857; }
-.tc-message.is-visible { display: block; }
-.tc-message.is-error { color: #b42318; }
-@media (max-width: 900px) { .tc-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) {
-  .tc-tab-content[data-tc-pane="form"] { padding: 15px; }
-  .tc-form { grid-template-columns: 1fr; }
-  .tc-wide { grid-column: span 1; }
-  .tc-form-actions { flex-wrap: wrap; }
-}
+
+.temperature-page{--tc-ink:#173b43;--tc-primary:#0f766e;--tc-mint:#ccfbf1;--tc-bg:#f3f8f8;color:var(--tc-ink);font-family:"Prompt","Kanit",sans-serif}
+.temperature-page *{box-sizing:border-box}
+.tc-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 30px;border-radius:22px;background:linear-gradient(120deg,#0f766e,#115e59 65%,#164e63);color:#fff;box-shadow:0 12px 30px #0f766e20;margin-bottom:22px}
+.tc-eyebrow{font-size:11px;letter-spacing:2px;opacity:.8;font-weight:700}.tc-hero h1{font-size:clamp(25px,3vw,34px);font-weight:700;margin:5px 0}.tc-hero p{margin:0;opacity:.86}.tc-hero-icon{font-size:48px;background:#ffffff20;border:1px solid #ffffff40;border-radius:18px;padding:12px 18px}
+.tc-panel{background:#fff;border:1px solid #e1eeee;border-radius:18px;padding:22px;margin-bottom:22px;box-shadow:0 8px 26px #17434d0a}
+.tc-section-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}.tc-section-heading h2{font-size:20px;font-weight:700;margin:0 0 4px}.tc-section-heading p{color:#70868b;margin:0;font-size:13px}.tc-live-badge{font-size:12px;color:#0f766e;background:#e6fffa;border-radius:999px;padding:8px 12px;white-space:nowrap}.tc-live-badge i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;margin-right:6px}
+.tc-tabs{display:flex;gap:8px;border-bottom:1px solid #e6eeee;margin-bottom:18px}.tc-tab{border:0;background:transparent;padding:11px 16px;color:#668087;font:inherit;font-weight:600;border-bottom:3px solid transparent}.tc-tab.active{color:#0f766e;border-bottom-color:#0f766e}.tc-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.tc-field{display:flex;flex-direction:column;gap:7px}.tc-field label,.tc-report-controls label{font-size:12px;color:#527078;font-weight:600}.tc-field input,.tc-field select,.tc-report-controls input{width:100%;min-height:42px;border:1px solid #d7e5e6;border-radius:10px;padding:9px 11px;background:#fff;color:#24444b;font:inherit;font-size:13px;outline:none}.tc-field input:focus,.tc-field select:focus,.tc-report-controls input:focus{border-color:#0f766e;box-shadow:0 0 0 3px #0f766e15}.tc-wide{grid-column:span 2}.tc-input-unit{display:flex}.tc-input-unit input{border-radius:10px 0 0 10px}.tc-input-unit span{display:grid;place-items:center;min-width:48px;background:#edf7f6;border:1px solid #d7e5e6;border-left:0;border-radius:0 10px 10px 0;font-size:13px}.tc-form-actions{grid-column:1/-1;display:flex;gap:9px;margin-top:3px}.tc-btn{border:0;border-radius:10px;padding:10px 15px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}.tc-btn:disabled{opacity:.6;cursor:wait}.tc-btn-primary{background:#0f766e;color:#fff}.tc-btn-primary:hover{background:#115e59}.tc-btn-quiet{background:#eff5f5;color:#526d72}.tc-btn-print{background:#e5f4f2;color:#0f766e}.tc-message{display:none;margin-top:12px;font-size:13px;color:#047857}.tc-message.is-visible{display:block}.tc-message.is-error{color:#b42318}
+.tc-scan-box{display:flex;align-items:flex-start;gap:17px;padding:20px;border-radius:14px;background:#f0fdfa;border:1px solid #c9f1e9}.tc-scan-icon{font-size:32px}.tc-scan-box h3{font-size:17px;margin:0 0 5px}.tc-scan-box p{font-size:13px;color:#56747a;margin:0 0 10px}.tc-scan-box code{display:inline-block;padding:7px 10px;background:#123e42;color:#d5fff5;border-radius:7px;font-size:12px}.tc-scan-note{margin-top:12px!important}.tc-api-example{margin-top:12px;background:#f7f9fb;border:1px solid #e3e9ed;border-radius:12px;padding:12px 15px}.tc-api-example span{font-size:12px;font-weight:700}.tc-api-example pre{margin:7px 0 0;white-space:pre-wrap;font-size:12px}
+.tc-report-heading{align-items:flex-start}.tc-report-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;justify-content:flex-end}.tc-report-controls input{width:auto;min-width:145px;min-height:38px}.tc-report-controls input[type=month]{min-width:135px}.tc-legend{display:flex;gap:18px;align-items:center;flex-wrap:wrap;color:#70868b;font-size:11px;margin:12px 0 16px}.tc-legend span{display:flex;align-items:center;gap:6px}.tc-dot{width:9px;height:9px;border-radius:50%;display:inline-block}.tc-ok{background:#10b981}.tc-alert{background:#ef4444}.tc-print-title{display:flex;justify-content:space-between;gap:15px;font-size:13px;margin:4px 0 14px}.tc-chart-section{border:1px solid #9aabad;margin:0 0 17px;background:white;break-inside:avoid}.tc-chart-title{background:#e8eef9;border-bottom:1px solid #9aabad;padding:8px 10px;display:flex;justify-content:space-between;gap:12px;font-size:12px}.tc-chart-title span{font-size:11px;color:#52666c}.tc-table-scroll{overflow-x:auto}.tc-month-table{border-collapse:collapse;width:100%;table-layout:fixed;min-width:1000px;font-size:9px;color:#172b30}.tc-month-table th,.tc-month-table td{border:1px solid #9aa9ac;text-align:center;padding:3px 1px;height:24px;overflow:hidden}.tc-month-table thead th{background:#f6f8fc;font-weight:700}.tc-month-table .tc-row-label{width:76px;background:#eef2f8;text-align:left;padding-left:6px}.tc-month-table td{position:relative;font-size:10px}.tc-month-table td small{display:block;color:#b42318;font-size:7px;font-weight:700}.tc-cell-ok{background:#e8fbf2}.tc-cell-alert{background:#fee2e2;color:#b42318;font-weight:700}.tc-cell-empty{background:#fff}.tc-sign-line{padding:8px;font-size:10px;border-top:1px solid #cbd5d7}.tc-empty{padding:30px;text-align:center;color:#71878b}.tc-error{color:#b42318}
+@media(max-width:900px){.tc-form{grid-template-columns:repeat(2,minmax(0,1fr))}.tc-report-heading{display:block}.tc-report-controls{justify-content:flex-start;margin-top:15px}.tc-section-heading{align-items:flex-start}}
+@media(max-width:560px){.tc-hero{padding:20px}.tc-hero-icon{font-size:30px;padding:8px}.tc-panel{padding:15px}.tc-form{grid-template-columns:1fr}.tc-wide{grid-column:span 1}.tc-form-actions{flex-wrap:wrap}.tc-section-heading{display:block}.tc-live-badge{display:inline-block;margin-top:10px}.tc-print-title{display:block}.tc-print-title span{display:block;margin-top:4px}}
+@media print{body *{visibility:hidden!important}.temperature-page,.temperature-page *{visibility:visible!important}.temperature-page{position:absolute;left:0;top:0;width:100%;padding:0!important;color:#000!important}.tc-hero,.tc-input-panel,.tc-report-controls,.tc-legend,.tc-report-message,.tc-report-heading p,.tc-message{display:none!important}.tc-report-panel{border:0!important;box-shadow:none!important;padding:0!important}.tc-report-heading{display:block!important}.tc-report-heading h2{font-size:16px!important}.tc-report{width:100%}.tc-chart-section{break-inside:avoid;page-break-inside:avoid;margin-bottom:8px}.tc-table-scroll{overflow:visible!important}.tc-month-table{min-width:0!important;width:100%!important;font-size:6px!important}.tc-month-table th,.tc-month-table td{height:17px!important;padding:1px 0!important;font-size:6px!important}.tc-month-table .tc-row-label{width:42px!important}.tc-chart-title{padding:4px!important;font-size:8px!important}.tc-chart-title span,.tc-sign-line{font-size:7px!important}.tc-month-table td small{font-size:5px!important}@page{size:A4 landscape;margin:8mm}}
+
+/* แถวผู้ตรวจ/ผู้บันทึก ให้รูปแบบสอดคล้องกับ Daily Check */
+.tc-month-table .tc-recorder-row th,.tc-month-table .tc-recorder-row td{background:#f8fafc;height:28px!important;border-top:2px solid #9aa9ac!important}
+.tc-month-table .tc-recorder-row .tc-row-label{font-weight:700;white-space:normal}
+.tc-recorder-cell{padding:2px!important}
+.tc-recorder-button{display:inline-flex;align-items:center;justify-content:center;gap:2px;max-width:100%;border:0;background:#e6fffa;color:#0f766e;border-radius:5px;padding:2px 3px;font:inherit;font-size:8px;cursor:pointer}
+.tc-recorder-button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44px}
+.tc-recorder-empty{color:#94a3b8;font-size:10px}
+@media print{.tc-month-table .tc-recorder-row th,.tc-month-table .tc-recorder-row td{height:16px!important;background:#f8fafc!important}.tc-recorder-button{background:transparent!important;color:#000!important;padding:0!important;font-size:5px!important}.tc-recorder-button span{max-width:24px}.tc-recorder-empty{font-size:5px!important}}
+
+/* Monthly plot graph aligned with the attached temperature/humidity record sheet */
+.tc-report-controls select{width:auto;min-width:180px;min-height:38px;border:1px solid #d7e5e6;border-radius:10px;padding:8px 11px;background:#fff;color:#24444b;font:inherit;font-size:13px}
+.tc-graph-wrap{padding:8px 10px 10px;background:#fff;border-top:1px solid #cbd5d7;break-inside:avoid}.tc-graph-heading{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#1e3a40;margin-bottom:4px}.tc-graph-heading small{font-weight:400;color:#647b80}.tc-month-graph{display:block;width:100%;height:auto;max-height:300px;background:repeating-linear-gradient(to bottom,#fff 0,#fff 19px,#f2f5f6 20px)}.tc-graph-axis-note{font-size:9px;color:#647b80;text-align:right;margin-top:3px}
+@media print{.tc-report-controls select{display:none!important}.tc-graph-wrap{padding:3px 5px!important}.tc-month-graph{max-height:155px!important}.tc-graph-heading{font-size:7px!important}.tc-graph-heading small,.tc-graph-axis-note{font-size:6px!important}.tc-month-graph text{font-size:8px!important}.tc-chart-section{break-inside:avoid!important;page-break-inside:avoid!important}}

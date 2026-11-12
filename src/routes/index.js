@@ -102,6 +102,15 @@ router.use(
 );
 
 /* =====================================================
+ * EQUIPMENT QR INSPECTION
+ * Isolated module; does not modify Emergency Checklist.
+ * ===================================================== */
+router.use(
+  "/equipment",
+  require("../modules/equipment/equipment.routes")
+);
+
+/* =====================================================
  * TEMPERATURE CHECK
  * ===================================================== */
 router.use(
