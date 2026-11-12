@@ -24,6 +24,19 @@ const routes = {
     system: "pharmacy"
   },
 
+  /* E-StockScan modules integrated into the Hub SPA */
+  "estockscan-session": {
+    view: "/views/estockscan-session.html",
+    script: "/modules/estockscan/session.client.js",
+    system: "emergency"
+  },
+
+  "estockscan-dispense": {
+    view: "/views/estockscan-dispense.html",
+    script: "/modules/estockscan/dispense.client.js",
+    system: "emergency"
+  },
+
 
   /* ===================================================
      VACCINE MANAGEMENT
@@ -79,6 +92,13 @@ const routes = {
   },
 
   "temperature-checklist": {
+    view: "/views/temperature-checklist.html",
+    script: "/modules/temperaturecheck/temperaturecheck.client.js",
+    style: "/modules/temperaturecheck/temperaturecheck.style.css",
+    system: "emergency"
+  },
+
+  "temperature-entry": {
     view: "/views/temperature-checklist.html",
     script: "/modules/temperaturecheck/temperaturecheck.client.js",
     style: "/modules/temperaturecheck/temperaturecheck.style.css",

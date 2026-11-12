@@ -55,6 +55,12 @@ router.use(
   require("../modules/dispense/dispense.routes")
 );
 
+/* E-StockScan integration: isolated namespace to avoid collision with Hub DISPENSE */
+router.use(
+  "/estockscan",
+  require("../modules/estockscan/estockscan.routes")
+);
+
 
 /* =====================================================
  * RECEIVE DRUG

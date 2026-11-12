@@ -1,0 +1,53 @@
+<section class="estockscan-dispense">
+<main class="disp-wrap">
+
+<div class="top"><h1>💊 DISPENSE</h1><button class="back" id="backBtn" type="button">← Dashboard</button></div>
+
+
+
+<section class="card">
+
+<div class="camera-box">
+
+<video id="camera" autoplay playsinline muted></video>
+
+<div id="cameraPlaceholder" class="camera-placeholder">กด “เปิดกล้อง” เพื่อสแกน Sticker</div>
+
+<div id="scanLine" class="scan-line"></div>
+
+</div>
+
+<div class="camera-actions">
+
+<button id="startCamera" class="btn primary" type="button">📷 เปิดกล้อง</button>
+
+<button id="captureSticker" class="btn secondary" type="button" disabled>📸 อ่าน Sticker</button>
+
+<button id="stopCamera" class="btn secondary" type="button" disabled>⏹ หยุด</button>
+
+</div>
+
+<p id="scanHint" class="status">Sticker ไม่มี QR — ระบบจะถ่ายภาพแล้วใช้ OCR อ่านข้อมูล</p>
+
+<div id="ocrProgress" class="ocr-progress"><div id="ocrBar"></div></div>
+
+<p id="ocrStatus" class="status" aria-live="polite"></p>
+
+<details id="ocrDebugWrap" class="field hidden">
+
+<summary>ดูข้อความที่ OCR อ่านได้ (สำหรับตรวจสอบ)</summary>
+
+<pre id="ocrDebug" class="ocr-debug"></pre>
+
+</details>
+
+<canvas id="captureCanvas" class="hidden"></canvas>
+
+</section>
+
+
+
+<section id="preview" class="card hidden"></section>
+
+</main>
+</section>

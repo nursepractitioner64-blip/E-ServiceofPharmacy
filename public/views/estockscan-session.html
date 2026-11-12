@@ -1,0 +1,30 @@
+<section class="estockscan-session">
+  <main class="estockscan-session-container">
+    <header class="estockscan-session-header">
+      <div>
+        <div class="estockscan-session-title">🚑 SESSION · ตรวจสอบรายการ</div>
+        <div class="estockscan-session-subtitle">E-StockScan · Inventory Verification</div>
+      </div>
+      <a class="estockscan-session-back" href="#dashboard" data-route="dashboard">← Dashboard</a>
+    </header>
+
+    <section id="info" class="estockscan-session-info">
+      <div>Session : <strong id="sessionId">-</strong></div>
+      <div>สาขา : <strong id="branchName">-</strong></div>
+      <div>User : <strong id="userName">-</strong></div>
+      <div>รายการ : <strong id="totalItems">0</strong></div>
+    </section>
+
+    <section id="reader" class="estockscan-session-reader"></section>
+    <section id="preview" class="estockscan-session-preview"></section>
+    <section id="list" class="estockscan-session-list">
+      <div class="estockscan-session-empty">ยังไม่มีรายการที่สแกน</div>
+    </section>
+
+    <div class="estockscan-session-actions">
+      <button id="btnSendAll" class="estockscan-session-save" type="button">✅ ส่งรายการทั้งหมด</button>
+      <button id="btnClear" class="estockscan-session-reset" type="button">เริ่มรอบใหม่</button>
+    </div>
+    <p class="estockscan-session-note">ระบบจะป้องกันการสแกน Sticker ซ้ำภายใน SESSION เดียวกัน และบันทึกผลแยกตาม BRANCH_ID</p>
+  </main>
+</section>

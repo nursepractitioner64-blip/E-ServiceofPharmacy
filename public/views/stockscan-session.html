@@ -1,0 +1,56 @@
+<section class="stockscan-page">
+  <header class="stockscan-header">
+    <div>
+      <div class="stockscan-eyebrow">NURSE STATION HUB · STOCK TOOLS</div>
+      <h1><i class="fa-solid fa-clipboard-check"></i> SESSION ตรวจนับ Stock</h1>
+      <p>สแกน QR / Barcode เพื่อนำรายการเข้ารอบตรวจนับของสาขาที่กำลังปฏิบัติงาน</p>
+    </div>
+    <div class="stockscan-session-meta">
+      <span>SESSION ID</span><strong id="ss-session-id">กำลังสร้าง...</strong>
+      <span>สาขาที่ปฏิบัติงาน</span><strong id="ss-branch">-</strong>
+      <span>ผู้ตรวจนับ</span><strong id="ss-user">-</strong>
+    </div>
+  </header>
+
+  <div class="stockscan-grid">
+    <section class="stockscan-card">
+      <div class="stockscan-card-title"><i class="fa-solid fa-camera"></i><div><h2>สแกนรายการ</h2><p>อนุญาตให้ใช้กล้องหลังของอุปกรณ์</p></div></div>
+      <div id="ss-reader" class="stockscan-reader"></div>
+      <div class="stockscan-actions">
+        <button id="ss-start-camera" class="ss-btn ss-primary" type="button"><i class="fa-solid fa-camera"></i> เปิดกล้อง</button>
+        <button id="ss-stop-camera" class="ss-btn ss-light" type="button" disabled><i class="fa-solid fa-stop"></i> หยุดกล้อง</button>
+      </div>
+      <p id="ss-scan-status" class="stockscan-hint" aria-live="polite">กดเปิดกล้อง แล้วสแกน QR Code ของรายการ Movement</p>
+    </section>
+
+    <section class="stockscan-card">
+      <div class="stockscan-card-title"><i class="fa-solid fa-box-open"></i><div><h2>รายการที่สแกน</h2><p>สแกนซ้ำใน SESSION เดียวกันจะถูกปฏิเสธ</p></div></div>
+      <div id="ss-preview" class="stockscan-preview empty">ยังไม่มีรายการใหม่ที่รอยืนยัน</div>
+      <div id="ss-pending-list" class="stockscan-pending"></div>
+      <div class="stockscan-actions stockscan-actions-stack">
+        <button id="ss-save-items" class="ss-btn ss-primary" type="button" disabled><i class="fa-solid fa-cloud-arrow-up"></i> บันทึกรายการสแกน</button>
+        <button id="ss-close-session" class="ss-btn ss-success" type="button" disabled><i class="fa-solid fa-circle-check"></i> สรุปผลและปิด SESSION</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="stockscan-card stockscan-results-card">
+    <div class="stockscan-card-title"><i class="fa-solid fa-list-check"></i><div><h2>รายการที่บันทึกใน SESSION</h2><p>แสดงเฉพาะข้อมูลของสาขาที่เลือกอยู่</p></div></div>
+    <div class="stockscan-table-wrap">
+      <table class="stockscan-table">
+        <thead><tr><th>รหัสสินค้า</th><th>ชื่อสินค้า</th><th>MOVEMENT ID</th><th>LOT</th><th>EXP</th><th>จำนวน</th></tr></thead>
+        <tbody id="ss-saved-rows"><tr><td colspan="6" class="empty-cell">กำลังโหลดข้อมูล...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="ss-result-card" class="stockscan-card stockscan-results-card" hidden>
+    <div class="stockscan-card-title"><i class="fa-solid fa-chart-column"></i><div><h2>ผลการตรวจนับ</h2><p>คำนวณแยกตาม CODE และ BRANCH_ID</p></div></div>
+    <div class="stockscan-table-wrap">
+      <table class="stockscan-table">
+        <thead><tr><th>CODE</th><th>REQUIRED</th><th>ACTUAL</th><th>DIFF</th><th>สถานะ</th></tr></thead>
+        <tbody id="ss-result-rows"></tbody>
+      </table>
+    </div>
+  </section>
+</section>

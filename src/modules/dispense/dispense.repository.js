@@ -610,6 +610,142 @@ function normalizeDateValue(value) {
   return raw;
 }
 
+
+// E-StockScan DISPENSE: write one authoritative OUT movement plus its detail
+// record in a single Sheets batchUpdate. INVENTORY_DISPENSE is an audit/detail
+// sheet only; stock balances are calculated exclusively from INVENTORY_MOVEMENT.
+async function createEStockScanDispense(data = {}, context = {}) {
+  const sheets = await getSheets();
+  const branchId = cleanText(context.branchId);
+  const lot = cleanText(data.lot);
+  const exp = normalizeDateValue(data.exp);
+  const code = normalizeDispenseCode(data.code, lot, exp);
+  const qty = Number(data.qty);
+  const requestId = cleanText(data.requestId);
+  if (!branchId) throw new Error("ไม่พบสาขาที่ปฏิบัติงาน กรุณาเลือกสาขาก่อนบันทึก");
+  if (!code || !lot || !exp) throw new Error("ข้อมูลยา/LOT/EXP ไม่ครบถ้วน");
+  if (!Number.isFinite(qty) || qty <= 0) throw new Error("จำนวนจ่ายต้องมากกว่า 0");
+  if (!cleanText(data.target)) throw new Error("กรุณาระบุผู้รับบริการ");
+  if (!requestId) throw new Error("ไม่พบรหัสคำขอจ่ายยา กรุณาลองใหม่");
+
+  const { withSequenceLock } = require("../../utils/running/sequence-lock");
+  const { getBangkokDateParts } = require("../../utils/running/bangkok-date");
+  const { maxAnnualSequence, formatAnnualNumber } = require("../../utils/running/annual-number-format");
+
+  return withSequenceLock(`INVENTORY_MOVEMENT:dispense:${branchId}`, async () => {
+    // Idempotency: a browser retry with the same request ID returns the saved result.
+    const detailResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: "INVENTORY_DISPENSE!A:L"
+    });
+    const detailRows = detailResponse.data.values || [];
+    const detailHeader = (detailRows[0] || []).map(x => cleanText(x).toUpperCase());
+    const detailIndex = Object.fromEntries(detailHeader.map((h, i) => [h, i]));
+    const previous = detailRows.slice(1).find(r => cleanText(r[detailIndex.DISPENSE_ID]) === requestId);
+    if (previous) {
+      const previousRef = cleanText(previous[detailIndex.REF_NO]);
+      const current = await getInventoryMovements();
+      const movement = current.find(r => cleanText(r.REF_NO) === previousRef &&
+        cleanText(r.TYPE).toUpperCase() === "OUT" &&
+        cleanText(r.BRANCH_ID) === branchId);
+      if (movement) {
+        const currentBalance = current.filter(row =>
+          cleanText(row.BRANCH_ID) === branchId &&
+          cleanText(row.CODE).toUpperCase() === cleanText(movement.CODE).toUpperCase() &&
+          cleanText(row.LOT) === cleanText(movement.LOT) &&
+          normalizeDateValue(row.EXP) === normalizeDateValue(movement.EXP)
+        ).reduce((total, row) => {
+          const amount = Math.abs(Number(row.QTY || 0));
+          if (row.TYPE === "IN") return total + amount;
+          if (row.TYPE === "OUT") return total - amount;
+          return total;
+        }, 0);
+        return {
+          movementId: cleanText(movement.MOVEMENT_ID),
+          refNo: previousRef,
+          remaining: currentBalance,
+          alreadySaved: true
+        };
+      }
+      throw new Error("พบรหัสคำขอจ่ายเดิมใน INVENTORY_DISPENSE แต่ไม่พบรายการ OUT ใน INVENTORY_MOVEMENT กรุณาให้ผู้ดูแลตรวจสอบก่อนทำรายการซ้ำ");
+    }
+
+    const latest = await getInventoryMovements();
+    const matching = latest.filter(row =>
+      cleanText(row.BRANCH_ID) === branchId &&
+      cleanText(row.CODE).toUpperCase() === code &&
+      cleanText(row.LOT) === lot &&
+      normalizeDateValue(row.EXP) === exp &&
+      (row.TYPE === "IN" || row.TYPE === "OUT")
+    );
+    const balance = matching.reduce((total, row) => {
+      const amount = Math.abs(Number(row.QTY || 0));
+      if (!Number.isFinite(amount)) return total;
+      if (row.TYPE === "IN") return total + amount;
+      if (row.TYPE === "OUT") return total - amount;
+      return total;
+    }, 0);
+    if (balance <= 0 || qty > balance) {
+      throw new Error(`สต๊อกไม่เพียงพอ LOT ${lot} (คงเหลือ ${Math.max(0, balance)})`);
+    }
+
+    const source = matching.find(row => row.TYPE === "IN" && row.CONTAINER_ID) ||
+      matching.find(row => row.TYPE === "IN") || {};
+    const now = new Date();
+    const { yyyy: year } = getBangkokDateParts(now);
+    const movementId = formatAnnualNumber(
+      "MOVID", maxAnnualSequence(latest.map(row => row.MOVEMENT_ID), "MOVID", year) + 1, now
+    );
+    const refNo = formatAnnualNumber(
+      "RCOUT", maxAnnualSequence(latest.map(row => row.REF_NO), "RCOUT", year) + 1, now
+    );
+    const dispenseId = requestId;
+    const movementRow = [
+      movementId, "OUT", refNo,
+      cleanText(data.date) || now.toISOString().slice(0, 10),
+      code, cleanText(data.name), qty, cleanText(data.unit), lot, exp,
+      cleanText(data.target), cleanText(context.user), now.toISOString(), branchId,
+      cleanText(context.location || source.LOCATION), cleanText(source.QRCODE),
+      cleanText(source.CONTAINER_ID), cleanText(source.CONTAINER_QR)
+    ];
+    const detailRow = [
+      dispenseId, refNo, cleanText(data.patientName), cleanText(data.hn),
+      cleanText(data.medicineName), qty, lot, exp, code,
+      cleanText(context.user), now.toISOString(), cleanText(data.qrRaw)
+    ];
+
+    const movementSheetId = await getSheetId(sheets, INVENTORY_SHEET);
+    const detailSheetId = await getSheetId(sheets, "INVENTORY_DISPENSE");
+    const cell = value => ({
+      userEnteredValue: typeof value === "number"
+        ? { numberValue: value }
+        : { stringValue: String(value ?? "") }
+    });
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: {
+        requests: [
+          {
+            appendCells: {
+              sheetId: movementSheetId,
+              rows: [{ values: movementRow.map(cell) }],
+              fields: "userEnteredValue"
+            }
+          },
+          {
+            appendCells: {
+              sheetId: detailSheetId,
+              rows: [{ values: detailRow.map(cell) }],
+              fields: "userEnteredValue"
+            }
+          }
+        ]
+      }
+    });
+    return { movementId, refNo, remaining: balance - qty, alreadySaved: false };
+  });
+}
+
 async function updateInventoryDispense(refNo, data = {}, context = {}) {
   const sheets = await getSheets();
   const res = await sheets.spreadsheets.values.get({
@@ -694,6 +830,7 @@ module.exports = {
   getInventoryMovements,
   getInventoryByRefNo,
   createInventoryDispense,
+  createEStockScanDispense,
   updateInventoryDispense,
   deleteInventoryDispense
 

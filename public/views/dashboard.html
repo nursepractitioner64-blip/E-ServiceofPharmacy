@@ -1,56 +1,78 @@
 <section class="content-grid">
-  <div class="card stock-card">
-    <div class="card-header stock-header">
-      <div class="stock-header-left">
-        <div class="stock-icon">📊</div>
-        <div>
-          <h3 id="dashboardSystemTitle">🚑 Emergency Check</h3>
-          <h4 id="dashboardSystemSubtitle">Emergency Stock Readiness Dashboard</h4>
-        </div>
-      </div>
-      <div class="stock-header-right">
-        <div class="live-status"><span class="dot"></span> LIVE DATA</div>
-        <button id="dashboardRefreshBtn" class="btn btn-refresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
-      </div>
+
+<style>
+/* NurseHub LINE quick access — additive styles; existing dashboard styles remain unchanged */
+.nursehub-shortcuts {
+  margin: 0 0 22px;
+  padding: 20px;
+  border: 1px solid #dcefeb;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f4fffc 0%, #ffffff 72%);
+  box-shadow: 0 8px 24px rgba(15, 118, 110, .06);
+}
+.nursehub-shortcuts-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:15px; }
+.nursehub-shortcuts-head h3 { margin:0; color:#134e4a; font-size:18px; font-weight:700; }
+.nursehub-shortcuts-head p { margin:4px 0 0; color:#64817d; font-size:12px; }
+.nursehub-shortcuts-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.nursehub-shortcut {
+  display:flex; align-items:center; gap:12px; min-height:78px; padding:14px;
+  border:1px solid #e2eeeb; border-radius:14px; background:#fff; color:#174e49;
+  text-decoration:none; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.nursehub-shortcut:hover { color:#0f766e; border-color:#8dd8cb; transform:translateY(-2px); box-shadow:0 8px 18px rgba(15,118,110,.09); }
+.nursehub-shortcut-icon {
+  display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; border-radius:13px;
+  background:#e7f8f4; color:#0f766e; font-size:21px;
+}
+.nursehub-shortcut strong { display:block; font-size:14px; font-weight:700; }
+.nursehub-shortcut small { display:block; margin-top:3px; color:#718985; font-size:11px; }
+.nursehub-shortcut.is-disabled { opacity:.58; cursor:not-allowed; background:#f8faf9; }
+.nursehub-shortcut.is-disabled:hover { transform:none; box-shadow:none; border-color:#e2eeeb; color:#174e49; }
+.nursehub-shortcut-status { margin-left:auto; align-self:flex-start; white-space:nowrap; color:#879894; font-size:10px; }
+@media(max-width:768px) { .nursehub-shortcuts-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; } .nursehub-shortcut { padding:11px; gap:9px; } }
+@media(max-width:420px) { .nursehub-shortcuts { padding:14px; } .nursehub-shortcut { min-height:70px; } .nursehub-shortcut-icon { width:38px;height:38px;flex-basis:38px;font-size:18px; } .nursehub-shortcut strong { font-size:12px; } .nursehub-shortcut small { font-size:10px; } }
+</style>
+
+<section class="nursehub-shortcuts" aria-label="NurseHub Quick Access">
+  <div class="nursehub-shortcuts-head">
+    <div>
+      <h3><i class="fa-solid fa-grid-2"></i> NurseHub Quick Access</h3>
+      <p>เมนูทางลัดสำหรับเข้าใช้งานระบบงานพยาบาล</p>
     </div>
-
-    <div class="dashboard-system-tabs">
-      <button type="button" class="dashboard-system-tab active" data-dashboard-system="emergency">🚑 Emergency Check</button>
-      <button type="button" class="dashboard-system-tab" data-dashboard-system="controlled">💊 Controlled Drug</button>
+    <span class="badge rounded-pill text-bg-light border">6 เมนู</span>
+  </div>
+  <div class="nursehub-shortcuts-grid">
+    <a class="nursehub-shortcut" href="#estockscan-session" data-route="estockscan-session">
+      <span class="nursehub-shortcut-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+      <span><strong>SESSION</strong><small>E-StockScan · ตรวจสอบรายการ</small></span>
+      <span class="shortcuts-arrow">›</span>
+    </a>
+    <a class="nursehub-shortcut" href="#estockscan-dispense" data-route="estockscan-dispense">
+      <span class="nursehub-shortcut-icon"><i class="fa-solid fa-prescription-bottle-medical"></i></span>
+      <span><strong>DISPENSE</strong><small>E-StockScan · จ่ายยา</small></span>
+      <span class="shortcuts-arrow">›</span>
+    </a>
+    <a class="nursehub-shortcut" href="#temperature-entry" data-route="temperature-entry">
+      <span class="nursehub-shortcut-icon"><i class="fa-solid fa-temperature-half"></i></span>
+      <span><strong>TEMPERATURE</strong><small>บันทึกอุณหภูมิและความชื้น</small></span>
+      <span class="shortcuts-arrow">›</span>
+    </a>
+    <a class="nursehub-shortcut" href="#dashboard" data-route="dashboard">
+      <span class="nursehub-shortcut-icon"><i class="fa-solid fa-chart-line"></i></span>
+      <span><strong>DASHBOARD</strong><small>ภาพรวมระบบ</small></span>
+      <span class="shortcuts-arrow">›</span>
+    </a>
+    <div class="nursehub-shortcut is-disabled" aria-disabled="true" title="ยังไม่มีหน้ารายงานกลางในโปรเจกต์ชุดนี้">
+      <span class="nursehub-shortcut-icon"><i class="fa-solid fa-chart-column"></i></span>
+      <span><strong>REPORTS</strong><small>ศูนย์รายงาน</small></span>
+      <span class="nursehub-shortcut-status">เร็ว ๆ นี้</span>
     </div>
-
-    <div class="summary-section">
-      <div class="summary-header">
-        <h3>System Overview</h3>
-        <p>ข้อมูลคำนวณจาก Master และ Stock Movement จริง</p>
-      </div>
-      <div id="summaryCards" class="summary-row"><div class="loading-card">กำลังโหลด...</div></div>
-    </div>
-
-    <div class="dashboard-table-card">
-      <div class="table-header"><h4>📦 Stock Balance</h4></div>
-      <div class="table-responsive">
-        <table class="table"><thead><tr><th>Code</th><th>ชื่อ</th><th>Unit</th><th class="text-end">Required</th><th class="text-end">Balance</th><th>Status</th></tr></thead>
-        <tbody id="dashboardBalances"><tr><td colspan="6" class="text-center">กำลังโหลด...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <div class="dashboard-alert-grid" id="dashboardAlerts"></div>
-
-    <div class="dashboard-table-card">
-      <div class="table-header"><h4>⏰ Lot ใกล้หมดอายุ</h4></div>
-      <div class="table-responsive">
-        <table class="table"><thead><tr><th>Code</th><th>ชื่อ</th><th>Lot</th><th>EXP</th><th class="text-end">Qty</th><th class="text-end">เหลือ</th></tr></thead>
-        <tbody id="dashboardExpiring"><tr><td colspan="6" class="text-center">กำลังโหลด...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <div class="dashboard-table-card">
-      <div class="table-header"><h4>🧾 การเคลื่อนไหวล่าสุด</h4></div>
-      <div class="table-responsive">
-        <table class="table"><thead><tr><th>วันที่</th><th>Type</th><th>Code</th><th>ชื่อ</th><th>Lot</th><th class="text-end">Qty</th></tr></thead>
-        <tbody id="dashboardRecent"><tr><td colspan="6" class="text-center">กำลังโหลด...</td></tr></tbody></table>
-      </div>
+    <div class="nursehub-shortcut is-disabled" aria-disabled="true" title="ยังไม่มีศูนย์แจ้งเตือนกลางในโปรเจกต์ชุดนี้">
+      <span class="nursehub-shortcut-icon"><i class="fa-solid fa-bell"></i></span>
+      <span><strong>NOTIFICATIONS</strong><small>ศูนย์แจ้งเตือน</small></span>
+      <span class="nursehub-shortcut-status">เร็ว ๆ นี้</span>
     </div>
   </div>
+</section>
+
 </section>
