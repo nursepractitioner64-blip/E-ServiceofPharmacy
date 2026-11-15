@@ -20,7 +20,7 @@ test('LINE login and link use LINE hosted OAuth authorization and a server callb
   assert.match(routes, /router\.get\('\/line\/callback'/);
   assert.match(routes, /oauth2\/v2\.1\/authorize/);
   assert.match(routes, /oauth2\/v2\.1\/token/);
-  assert.match(routes, /auth\.createSession\(user, res\)/);
+  assert.match(routes, /auth\.createSession\(user, req, res\)/);
 });
 
 test('login UI offers LINE QR Login and the existing account link action', () => {

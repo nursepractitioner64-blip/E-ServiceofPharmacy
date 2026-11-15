@@ -33,7 +33,7 @@ router.post('/selection', requireAuth, async (req, res) => {
     const user = await effectiveUser(req);
     const branchId = String(req.body?.branchId || '').trim();
     if (branchId === 'ALL' && user.role === 'ADMIN') {
-      auth.setSessionBranch(req, 'ALL');
+      await auth.setSessionBranch(req, 'ALL');
       return res.json({ ok: true, currentBranchId: 'ALL', currentBranchName: 'ภาพรวมทุกสาขา' });
     }
     if (!branchId) return res.status(400).json({ ok: false, message: 'กรุณาเลือกสาขา' });
@@ -43,7 +43,7 @@ router.post('/selection', requireAuth, async (req, res) => {
     if (user.role !== 'ADMIN' && !(user.branchIds || []).some(id => String(id).trim().toUpperCase() === branchId.toUpperCase())) {
       return res.status(403).json({ ok: false, message: 'คุณไม่มีสิทธิ์เลือกสาขานี้' });
     }
-    auth.setSessionBranch(req, branchId);
+    await auth.setSessionBranch(req, branchId);
     res.json({ ok: true, currentBranchId: branchId, currentBranchName: branch.BRANCH_NAME });
   } catch (err) { console.error('BRANCH SELECT ERROR:', err.message); res.status(500).json({ ok: false, message: 'เลือกสาขาไม่สำเร็จ' }); }
 });

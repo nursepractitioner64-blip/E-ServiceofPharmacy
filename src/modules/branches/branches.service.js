@@ -335,7 +335,7 @@ async function updateBranch(branchId, input) {
       requestBody: { valueInputOption: 'RAW', data: changes }
     });
     if (requestedId !== branchId) {
-      try { require('../auth/auth.service').remapBranchId(branchId, requestedId); }
+      try { await require('../auth/auth.service').remapBranchId(branchId, requestedId); }
       catch (err) { console.warn('BRANCH SESSION REMAP WARNING:', err.message); }
     }
     console.log(`BRANCH UPDATE SUCCESS: ${branchId} -> ${requestedId}`);

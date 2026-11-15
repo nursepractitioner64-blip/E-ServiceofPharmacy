@@ -25,7 +25,7 @@ git status
 
 git add .
 
-git commit -m "Update Pharmacy Stock Card 12-11-2026 V3"
+git commit -m "Update Pharmacy Stock Card 15-11-2026 V3_1"
 
 git push
 

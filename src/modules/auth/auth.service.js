@@ -1,11 +1,10 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const { getSheets, getSpreadsheetId } = require('../../config/google');
+const { pool } = require('../../config/postgres');
 
 const scryptAsync = promisify(crypto.scrypt);
-const SESSION_COOKIE = 'esp_session';
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
-const sessions = new Map();
 const loginAttempts = new Map();
 let bootstrapPromise = null;
 let usersSheetPromise = null;
@@ -30,30 +29,6 @@ function parseBranchIds(value) {
 function nowIso() { return new Date().toISOString(); }
 function randomId(prefix = 'USR') { return `${prefix}-${crypto.randomUUID()}`; }
 function columnLetter(n) { let out = ''; while (n > 0) { const r = (n - 1) % 26; out = String.fromCharCode(65 + r) + out; n = Math.floor((n - 1) / 26); } return out; }
-
-function cookieOptions(maxAgeSeconds) {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure}`;
-}
-
-function getCookie(req, name) {
-  const raw = String(req.headers.cookie || '');
-  for (const part of raw.split(';')) {
-    const idx = part.indexOf('=');
-    if (idx < 0) continue;
-    if (part.slice(0, idx).trim() === name) return part.slice(idx + 1).trim();
-  }
-  return '';
-}
-
-function setSessionCookie(res, sid) {
-  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=${encodeURIComponent(sid)}; ${cookieOptions(Math.floor(SESSION_TTL_MS / 1000))}`);
-}
-
-function clearSessionCookie(res) {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`);
-}
 
 function publicUser(user) {
   return {
@@ -416,11 +391,30 @@ async function authenticate(username, password) {
   return user;
 }
 
-async function createSession(user, res) {
-  const sid = crypto.randomBytes(32).toString('base64url');
+function sessionExpiry(req) {
+  const expires = req.session?.cookie?.expires;
+  if (expires) return new Date(expires).getTime();
+  const maxAge = Number(req.session?.cookie?.maxAge || SESSION_TTL_MS);
+  return Date.now() + maxAge;
+}
+
+async function saveRequestSession(req) {
+  if (!req.session) throw new Error('Express session middleware is not available on this request.');
+  await new Promise((resolve, reject) => req.session.save(err => err ? reject(err) : resolve()));
+}
+
+async function createSession(user, req, res) {
+  if (!req?.session || typeof req.session.regenerate !== 'function') {
+    throw new Error('Persistent session middleware is not initialized.');
+  }
   const safe = publicUser(user);
-  sessions.set(sid, { user: safe, expiresAt: Date.now() + SESSION_TTL_MS });
-  setSessionCookie(res, sid);
+  await new Promise((resolve, reject) => req.session.regenerate(err => err ? reject(err) : resolve()));
+  req.session.user = safe;
+  req.session.currentBranchId = '';
+  req.session.createdAt = Date.now();
+  req.session.cookie.maxAge = SESSION_TTL_MS;
+  await saveRequestSession(req);
+
   try {
     const latest = await readUsers();
     const row = latest.find(u => u.USER_ID === user.USER_ID);
@@ -435,47 +429,70 @@ async function createSession(user, res) {
 }
 
 function getSession(req) {
-  const sid = getCookie(req, SESSION_COOKIE);
-  if (!sid) return null;
-  const session = sessions.get(sid);
-  if (!session) return null;
-  if (Date.now() >= session.expiresAt) { sessions.delete(sid); return null; }
-  return { sid, ...session, currentBranchId: session.currentBranchId || '' };
+  const session = req?.session;
+  if (!session || !session.user) return null;
+  const expiresAt = sessionExpiry(req);
+  if (Date.now() >= expiresAt) return null;
+  return {
+    sid: req.sessionID,
+    user: session.user,
+    expiresAt,
+    currentBranchId: String(session.currentBranchId || '')
+  };
 }
 
-function setSessionBranch(req, branchId) {
+async function setSessionBranch(req, branchId) {
   const current = getSession(req);
   if (!current) return null;
-  const session = sessions.get(current.sid);
-  session.currentBranchId = String(branchId || '').trim();
-  sessions.set(current.sid, session);
-  return { currentBranchId: session.currentBranchId };
+  req.session.currentBranchId = String(branchId || '').trim();
+  await saveRequestSession(req);
+  return { currentBranchId: req.session.currentBranchId };
 }
 
-function remapBranchId(oldId, newId) {
-  for (const [sid, session] of sessions.entries()) {
-    if (session.currentBranchId === oldId) session.currentBranchId = newId;
-    if (session.user && Array.isArray(session.user.branchIds)) {
-      session.user.branchIds = session.user.branchIds.map(id => id === oldId ? newId : id);
-    }
-    sessions.set(sid, session);
-  }
+async function remapBranchId(oldId, newId) {
+  const oldValue = String(oldId || '');
+  const newValue = String(newId || '');
+  if (!oldValue || !newValue) return false;
+  await pool.query(
+    `UPDATE user_sessions
+       SET sess = jsonb_set(
+         jsonb_set(sess::jsonb, '{currentBranchId}',
+           CASE WHEN sess::jsonb->>'currentBranchId' = $1 THEN to_jsonb($2::text)
+                ELSE COALESCE(sess::jsonb->'currentBranchId', '""'::jsonb) END, true),
+         '{user,branchIds}',
+         COALESCE((
+           SELECT jsonb_agg(CASE WHEN item = to_jsonb($1::text) THEN to_jsonb($2::text) ELSE item END)
+           FROM jsonb_array_elements(COALESCE(sess::jsonb #> '{user,branchIds}', '[]'::jsonb)) AS items(value)
+         ), '[]'::jsonb), true
+       )::json
+     WHERE sess::jsonb->>'currentBranchId' = $1
+        OR EXISTS (
+          SELECT 1 FROM jsonb_array_elements(COALESCE(sess::jsonb #> '{user,branchIds}', '[]'::jsonb)) AS items(value)
+          WHERE value = to_jsonb($1::text)
+        )`,
+    [oldValue, newValue]
+  );
   return true;
 }
 
-function clearSessionBranch(req) {
+async function clearSessionBranch(req) {
   const current = getSession(req);
   if (!current) return false;
-  const session = sessions.get(current.sid);
-  session.currentBranchId = '';
-  sessions.set(current.sid, session);
+  req.session.currentBranchId = '';
+  await saveRequestSession(req);
   return true;
 }
 
-function destroySession(req, res) {
-  const sid = getCookie(req, SESSION_COOKIE);
-  if (sid) sessions.delete(sid);
-  clearSessionCookie(res);
+async function destroySession(req, res) {
+  if (req?.session && typeof req.session.destroy === 'function') {
+    await new Promise((resolve, reject) => req.session.destroy(err => err ? reject(err) : resolve()));
+  }
+  res.clearCookie('esp_session', {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
+  });
 }
 
 async function listUsers() {
@@ -516,10 +533,11 @@ async function setUserPassword(userId, password) {
   user.PASSWORD_HASH = await hashPassword(password);
   user.PASSWORD_CHANGED_AT = nowIso();
   await updateUserRow(user.__rowNumber, user);
-  // Revoke all active sessions for the changed account.
-  for (const [sid, session] of sessions.entries()) {
-    if (session.user.userId === userId) sessions.delete(sid);
-  }
+  // Revoke all persistent sessions for the changed account.
+  await pool.query(
+    `DELETE FROM user_sessions WHERE sess::jsonb->'user'->>'userId' = $1`,
+    [String(userId)]
+  );
   return true;
 }
 
@@ -537,7 +555,10 @@ async function setUserStatus(userId, status, actor) {
   user.STATUS = normalized;
   await updateUserRow(user.__rowNumber, user);
   if (normalized !== 'ACTIVE') {
-    for (const [sid, session] of sessions.entries()) if (session.user.userId === userId) sessions.delete(sid);
+    await pool.query(
+      `DELETE FROM user_sessions WHERE sess::jsonb->'user'->>'userId' = $1`,
+      [String(userId)]
+    );
   }
   return true;
 }
@@ -549,13 +570,13 @@ async function setUserBranches(userId, branchIds) {
   if (!user) return false;
   user.BRANCH_IDS = normalized.join(',');
   await updateUserRow(user.__rowNumber, user);
-  // Refresh active sessions so new branch permissions take effect immediately.
-  for (const [sid, session] of sessions.entries()) {
-    if (session.user.userId === userId) {
-      session.user.branchIds = normalized;
-      sessions.set(sid, session);
-    }
-  }
+  // Refresh persistent sessions so changed branch permissions take effect immediately.
+  await pool.query(
+    `UPDATE user_sessions
+       SET sess = jsonb_set(sess::jsonb, '{user,branchIds}', $2::jsonb, true)::json
+     WHERE sess::jsonb->'user'->>'userId' = $1`,
+    [String(userId), JSON.stringify(normalized)]
+  );
   return true;
 }
 

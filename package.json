@@ -21,6 +21,9 @@
     "module-alias": "^2.3.4",
     "multer": "^1.4.5-lts.1",
     "node-dbf": "^0.4.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "connect-pg-simple": "^10.0.0",
+    "express-session": "^1.18.2",
+    "pg": "^8.16.3"
   }
 }

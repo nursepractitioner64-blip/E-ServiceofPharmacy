@@ -3,14 +3,21 @@ require("module-alias/register");
 
 const express = require("express");
 const path = require("path");
+const { createSessionMiddleware } = require("./src/config/session");
 
 const app = express();
+
+// Render terminates HTTPS at its proxy; trust one proxy hop so Secure cookies work.
+app.set('trust proxy', 1);
 
 /* =====================================================
  * SECURITY / CORE MIDDLEWARE
 ===================================================== */
 
 app.use(express.json());
+
+// Persistent auth session must be available to every API route and middleware.
+app.use(createSessionMiddleware());
 
 app.use(
   express.urlencoded({

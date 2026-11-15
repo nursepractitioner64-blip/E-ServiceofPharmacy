@@ -85,7 +85,7 @@ router.get('/line/callback', async (req, res) => {
       return res.redirect(302, url.toString());
     }
     const user = await auth.authenticateByLineIdToken(tokenData.id_token);
-    await auth.createSession(user, res);
+    await auth.createSession(user, req, res);
     const url = new URL(appUrl); url.searchParams.set('lineLogin', 'success');
     return res.redirect(302, url.toString());
   } catch (err) {
@@ -169,7 +169,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ ok: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง หรือบัญชีถูกระงับ' });
     }
     auth.clearLoginFailures(req, username);
-    const safeUser = await auth.createSession(user, res);
+    const safeUser = await auth.createSession(user, req, res);
     return res.json({ ok: true, user: safeUser });
   } catch (err) {
     console.error('AUTH LOGIN ERROR:', err.message);
@@ -183,9 +183,14 @@ router.get('/me', (req, res) => {
   return res.json({ ok: true, user: session.user, expiresAt: new Date(session.expiresAt).toISOString() });
 });
 
-router.post('/logout', (req, res) => {
-  auth.destroySession(req, res);
-  return res.json({ ok: true });
+router.post('/logout', async (req, res) => {
+  try {
+    await auth.destroySession(req, res);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('AUTH LOGOUT ERROR:', err.message);
+    return res.status(500).json({ ok: false, message: 'ออกจากระบบไม่สำเร็จ กรุณาลองใหม่' });
+  }
 });
 
 router.get('/users', requireAuth, requireAdmin, async (req, res) => {
