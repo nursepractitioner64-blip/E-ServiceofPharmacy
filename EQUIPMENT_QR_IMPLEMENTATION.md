@@ -48,3 +48,21 @@ The browser uses the existing `html5-qrcode` scanner and the `qrcodejs` library 
 - `node --check` passed for the Equipment route, Equipment client, central API router and SPA router.
 - The uploaded baseline has 99 existing tests: 86 pass and 13 fail. The modified project has those same 13 pre-existing failures, plus 7 new Equipment structural tests passing (106 total: 93 pass, 13 fail). The new Equipment test file passes independently (7/7).
 - Live Google Sheets writes, real camera scanning, QR printing and browser UI interaction have not been tested in this environment. They require the user's configured Google credentials, branch session and a browser with camera permission.
+
+
+## QR launch from another module (no scanner on Equipment menu)
+Opening `#equipment` does not show a scanner and does not request camera permission. The Equipment page opens on the branch asset list. The QR scanner must be started by the calling module. After it decodes a QR value, invoke one of:
+
+```js
+window.openEquipmentInspectionByQr(decodedText);
+```
+
+or
+
+```js
+window.dispatchEvent(new CustomEvent("equipment:qr-scanned", {
+  detail: { qrValue: decodedText }
+}));
+```
+
+The Equipment module resolves the QR against the active branch and then displays the inspection checklist. On successful save, the success result is shown briefly and the page returns to the Equipment menu; no camera is started here. If saving fails, the checklist remains open for correction/retry.

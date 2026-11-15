@@ -13,6 +13,7 @@ let scanLocked = false;
 let selectedChecklistMaster = "";
 let reportCache = null;
 let isEditingMaster = false;
+let successResetTimer = null;
 
 async function api(path, options = {}) {
   const response = await fetch(`${API}${path}`, {
@@ -291,45 +292,55 @@ function renderChecklistForm(device) {
     </div>`;
   }).join("");
   $("eqInspectionRemark").value="";
+  setMessage("eqInspectionMessage","");
   $("eqCheckCard").hidden=false;$("eqResultCard").hidden=true;
   $("eqCheckCard").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 async function stopScanner() {
-  if(!scanner)return;
-  try {if(scannerStarted)await scanner.stop();await scanner.clear();}
-  catch(error){console.warn("Equipment scanner cleanup:",error);}
-  finally {scanner=null;scannerStarted=false;scanLocked=false;}
-  const reader=$("eqReader");
-  if(reader)reader.innerHTML=`<div class="eq-reader-placeholder"><i class="fa-solid fa-camera"></i><strong>หยุดกล้องแล้ว</strong><span>กดเปิดกล้องเพื่อสแกนอีกครั้ง</span></div>`;
-  if($("eqStartScanner"))$("eqStartScanner").disabled=false;
-  if($("eqStopScanner"))$("eqStopScanner").disabled=true;
+  // Equipment QR scanning is owned by the calling module; this page never opens the camera.
+  if (scanner && scannerStarted) {
+    try { await scanner.stop(); await scanner.clear(); }
+    catch (error) { console.warn("Equipment scanner cleanup:", error); }
+  }
+  scanner = null; scannerStarted = false; scanLocked = false;
 }
-async function startScanner() {
-  if(scannerStarted)return;
-  if(!currentBranchId||currentBranchId==="ALL")throw new Error("กรุณาเลือกสาขาปฏิบัติงานก่อน");
-  if(!window.Html5Qrcode)throw new Error("ไม่พบไลบรารี html5-qrcode");
-  $("eqReader").innerHTML="";
-  scanner=new Html5Qrcode("eqReader");
-  await scanner.start({facingMode:"environment"},{fps:10,qrbox:(w,h)=>({width:Math.min(w,280),height:Math.min(h,280)})},handleScan);
-  scannerStarted=true;$("eqStartScanner").disabled=true;$("eqStopScanner").disabled=false;
-  setMessage("eqScanMessage","กำลังสแกน QR...");
-}
-async function handleScan(decodedText) {
-  if(scanLocked)return;
-  scanLocked=true;
+
+async function openInspectionByQr(qrValue) {
+  const value = String(qrValue || "").trim();
+  if (!value) throw new Error("ไม่พบข้อมูล QR Code");
+  if (!currentBranchId || currentBranchId === "ALL") throw new Error("กรุณาเลือกสาขาปฏิบัติงานก่อน");
+  if (scanLocked) return;
+  if (successResetTimer) { clearTimeout(successResetTimer); successResetTimer = null; }
+  scanLocked = true;
   try {
-    await stopScanner();
-    setMessage("eqScanMessage","กำลังตรวจสอบ QR...");
-    const result=await api("/scan/resolve",{method:"POST",body:JSON.stringify({qrValue:decodedText})});
-    $("eqScanMessage").textContent="";
-    $("eqResultCard").hidden=true;
+    const result = await api("/scan/resolve", { method: "POST", body: JSON.stringify({ qrValue: value }) });
+    activeDevice = null;
+    $("eqCheckCard").hidden = false;
+    $("eqResultCard").hidden = true;
+    document.querySelectorAll("[data-eq-tab]").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll("[data-eq-panel]").forEach(panel => {
+      panel.classList.toggle("active", panel.dataset.eqPanel === "scan");
+      panel.hidden = panel.dataset.eqPanel !== "scan";
+    });
     renderChecklistForm(result.data);
-  } catch(error) {
-    setMessage("eqScanMessage",error.message);
-    scanLocked=false;
+    return result.data;
+  } catch (error) {
+    scanLocked = false;
+    throw error;
   }
 }
+
+// Other modules call this after their own QR scanner decodes a value.
+window.openEquipmentInspectionByQr = openInspectionByQr;
+function handleExternalEquipmentQr(event) {
+  const qrValue = event?.detail?.qrValue ?? event?.detail?.value ?? "";
+  openInspectionByQr(qrValue).catch(error => {
+    console.error("EQUIPMENT QR OPEN ERROR:", error);
+    window.dispatchEvent(new CustomEvent("equipment:qr-error", { detail: { message: error.message } }));
+  });
+}
+
 async function saveInspection(event) {
   event.preventDefault();
   if(!activeDevice)return;
@@ -343,14 +354,29 @@ async function saveInspection(event) {
   try {
     const result=await api("/inspections",{method:"POST",body:JSON.stringify({equipmentId:activeDevice.equipmentId,answers,remark:$("eqInspectionRemark").value})});
     const d=result.data;
-    $("eqCheckCard").hidden=true;$("eqResultCard").hidden=false;
+    $("eqCheckCard").hidden=true;
+    $("eqResultCard").hidden=false;
     const pass=d.status==="PASS";
-    $("eqResultMark").textContent=pass?"✓":"✕";$("eqResultMark").classList.toggle("fail",!pass);
-    $("eqResultTitle").textContent=pass?"ตรวจสอบผ่าน":"ตรวจสอบไม่ผ่าน";
+    $("eqResultMark").textContent=pass?"✓":"✕";
+    $("eqResultMark").classList.toggle("fail",!pass);
+    $("eqResultTitle").textContent="บันทึกผลสำเร็จ";
     $("eqResultText").textContent=`${d.assetCode} · ${d.inspectionDate} ${d.inspectionTime} · ผู้ตรวจ ${d.inspector}`;
     $("eqResultCard").scrollIntoView({behavior:"smooth",block:"center"});
+    // แจ้งผลสำเร็จชั่วคราว แล้วกลับสู่หน้า Equipment menu โดยไม่เปิดกล้อง
+    if(successResetTimer)clearTimeout(successResetTimer);
+    successResetTimer=setTimeout(()=>{
+      successResetTimer=null;
+      $("eqResultCard").hidden=true;
+      $("eqCheckCard").hidden=true;
+      activeDevice=null;
+      scanLocked=false;
+      showTab("assets");
+      document.querySelectorAll('[data-eq-panel="scan"]').forEach(panel=>{panel.classList.remove("active");panel.hidden=true;});
+    },2000);
   } catch(error) {
-    setMessage("eqScanMessage",error.message);
+    // Keep the checklist open and show the API/validation error beside the Save button.
+    setMessage("eqInspectionMessage",error.message || "บันทึกผลตรวจไม่สำเร็จ");
+    console.error("EQUIPMENT INSPECTION SAVE (CLIENT):", error);
   } finally {button.disabled=false;}
 }
 
@@ -446,10 +472,8 @@ function bindEvents() {
   $("eqResetAsset").addEventListener("click",resetAssetForm);
   $("eqReloadAssets").addEventListener("click",loadAssets);
   $("eqInspectionForm").addEventListener("submit",saveInspection);
-  $("eqStartScanner").addEventListener("click",()=>startScanner().catch(e=>setMessage("eqScanMessage",e.message)));
-  $("eqStopScanner").addEventListener("click",stopScanner);
-  $("eqCancelInspection").addEventListener("click",async()=>{activeDevice=null;$("eqCheckCard").hidden=true;await startScanner().catch(e=>setMessage("eqScanMessage",e.message));});
-  $("eqScanNext").addEventListener("click",async()=>{$("eqResultCard").hidden=true;activeDevice=null;await startScanner().catch(e=>setMessage("eqScanMessage",e.message));});
+  $("eqCancelInspection").addEventListener("click",()=>{activeDevice=null;$("eqCheckCard").hidden=true;scanLocked=false;showTab("assets");document.querySelectorAll('[data-eq-panel="scan"]').forEach(panel=>{panel.classList.remove("active");panel.hidden=true;});});
+  window.addEventListener("equipment:qr-scanned", handleExternalEquipmentQr);
   $("eqLoadReport").addEventListener("click",loadReport);
   document.addEventListener("click",handleDelegatedClick);
 }
@@ -469,6 +493,8 @@ async function handleDelegatedClick(event) {
 export async function init() {
   bindEvents();
   initReportFilters();
+  showTab("assets");
+  document.querySelectorAll('[data-eq-panel="scan"]').forEach(panel => { panel.hidden = true; panel.classList.remove("active"); });
   try {
     await loadContext();
     await loadMasters();
@@ -484,11 +510,11 @@ export async function init() {
       if(masterTab)masterTab.hidden=true;
     }
   } catch(error) {
-    setMessage("eqScanMessage",error.message);
     console.error("EQUIPMENT INIT ERROR:",error);
   }
 }
 export async function destroy() {
   document.removeEventListener("click",handleDelegatedClick);
+  window.removeEventListener("equipment:qr-scanned", handleExternalEquipmentQr);
   await stopScanner();
 }

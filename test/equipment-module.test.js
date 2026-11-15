@@ -46,17 +46,19 @@ test("Monthly report aggregates one row per Master CODE and exposes per-asset da
   assert.match(routes, /hasSevenDayFail/);
 });
 
-test("Equipment QR scanner, dynamic checklist and monthly report UI are registered", () => {
+test("Equipment menu hides camera scanning and supports external QR checklist launch", () => {
   const app = read("public/assets/js/app.js");
   const dashboard = read("public/views/dashboard.html");
   const view = read("public/views/equipment.html");
   const client = read("public/modules/equipment/equipment.client.js");
   assert.match(app, /equipment\.html/);
   assert.match(dashboard, /data-route="equipment"/);
-  assert.match(view, /id="eqReader"/);
+  assert.doesNotMatch(view, /id="eqReader"/);
+  assert.doesNotMatch(view, /data-eq-tab="scan"/);
   assert.match(view, /id="eqChecklistFields"/);
   assert.match(view, /id="eqReportTable"/);
-  assert.match(client, /Html5Qrcode/);
+  assert.match(client, /window\.openEquipmentInspectionByQr = openInspectionByQr/);
+  assert.match(client, /equipment:qr-scanned/);
   assert.match(client, /data-day-detail/);
 });
 
@@ -64,4 +66,12 @@ test("QR generation library is included without replacing the existing scanner l
   const html = read("public/index.html");
   assert.match(html, /html5-qrcode/);
   assert.match(html, /qrcode\.min\.js/);
+});
+
+test("Successful inspection returns to Equipment menu without opening a camera", () => {
+  const client = read("public/modules/equipment/equipment.client.js");
+  assert.match(client, /\$\("eqCheckCard"\)\.hidden=true;[\s\S]*\$\("eqResultCard"\)\.hidden=false;/);
+  assert.match(client, /successResetTimer=setTimeout\(\(\)=>[\s\S]*showTab\("assets"\);[\s\S]*\},2000\);/);
+  assert.doesNotMatch(client, /await startScanner\(\)/);
+  assert.match(client, /catch\(error\)\s*\{[\s\S]*setMessage\("eqInspectionMessage",error\.message/);
 });
