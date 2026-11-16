@@ -1273,10 +1273,15 @@ async function navigateWithoutHistory(
       config.view
     );
 
+    /* โหลด CSS ของ Route ให้เหมือน navigate() */
+    await loadRouteStyle(
+      config.style
+    );
+
   } catch (err) {
 
     console.error(
-      "❌ VIEW LOAD ERROR:",
+      "❌ VIEW / STYLE LOAD ERROR:",
       err
     );
 
