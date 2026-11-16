@@ -4,7 +4,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "build:line-rich-menu": "node scripts/build-line-rich-menu-image.js",
+    "publish:line-rich-menu": "node scripts/publish-line-rich-menu.js"
   },
   "_moduleAliases": {
     "@": "src"

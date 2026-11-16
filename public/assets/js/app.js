@@ -24,6 +24,19 @@ const routes = {
     system: "pharmacy"
   },
 
+  /* LINE Rich Menu destinations - placeholder modules */
+  reports: {
+    view: "/views/reports.html",
+    script: null,
+    system: "pharmacy"
+  },
+
+  notifications: {
+    view: "/views/notifications.html",
+    script: null,
+    system: "pharmacy"
+  },
+
   /* E-StockScan modules integrated into the Hub SPA */
   "estockscan-session": {
     view: "/views/estockscan-session.html",
@@ -447,17 +460,10 @@ async function loadRouteStyle(styleUrl) {
     "true";
 
 
-  document.head.appendChild(
-    link
-  );
-
-
-  currentRouteStyle =
-    link;
-
-
   /* =====================================================
      รอให้ CSS โหลดเสร็จ
+     ผูก onload/onerror ก่อน appendChild เพื่อป้องกัน
+     browser ที่โหลดไฟล์จาก cache เร็ว จนพลาด event
   ===================================================== */
 
   await new Promise(
@@ -494,6 +500,10 @@ async function loadRouteStyle(styleUrl) {
         );
 
       };
+
+      document.head.appendChild(link);
+
+      currentRouteStyle = link;
 
     }
   );

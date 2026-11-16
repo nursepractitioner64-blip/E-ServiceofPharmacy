@@ -25,11 +25,11 @@ git status
 
 git add .
 
-git commit -m "Update Pharmacy Stock Card 15-11-2026 V3_1"
+git commit -m "Update Pharmacy Stock Card 15-11-2026 V4"
 
 git push
 
-
+25322532
 
 1. เข้าโฟลเดอร์โปรเจกต์
 cd "F:\STM\ชื่อโปรเจกต์ใหม่" ื่ 
