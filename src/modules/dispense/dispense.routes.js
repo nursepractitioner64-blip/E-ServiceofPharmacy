@@ -15,6 +15,8 @@ router.get("/stock-movement", requireAuth, requireBranch, controller.getStockMov
 
 router.get("/next-refno", controller.getNextRefNo);
 
+router.get("/available-lots/:code", requireAuth, requireBranch, controller.getAvailableLots);
+
 router.get("/:refNo", requireAuth, requireBranch, controller.getByRefNo);
 
 router.post(

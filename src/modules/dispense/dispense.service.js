@@ -251,6 +251,10 @@ async function getList() {
   return repository.getInventoryMovements();
 }
 
+async function getAvailableLots(code, context = {}) {
+  return repository.getAvailableLots(code, context.branchId || "");
+}
+
 async function getByRefNo(refNo, context = {}) {
   return repository.getInventoryByRefNo(refNo, context.branchId || "");
 }
@@ -270,6 +274,7 @@ async function deleteDispense(refNo, context) {
 module.exports = {
   uploadDrugOpd,
   getList,
+  getAvailableLots,
   getByRefNo,
   createDispense,
   updateDispense,

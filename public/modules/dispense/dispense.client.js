@@ -97,13 +97,17 @@ export async function init() {
       document.getElementById("unit").value =
         opt?.dataset?.unit || "";
 
-      document.getElementById("lot").value =
-        opt?.dataset?.lot || "";
-
-      document.getElementById("exp").value =
-        opt?.dataset?.exp || "";
+      loadAvailableLots(this.value).catch(err => {
+        console.error("LOAD DISPENSE LOTS ERROR:", err);
+        alert(err.message || "ค้นหา LOT ไม่สำเร็จ");
+      });
 
     });
+
+  document.getElementById("lot")?.addEventListener("change", function () {
+    const opt = this.selectedOptions[0];
+    document.getElementById("exp").value = toDateInput(opt?.dataset?.exp || "");
+  });
 
   await loadNextRefNo();
   await loadDispenseList();
@@ -450,6 +454,7 @@ await openDispenseModal(true);
   qtyEl.value = d.qty || "";
   unitEl.value = d.unit || "";
 
+  await loadAvailableLots(d.code || "", d.lot || "", d.exp || "");
   lotEl.value = d.lot || "";
   expEl.value = toDateInput(d.exp) || "";
 
@@ -507,6 +512,49 @@ async function loadNextRefNo() {
   } catch (err) {
     console.error("โหลดเลขที่จำหน่ายไม่สำเร็จ", err);
   }
+}
+
+async function loadAvailableLots(code, selectedLot = "", selectedExp = "") {
+  const lotEl = document.getElementById("lot");
+  const expEl = document.getElementById("exp");
+  if (!lotEl || !expEl) return [];
+
+  lotEl.disabled = true;
+  lotEl.innerHTML = '<option value="">กำลังโหลด LOT...</option>';
+  expEl.value = "";
+  if (!code) {
+    lotEl.innerHTML = '<option value="">-- เลือกรหัสยาก่อน --</option>';
+    return [];
+  }
+
+  const res = await fetch(`/api/dispense/available-lots/${encodeURIComponent(code)}`);
+  const json = await res.json();
+  if (!res.ok || !json.ok || !Array.isArray(json.data)) {
+    throw new Error(json.message || "ไม่สามารถโหลด LOT จากสต็อกได้");
+  }
+
+  lotEl.innerHTML = '<option value="">-- เลือก LOT --</option>';
+  json.data.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.LOT;
+    opt.textContent = `${item.LOT} | EXP ${item.EXP} | คงเหลือ ${item.BALANCE} ${item.UNIT || ""}`;
+    opt.dataset.exp = item.EXP || "";
+    opt.dataset.balance = String(item.BALANCE ?? 0);
+    lotEl.appendChild(opt);
+  });
+  lotEl.disabled = json.data.length === 0;
+  if (!json.data.length) {
+    lotEl.innerHTML = '<option value="">ไม่พบ LOT ที่มียอดคงเหลือ</option>';
+  }
+
+  if (selectedLot) {
+    const match = [...lotEl.options].find(opt => opt.value === selectedLot &&
+      (!selectedExp || toDateInput(opt.dataset.exp) === toDateInput(selectedExp)));
+    if (match) lotEl.value = match.value;
+  }
+  const selected = lotEl.selectedOptions[0];
+  if (selected?.dataset?.exp) expEl.value = toDateInput(selected.dataset.exp);
+  return json.data;
 }
 
 async function loadDrugMaster() {

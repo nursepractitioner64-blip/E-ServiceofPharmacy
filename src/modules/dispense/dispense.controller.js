@@ -153,6 +153,19 @@ exports.getList = async (req, res) => {
 };
 
 
+exports.getAvailableLots = async (req, res) => {
+  try {
+    const branch = await getCurrentBranch(req);
+    const code = String(req.params.code || "").trim();
+    if (!code) return res.status(400).json({ ok: false, message: "กรุณาเลือกรหัสยา" });
+    const data = await service.getAvailableLots(code, branch);
+    return res.json({ ok: true, data });
+  } catch (err) {
+    console.error("DISPENSE AVAILABLE LOTS ERROR:", err);
+    return res.status(500).json({ ok: false, message: err.message || "ค้นหา LOT ไม่สำเร็จ" });
+  }
+};
+
 exports.getByRefNo = async (req, res) => {
 
   try {

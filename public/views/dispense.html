@@ -136,12 +136,14 @@
 
           <div class="psc-field">
             <label>Lot</label>
-            <input name="lot" id="lot" required/>
+            <select name="lot" id="lot" required disabled>
+              <option value="">-- เลือกรหัสยาก่อน --</option>
+            </select>
           </div>
 
           <div class="psc-field">
             <label>วันหมดอายุ</label>
-            <input type="date" name="exp"  id="exp" required/>
+            <input type="date" name="exp" id="exp" required readonly/>
           </div>
           
 

@@ -456,6 +456,44 @@ async function getInventoryMovements() {
   })).filter(row => row.MOVEMENT_ID || row.REF_NO || row.CODE);
 }
 
+function aggregateAvailableLots(movements, code, branchId) {
+  const targetCode = cleanText(code).toUpperCase();
+  const targetBranch = cleanText(branchId);
+  if (!targetCode || !targetBranch) return [];
+
+  const groups = new Map();
+  for (const row of movements || []) {
+    const rowCode = cleanText(row.CODE).toUpperCase();
+    const rowBranch = cleanText(row.BRANCH_ID);
+    const type = cleanText(row.TYPE).toUpperCase();
+    const lot = cleanText(row.LOT);
+    const exp = normalizeDateValue(row.EXP);
+    if (rowCode !== targetCode || rowBranch !== targetBranch || !lot || !["IN", "OUT"].includes(type)) continue;
+
+    const key = `${rowCode}||${lot}||${exp}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        CODE: rowCode, NAME: cleanText(row.NAME), UNIT: cleanText(row.UNIT),
+        LOT: lot, EXP: exp, BALANCE: 0
+      });
+    }
+    const item = groups.get(key);
+    const qty = Math.abs(Number(row.QTY || 0));
+    if (Number.isFinite(qty)) item.BALANCE += type === "IN" ? qty : -qty;
+    if (cleanText(row.NAME)) item.NAME = cleanText(row.NAME);
+    if (cleanText(row.UNIT)) item.UNIT = cleanText(row.UNIT);
+  }
+
+  return [...groups.values()]
+    .filter(item => item.BALANCE > 0)
+    .sort((a, b) => String(a.LOT).localeCompare(String(b.LOT), undefined, { numeric: true }));
+}
+
+async function getAvailableLots(code, branchId) {
+  const movements = await getInventoryMovements();
+  return aggregateAvailableLots(movements, code, branchId);
+}
+
 async function getInventoryByRefNo(refNo, branchId = "") {
   const rows = await getInventoryMovements();
   return rows.find(row =>
@@ -828,6 +866,8 @@ module.exports = {
   getStockMovements,
   getDispenseLogs,
   getInventoryMovements,
+  getAvailableLots,
+  aggregateAvailableLots,
   getInventoryByRefNo,
   createInventoryDispense,
   createEStockScanDispense,
