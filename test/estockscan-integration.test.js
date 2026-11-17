@@ -29,15 +29,17 @@ test("SESSION blocks duplicate movement IDs and keeps results separated by BRANC
   assert.match(source, /RESULT_HEADERS = \["SESSION", "CODE", "REQUIRED", "ACTUAL", "DIFF", "BRANCH_ID"\]/);
 });
 
-test("DISPENSE writes one authoritative Hub stock movement and a detail log atomically", () => {
+test("DISPENSE reads and writes VACCINE_MOVEMENT with INVENTORY_DISPENSE detail", () => {
   const routes = read("src/modules/estockscan/estockscan.routes.js");
-  const repository = read("src/modules/dispense/dispense.repository.js");
-  assert.match(routes, /createEStockScanDispense/);
-  assert.match(repository, /appendCells/);
-  assert.match(repository, /INVENTORY_MOVEMENT/);
-  assert.match(repository, /INVENTORY_DISPENSE/);
+  const lots = routes.slice(routes.indexOf("async function getBranchVaccineMovements"), routes.indexOf("function withSessionLock"));
+  const dispense = routes.slice(routes.indexOf('router.post("/dispense"'), routes.indexOf("module.exports = router"));
+  assert.match(lots, /VACCINE_MOVEMENT!A:P/);
+  assert.match(lots, /branchLocationMatches/);
+  assert.match(dispense, /appendCells/);
+  assert.match(dispense, /VACCINE_MOVEMENT/);
+  assert.match(dispense, /INVENTORY_DISPENSE/);
+  assert.doesNotMatch(dispense, /INVENTORY_MOVEMENT|createEStockScanDispense/);
   assert.doesNotMatch(routes, /CART_ID/i);
-  assert.doesNotMatch(repository.slice(repository.indexOf("async function createEStockScanDispense"), repository.indexOf("async function updateInventoryDispense")), /VACCINE_MOVEMENT/);
 });
 
 test("Dashboard Quick Access routes SESSION and DISPENSE inside the Hub SPA", () => {

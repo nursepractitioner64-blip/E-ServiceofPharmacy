@@ -274,7 +274,7 @@ stopCamera();
 
 $("ocrBar").style.width = "100%";
 
-$("ocrStatus").textContent = "อ่าน Sticker สำเร็จ กำลังค้นหา Lot จาก Inventory...";
+$("ocrStatus").textContent = "อ่าน Sticker สำเร็จ กำลังค้นหา Lot จาก VACCINE_MOVEMENT...";
 
 lots = await getDispenseLots(item.medicine_name);
 
@@ -286,7 +286,7 @@ render();
 
 $("ocrStatus").textContent = lots.length
 
-? "อ่านสำเร็จ — กรุณาตรวจสอบข้อมูลและเลือก Lot จาก Inventory"
+? "อ่านสำเร็จ — กรุณาตรวจสอบข้อมูลและเลือก Lot จาก VACCINE_MOVEMENT"
 
 : "อ่านข้อมูลสำเร็จ แต่ไม่พบ Lot ที่มี Stock สำหรับชื่อวัคซีนนี้";
 
@@ -466,7 +466,7 @@ preview.innerHTML = `
 
 <div class="field"><label class="label" for="doseCount">จำนวนโดส</label><input id="doseCount" class="input" value="${esc(item.dose_count)}" inputmode="numeric"></div>
 
-<div class="field"><label class="label" for="lotSelect">Lot จาก INVENTORY_MOVEMENT</label><button id="searchLotsBtn" class="scan-again" type="button">🔎 ค้นหา LOT จากชื่อยาที่กรอก</button>
+<div class="field"><label class="label" for="lotSelect">Lot จาก VACCINE_MOVEMENT</label><button id="searchLotsBtn" class="scan-again" type="button">🔎 ค้นหา LOT จาก VACCINE_MOVEMENT</button>
 
 <select id="lotSelect" class="select"><option value="">-- ผู้ตรวจเลือก Lot --</option>${lots.map((lot, index) => `<option value="${index}">${esc(lot.lot)} — คงเหลือ ${esc(lot.balance)}</option>`).join("")}</select>
 
@@ -533,7 +533,7 @@ await startCamera();
 
 if (!lots.length) {
 
-$("lotInfo").innerHTML = '<span class="danger">ไม่พบ Lot ที่มี Stock สำหรับรายการนี้ กรุณาตรวจชื่อวัคซีนใน Inventory</span>';
+$("lotInfo").innerHTML = '<span class="danger">ไม่พบ Lot ที่มี Stock สำหรับรายการนี้ กรุณาตรวจชื่อวัคซีนใน VACCINE_MOVEMENT</span>';
 
 }
 
@@ -549,7 +549,7 @@ if (item) {
 }
 if (!item || !selectedLot) {
 
-return Swal.fire({ icon: "warning", title: "กรุณาเลือก Lot", text: "ผู้ตรวจต้องเลือก Lot จาก Inventory ก่อนยืนยันการจ่าย" });
+return Swal.fire({ icon: "warning", title: "กรุณาเลือก Lot", text: "ผู้ตรวจต้องเลือก Lot จาก VACCINE_MOVEMENT ก่อนยืนยันการจ่าย" });
 
 }
 

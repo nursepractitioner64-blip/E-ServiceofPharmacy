@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const { requireAuth, requireBranch } = require("../auth/auth.middleware");
 const { getSheets, getSpreadsheetId } = require("../../config/google");
 const inventoryRepository = require("../dispense/dispense.repository");
+const branchService = require("../branches/branches.service");
 
 const COUNT_HEADERS = ["SESSION_ID", "MOVEMENT_ID", "CODE", "NAME", "QTY", "USER", "TIME", "BRANCH_ID"];
 const RESULT_HEADERS = ["SESSION", "CODE", "REQUIRED", "ACTUAL", "DIFF", "BRANCH_ID"];
@@ -156,57 +157,180 @@ function validateSticker(data) {
   return null;
 }
 
+
+const VACCINE_MOVEMENT_HEADERS = [
+  "MOVEMENT_ID", "TYPE", "REF_NO", "DATE", "CODE", "NAME", "QTY", "UNIT",
+  "LOT", "EXP", "TARGET", "USER", "TIME", "REMARK", "Location", "QRCODE"
+];
+
+function normalizeMovementType(value) {
+  const type = clean(value).toUpperCase();
+  if (["OUT", "ISSUE", "DISPENSE", "เบิก", "จ่าย", "เบิกจ่าย", "ตัดสต็อก"].includes(type)) return "OUT";
+  if (["IN", "RECEIVE", "RECEIVED", "รับ", "รับเข้า", "เติมสต็อก"].includes(type)) return "IN";
+  return type;
+}
+
+function normalizeDateKey(value) {
+  const text = clean(value);
+  if (!text) return "";
+  let m = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+  m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]), y = m[3];
+    if (a > 12) return `${y}-${String(b).padStart(2,"0")}-${String(a).padStart(2,"0")}`;
+    return `${y}-${String(a).padStart(2,"0")}-${String(b).padStart(2,"0")}`;
+  }
+  return text;
+}
+
+function dateToSheetSerial(value) {
+  const key = normalizeDateKey(value);
+  if (!key) return "";
+  const m = key.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) throw new Error(`วันที่ไม่ถูกต้อง: ${value}`);
+  const utc = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const d = new Date(utc);
+  if (d.getUTCFullYear() !== Number(m[1]) || d.getUTCMonth() !== Number(m[2]) - 1 || d.getUTCDate() !== Number(m[3])) {
+    throw new Error(`วันที่ไม่ถูกต้อง: ${value}`);
+  }
+  return Math.floor(utc / 86400000) + 25569;
+}
+
+function getBangkokYearMonth(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit"
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return { year: values.year, yearMonth: `${values.year}${values.month}` };
+}
+
+function nextMovementSequence(rows, columnIndex, prefix, year) {
+  const escaped = String(prefix).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const patterns = [
+    new RegExp(`^${escaped}${year}\\d{2}-(\\d+)$`),
+    new RegExp(`^${escaped}${year}-(\\d+)$`),
+    new RegExp(`^${escaped}${year}(\\d{5})$`)
+  ];
+  let max = 0;
+  for (const row of (rows || []).slice(1)) {
+    const value = clean(row[columnIndex]);
+    for (const pattern of patterns) {
+      const match = value.match(pattern);
+      if (match) { max = Math.max(max, Number(match[1]) || 0); break; }
+    }
+  }
+  return max + 1;
+}
+
+function branchLocationMatches(location, branchName) {
+  const loc = normalizeName(location);
+  const branch = normalizeName(branchName);
+  return Boolean(loc && branch && (loc === branch || loc.includes(branch)));
+}
+
+async function getBranchVaccineMovements(branchId) {
+  const branches = await branchService.listBranches({ includeInactive: false });
+  const branch = (branches || []).find(x => clean(x.BRANCH_ID) === clean(branchId));
+  if (!branch) throw new Error("ไม่พบสาขาที่กำลังใช้งาน");
+  const rows = await values("VACCINE_MOVEMENT!A:P");
+  if (!rows.length) return { branch, rows: [], rawRows: rows };
+  const headers = (rows[0] || []).map(x => clean(x).replace(/^\uFEFF/, "").toUpperCase());
+  const index = Object.fromEntries(headers.map((h, i) => [h, i]));
+  const required = ["MOVEMENT_ID", "TYPE", "REF_NO", "CODE", "NAME", "QTY", "UNIT", "LOT", "EXP", "LOCATION"];
+  const missing = required.filter(h => index[h] === undefined);
+  if (missing.length) {
+    const error = new Error(`VACCINE_MOVEMENT ขาดคอลัมน์: ${missing.join(", ")}`);
+    error.status = 409;
+    throw error;
+  }
+  const mapped = rows.slice(1).map(row => ({
+    movementId: clean(row[index.MOVEMENT_ID]), type: normalizeMovementType(row[index.TYPE]),
+    refNo: clean(row[index.REF_NO]), date: clean(row[index.DATE]), code: clean(row[index.CODE]),
+    name: clean(row[index.NAME]), qty: numeric(row[index.QTY]), unit: clean(row[index.UNIT]),
+    lot: clean(row[index.LOT]), exp: clean(row[index.EXP]), target: clean(row[index.TARGET]),
+    user: clean(row[index.USER]), time: clean(row[index.TIME]), remark: clean(row[index.REMARK]),
+    location: clean(row[index.LOCATION]), qrcode: clean(row[index.QRCODE])
+  })).filter(row => row.code && row.lot && branchLocationMatches(row.location, branch.BRANCH_NAME));
+  return { branch, rows: mapped, rawRows: rows };
+}
+
 async function availableLots(medicineName, branchId) {
-  const target = normalizeName(medicineName);
-  if (!target) return [];
-  const rows = await getBranchMovements(branchId);
-  const incoming = rows.filter(r => clean(r.TYPE).toUpperCase() === "IN" && clean(r.LOT));
-  const names = [...new Set(incoming.map(r => clean(r.NAME)).filter(Boolean))];
+  const targetName = clean(medicineName);
+  const targetNorm = normalizeName(targetName);
+  if (!targetNorm) return [];
+  const { rows } = await getBranchVaccineMovements(branchId);
+  const incoming = rows.filter(row => row.type === "IN" && row.lot);
+  const inventoryNames = [...new Set(incoming.map(row => row.name).filter(Boolean))];
   const aliases = new Map([
     [normalizeName("Vaccine Speeda (FS1)"), "6SPEED0001BG"],
     [normalizeName("Speeda FS1"), "6SPEED0001BG"],
     [normalizeName("Speeda"), "6SPEED0001BG"]
   ]);
-  const aliasCode = aliases.get(target);
+  const aliasCode = aliases.get(targetNorm);
+  let matchedNames = [];
   let matchedCodes = new Set();
   if (aliasCode) {
     matchedCodes.add(aliasCode);
+    matchedNames = [...new Set(rows.filter(row => row.code === aliasCode).map(row => row.name))];
   } else {
-    let matchedNames = names.filter(name => normalizeName(name) === target);
+    matchedNames = inventoryNames.filter(name => normalizeName(name) === targetNorm);
     if (!matchedNames.length) {
-      const partial = names.filter(name => {
-        const n = normalizeName(name);
-        return n.length >= 5 && target.length >= 5 && (n.includes(target) || target.includes(n));
+      const partial = inventoryNames.filter(name => {
+        const normalized = normalizeName(name);
+        return normalized.length >= 5 && targetNorm.length >= 5 &&
+          (normalized.includes(targetNorm) || targetNorm.includes(normalized));
       });
-      const bestLen = partial.length ? Math.max(...partial.map(x => normalizeName(x).length)) : 0;
-      const bestNames = partial.filter(x => normalizeName(x).length === bestLen);
-      const bestCodes = new Set(incoming.filter(r => bestNames.includes(clean(r.NAME))).map(r => clean(r.CODE)));
-      if (bestCodes.size === 1) matchedNames = bestNames;
+      const bestLength = partial.length ? Math.max(...partial.map(name => normalizeName(name).length)) : 0;
+      const best = partial.filter(name => normalizeName(name).length === bestLength);
+      const bestCodes = new Set(rows.filter(row => best.includes(row.name)).map(row => row.code));
+      if (bestCodes.size === 1) matchedNames = best;
     }
-    matchedCodes = new Set(incoming.filter(r => matchedNames.includes(clean(r.NAME))).map(r => clean(r.CODE)));
+    matchedCodes = new Set(rows.filter(row => matchedNames.includes(row.name)).map(row => row.code));
   }
   if (!matchedCodes.size) return [];
-
   const groups = new Map();
   for (const row of rows) {
-    const code = clean(row.CODE).toUpperCase();
-    const lot = clean(row.LOT);
-    const exp = clean(row.EXP);
-    const type = clean(row.TYPE).toUpperCase();
-    if (!matchedCodes.has(code) || !lot || !["IN", "OUT"].includes(type)) continue;
-    const key = `${code}||${lot}||${exp}`;
+    if (!matchedCodes.has(row.code) || !row.lot || !["IN", "OUT"].includes(row.type)) continue;
+    const key = `${row.code}||${row.lot}`;
     if (!groups.has(key)) groups.set(key, {
-      code, name: clean(row.NAME), lot, exp, unit: clean(row.UNIT), balance: 0
+      code: row.code, name: row.name, lot: row.lot, exp: row.exp, unit: row.unit, balance: 0
     });
     const item = groups.get(key);
-    if (type === "IN") item.balance += Math.abs(numeric(row.QTY));
-    if (type === "OUT") item.balance -= Math.abs(numeric(row.QTY));
-    if (clean(row.NAME)) item.name = clean(row.NAME);
-    if (clean(row.UNIT)) item.unit = clean(row.UNIT);
+    if (row.exp) item.exp = row.exp;
+    if (row.unit) item.unit = row.unit;
+    if (row.type === "IN") item.balance += Math.abs(row.qty);
+    if (row.type === "OUT") item.balance -= Math.abs(row.qty);
   }
-  return [...groups.values()]
-    .filter(x => x.balance > 0)
+  const outRefs = new Set(rows.filter(row => row.type === "OUT" && row.refNo).map(row => row.refNo));
+  const details = await values("INVENTORY_DISPENSE!A:L").catch(() => []);
+  if (details.length > 1) {
+    const header = details[0].map(x => clean(x).toUpperCase());
+    const idx = Object.fromEntries(header.map((h, i) => [h, i]));
+    for (const row of details.slice(1)) {
+      const refNo = clean(row[idx.REF_NO]);
+      if (refNo && outRefs.has(refNo)) continue;
+      const code = clean(row[idx.CODE]);
+      const name = clean(row[idx.MEDICINE_NAME]);
+      const lot = clean(row[idx.LOT]);
+      if (!lot || (code ? !matchedCodes.has(code) : !matchedNames.some(x => normalizeName(x) === normalizeName(name)))) continue;
+      const group = groups.get(`${code}||${lot}`) || [...groups.values()].find(x => x.lot === lot && (!code || x.code === code));
+      if (group) group.balance -= numeric(row[idx.DOSE_COUNT]);
+    }
+  }
+  return [...groups.values()].filter(item => item.balance > 0)
     .sort((a, b) => String(a.lot).localeCompare(String(b.lot), undefined, { numeric: true }));
+}
+
+async function getVaccineSheetIds(sheets) {
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId: getSpreadsheetId(), fields: "sheets(properties(sheetId,title))"
+  });
+  const map = new Map((meta.data.sheets || []).map(x => [x.properties.title, x.properties.sheetId]));
+  const movementId = map.get("VACCINE_MOVEMENT");
+  const detailId = map.get("INVENTORY_DISPENSE");
+  if (movementId === undefined || detailId === undefined) throw new Error("ไม่พบชีต VACCINE_MOVEMENT หรือ INVENTORY_DISPENSE");
+  return { movementId, detailId };
 }
 
 function withSessionLock(key, task) {
@@ -404,6 +528,7 @@ router.get("/dispense/lots", requireAuth, requireBranch, async (req, res) => {
   }
 });
 
+
 router.post("/dispense", requireAuth, requireBranch, async (req, res) => {
   return withDispenseLock(async () => {
     try {
@@ -418,70 +543,119 @@ router.post("/dispense", requireAuth, requireBranch, async (req, res) => {
       if (validationError) return res.status(400).json({ success: false, message: validationError });
       if (!data.lot) return res.status(400).json({ success: false, message: "กรุณาเลือก Lot" });
 
-      const requestId = clean(req.body?.request_id) || `DO-${crypto.randomUUID()}`;
+      await ensureHeaders("VACCINE_MOVEMENT", VACCINE_MOVEMENT_HEADERS);
       await ensureHeaders("INVENTORY_DISPENSE", DISPENSE_DETAIL_HEADERS);
-      const priorDetails = await values("INVENTORY_DISPENSE!A:L");
-      const priorHeader = (priorDetails[0] || []).map(x => clean(x).toUpperCase());
-      const priorIndex = Object.fromEntries(priorHeader.map((h, i) => [h, i]));
-      const prior = priorDetails.slice(1).find(r => clean(r[priorIndex.DISPENSE_ID]) === requestId);
-      if (prior) {
-        const priorRef = clean(prior[priorIndex.REF_NO]);
-        const movementRows = await inventoryRepository.getInventoryMovements();
-        const priorMovement = movementRows.find(r =>
-          clean(r.REF_NO) === priorRef &&
-          clean(r.TYPE).toUpperCase() === "OUT" &&
-          clean(r.BRANCH_ID) === clean(req.authBranchId)
+      const { branch, rows: branchMovements, rawRows: movementRows } =
+        await getBranchVaccineMovements(req.authBranchId);
+
+      const requestId = clean(req.body?.request_id) || `DO-${crypto.randomUUID()}`;
+      const detailRows = await values("INVENTORY_DISPENSE!A:L");
+      const detailHeader = (detailRows[0] || []).map(x => clean(x).toUpperCase());
+      const detailIndex = Object.fromEntries(detailHeader.map((h, i) => [h, i]));
+      const previous = detailRows.slice(1).find(row => clean(row[detailIndex.DISPENSE_ID]) === requestId);
+      if (previous) {
+        const previousRef = clean(previous[detailIndex.REF_NO]);
+        const previousMovement = branchMovements.find(row =>
+          row.refNo === previousRef && row.type === "OUT"
         );
-        if (!priorMovement) {
-          return res.status(409).json({ success: false, code: "DISPENSE_REPLAY_INCOMPLETE", message: "พบคำขอจ่ายเดิม แต่ไม่พบรายการตัด Stock ในสาขานี้ กรุณาติดต่อผู้ดูแลก่อนทำซ้ำ" });
+        if (!previousMovement) {
+          return res.status(409).json({
+            success: false, code: "DISPENSE_REPLAY_INCOMPLETE",
+            message: "พบคำขอจ่ายเดิมใน INVENTORY_DISPENSE แต่ไม่พบรายการ OUT ใน VACCINE_MOVEMENT ของสาขานี้ กรุณาตรวจสอบก่อนทำซ้ำ"
+          });
         }
         return res.json({
-          success: true, already_saved: true, ref_no: priorRef,
-          movement_id: clean(priorMovement.MOVEMENT_ID),
-          saved_sheet: "INVENTORY_MOVEMENT + INVENTORY_DISPENSE",
-          data: { ...data, code: clean(priorMovement.CODE), balance_after: null }
+          success: true, already_saved: true, saved_sheet: "VACCINE_MOVEMENT + INVENTORY_DISPENSE",
+          stock_ledger: "VACCINE_MOVEMENT", detail_log: "INVENTORY_DISPENSE",
+          movement_id: previousMovement.movementId, ref_no: previousRef
         });
       }
 
       const lots = await availableLots(data.medicine_name, req.authBranchId);
-      const selected = lots.find(x => clean(x.lot) === data.lot);
-      if (!selected) return res.status(409).json({ success: false, code: "LOT_NOT_AVAILABLE", message: "Lot ที่เลือกไม่มี Stock ในสาขานี้ หรือไม่ตรงกับยา/วัคซีน" });
-      if (data.dose_count > selected.balance) return res.status(409).json({ success: false, code: "INSUFFICIENT_STOCK", message: `Lot ${selected.lot} คงเหลือ ${selected.balance} แต่ต้องจ่าย ${data.dose_count}` });
-      if (!selected.exp) return res.status(409).json({ success: false, code: "LOT_EXP_MISSING", message: "Lot ที่เลือกไม่มีข้อมูล EXP" });
+      const selected = lots.find(item => clean(item.lot) === data.lot);
+      if (!selected) {
+        return res.status(409).json({
+          success: false, code: "LOT_NOT_AVAILABLE",
+          message: "ไม่พบ Lot ที่มี Stock สำหรับรายการนี้ กรุณาตรวจชื่อวัคซีนใน VACCINE_MOVEMENT"
+        });
+      }
+      if (data.dose_count > selected.balance) {
+        return res.status(409).json({
+          success: false, code: "INSUFFICIENT_STOCK",
+          message: `Lot ${selected.lot} คงเหลือ ${selected.balance} แต่ต้องจ่าย ${data.dose_count}`
+        });
+      }
+      if (!selected.exp) {
+        return res.status(409).json({ success: false, code: "LOT_EXP_MISSING", message: "Lot ที่เลือกไม่มีข้อมูล EXP ใน VACCINE_MOVEMENT" });
+      }
 
-      // Keep the original E-StockScan detail log, but write only ONE stock OUT:
-      // INVENTORY_MOVEMENT is the sole stock ledger; INVENTORY_DISPENSE is detail only.
-      const saved = await inventoryRepository.createEStockScanDispense({
-        requestId,
-        patientName: data.patient_name,
-        hn: data.hn,
-        medicineName: data.medicine_name,
-        qrRaw: clean(req.body?.qr_raw),
-        code: selected.code,
-        name: selected.name || data.medicine_name,
-        qty: data.dose_count,
-        unit: selected.unit || "dose",
-        lot: selected.lot,
-        exp: selected.exp,
-        target: [data.patient_name, data.hn].filter(Boolean).join(" / "),
-        date: new Date().toISOString().slice(0, 10)
-      }, {
-        branchId: req.authBranchId,
-        user: req.authUser.fullName || req.authUser.username
+      const { year, yearMonth } = getBangkokYearMonth();
+      const movementSequence = nextMovementSequence(movementRows, 0, "VMI", year);
+      const detailSequence = nextMovementSequence(detailRows, 1, "RCOUT", year);
+      const movementRefSequence = nextMovementSequence(movementRows, 2, "RCOUT", year);
+      const sequence = Math.max(detailSequence, movementRefSequence);
+      const movementId = `VMI${yearMonth}-${String(movementSequence).padStart(5, "0")}`;
+      const refNo = `RCOUT${yearMonth}-${String(sequence).padStart(5, "0")}`;
+      const now = new Date();
+      const timestamp = now.toISOString();
+      const movementDate = dateToSheetSerial(now.toISOString().slice(0, 10));
+      const expSerial = dateToSheetSerial(selected.exp);
+      const patientTarget = [data.patient_name, data.hn].filter(Boolean).join(" / ");
+      const userName = clean(req.authUser?.fullName || req.authUser?.username);
+      const movementQrCode = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(movementId)}`;
+
+      const movementRow = [
+        movementId, "OUT", refNo, movementDate, selected.code, selected.name || data.medicine_name,
+        data.dose_count, selected.unit || "dose", selected.lot, expSerial, patientTarget,
+        userName, timestamp, "", branch.BRANCH_NAME, movementQrCode
+      ];
+      const detailRow = [
+        requestId, refNo, data.patient_name, data.hn, data.medicine_name,
+        data.dose_count, selected.lot, expSerial, selected.code, userName,
+        timestamp, clean(req.body?.qr_raw)
+      ];
+
+      const sheets = await getSheets();
+      const { movementId: movementSheetId, detailId: detailSheetId } = await getVaccineSheetIds(sheets);
+      const cell = value => ({
+        userEnteredValue: typeof value === "number"
+          ? { numberValue: value }
+          : { stringValue: String(value ?? "") }
+      });
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: getSpreadsheetId(),
+        requestBody: {
+          requests: [
+            {
+              appendCells: {
+                sheetId: movementSheetId,
+                rows: [{ values: movementRow.map(cell) }],
+                fields: "userEnteredValue"
+              }
+            },
+            {
+              appendCells: {
+                sheetId: detailSheetId,
+                rows: [{ values: detailRow.map(cell) }],
+                fields: "userEnteredValue"
+              }
+            }
+          ]
+        }
       });
 
       return res.json({
         success: true,
-        saved_sheet: "INVENTORY_MOVEMENT + INVENTORY_DISPENSE",
-        stock_ledger: "INVENTORY_MOVEMENT",
+        saved_sheet: "VACCINE_MOVEMENT + INVENTORY_DISPENSE",
+        stock_ledger: "VACCINE_MOVEMENT",
         detail_log: "INVENTORY_DISPENSE",
-        already_saved: Boolean(saved.alreadySaved),
-        movement_id: saved.movementId,
-        ref_no: saved.refNo,
+        already_saved: false,
+        movement_id: movementId,
+        ref_no: refNo,
         data: {
           ...data, code: selected.code, lot: selected.lot, exp: selected.exp,
           balance_before: selected.balance,
-          balance_after: saved.remaining ?? selected.balance
+          balance_after: selected.balance - data.dose_count
         }
       });
     } catch (err) {

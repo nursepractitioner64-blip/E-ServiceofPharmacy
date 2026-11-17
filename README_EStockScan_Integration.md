@@ -38,16 +38,24 @@
 - การ retry หลังบันทึก COUNT_SESSION แต่ SESSION_RESULT ยังไม่สำเร็จ จะไม่ append Sticker เดิมซ้ำ
 - การสรุป SESSION ซ้ำจะคืนผลเดิม ไม่เพิ่มผลซ้ำ
 
-### DISPENSE
+### DISPENSE (NurseHub Quick Access)
 
-คงหน้าจอ OCR Sticker, การตรวจข้อมูลผู้รับบริการ, ค้นหา Lot, เลือก Lot, ตรวจจำนวนคงเหลือ และยืนยันการจ่าย
+คงหน้าจอ OCR Sticker, การตรวจข้อมูลผู้รับบริการ, ค้นหา Lot, เลือก Lot, ตรวจจำนวนคงเหลือ และยืนยันการจ่าย ตามต้นฉบับ E-StockScanVer3
 
-การบันทึก:
-- `INVENTORY_MOVEMENT` เป็น Stock Ledger หลัก และเพิ่ม OUT เพียงหนึ่งรายการ
-- `INVENTORY_DISPENSE` เป็น Detail Log ของ E-StockScan
-- ใช้ Google Sheets `batchUpdate` เพิ่มรายการทั้งสองชีตในคำขอเดียว
-- ไม่เขียน `VACCINE_MOVEMENT` ซ้ำ เพราะ Hub ใช้ `INVENTORY_MOVEMENT` คำนวณ Stock อยู่แล้ว
-- ใช้ `BRANCH_ID` จาก Hub และตรวจยอดคงเหลือซ้ำใน Repository ภายใต้ Sequence Lock
+อ่าน:
+- `VACCINE_MOVEMENT` — ค้นหา CODE, NAME, LOT, EXP และคำนวณยอด IN − OUT
+- `INVENTORY_DISPENSE` — ตรวจสอบรายละเอียดการจ่ายย้อนหลังที่ยังไม่มี REF_NO เชื่อมกับ OUT movement เพื่อป้องกันการนับ Stock ซ้ำ
+
+เขียน:
+- `VACCINE_MOVEMENT` — เพิ่มรายการ TYPE=OUT เพื่อบันทึกการเคลื่อนไหวและตัด Stock
+- `INVENTORY_DISPENSE` — บันทึกรายละเอียดผู้รับบริการ HN ชื่อยา จำนวน LOT/EXP และ QR_RAW
+
+การแยกสาขา:
+- โครงสร้าง `VACCINE_MOVEMENT` ตาม E-StockScanVer3 มี 16 คอลัมน์ A:P และไม่มี `BRANCH_ID`
+- Hub จึงใช้ค่า `Location` ใน `VACCINE_MOVEMENT` เทียบกับ `BRANCH_NAME` ของสาขาที่ Login แบบเข้มงวด ไม่อ่าน Stock ของสาขาที่ Location ไม่ตรง
+- รายการ OUT ใหม่บันทึก `Location` เป็นชื่อสาขาปัจจุบัน
+- `INVENTORY_DISPENSE` เป็น Detail Log และไม่มีการเพิ่ม `BRANCH_ID` เพื่อคง Header เดิม
+- ใช้ Hub authentication และ `requireBranch`; การบันทึกสองชีตใช้ Google Sheets `batchUpdate` คำขอเดียว
 
 ## ข้อมูลย้อนหลัง
 
@@ -79,6 +87,7 @@
 
 ## หมายเหตุสำคัญก่อน Production
 
-ข้อมูล DISPENSE เก่าของ E-StockScan บางชุดอาจอยู่ใน `VACCINE_MOVEMENT`/`INVENTORY_DISPENSE` โดยไม่มี `BRANCH_ID` ขณะที่ Stock Ledger ของ Hub แยกสาขาใน `INVENTORY_MOVEMENT` ได้ชัดเจน
-
-โมดูลใหม่จะไม่เดาสาขาให้ข้อมูลเก่า และคำนวณ Lot จาก `INVENTORY_MOVEMENT` ของสาขาปัจจุบันเท่านั้น เพื่อไม่ให้ตัด Stock ซ้ำหรือโยกข้อมูลย้อนหลังผิดสาขา ควรตรวจสอบ/กระทบยอดรายการ DISPENSE เก่าที่ไม่มี `BRANCH_ID` ก่อนเปิดใช้งานจริง
+- `VACCINE_MOVEMENT` ตามโครงสร้างต้นฉบับไม่มี `BRANCH_ID`; ระบบ Hub ใช้ `Location` เทียบกับ `BRANCH_NAME` ของสาขาที่ Login
+- แถวเก่าที่ `Location` ว่างหรือไม่ระบุชื่อสาขาจะไม่ถูกนำมาคำนวณเป็น Stock ของสาขาใด เพื่อป้องกันการปะปนข้ามสาขา
+- `INVENTORY_DISPENSE` ตามโครงสร้างเดิมไม่มี `BRANCH_ID`; รายการย้อนหลังที่ไม่มี OUT movement จึงไม่สามารถระบุสาขาได้จาก Detail เพียงอย่างเดียว ควรกระทบยอดรายการเก่าก่อนเปิดใช้งานหลายสาขา
+- SESSION ยังคงใช้ `INVENTORY_MOVEMENT` ตามเดิม การปรับนี้จำกัดเฉพาะ DISPENSE ใน NurseHub Quick Access
